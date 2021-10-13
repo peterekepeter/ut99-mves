@@ -73,7 +73,6 @@ var() config string MapFilters[1024], ExcludeFilters[32];
 var int iFilter, iExclF;
 
 
-var int CurrentID;
 var MVPlayerWatcher WatcherList, InactiveList;
 
 var MV_MapList MapList;
@@ -199,6 +198,7 @@ event PostBeginPlay()
 	local Class<Actor> ActorClass;
 	local int MapIdx;
 
+	log(" !MVE: PostBeginPlay!");
 	if ( bFirstRun )
 	{
 		bFirstRun = false;
@@ -319,6 +319,7 @@ event PostBeginPlay()
 		bResetServerPackages = false;
 		SaveConfig();
 	}
+	Spawn(class'MV_PlayerDetector').Initialize(self);
 }
 
 function Mutate( string MutateString, PlayerPawn Sender)
@@ -414,8 +415,6 @@ function bool CheckForTie ()
 
 event Tick( float DeltaTime)
 {
-	if ( Level.Game.CurrentID > CurrentID )
-		DetectNewPlayers();
 	if ( Level.NextURL != "" && !bMapChangeIssued )
 		MapChangeIssued();
 	if ( bMapChangeIssued && (Level.NextSwitchCountdown < 0) && (Level.NextURL == "") ) //Handle switch failure
@@ -475,26 +474,10 @@ function MapChangeIssued()
 	SaveConfig();
 }
 
-function DetectNewPlayers()
-{
-	local pawn P;
-
-	For ( P=Level.PawnList ; P!=none ; P=P.nextPawn )
-	{
-		if ( !P.IsA('MessagingSpectator') && P.PlayerReplicationInfo != none )
-		{
-			if ( (PlayerPawn(P) != none) && (P.PlayerReplicationInfo.PlayerID >= CurrentID) )
-				PlayerJoined( PlayerPawn(P) );
-			else if ( P.PlayerReplicationInfo.PlayerID < CurrentID )
-				break;
-		}
-	}
-	CurrentID = Level.Game.CurrentID;
-}
-
 function PlayerJoined( PlayerPawn P)
 {
 	local MVPlayerWatcher MVEPV;
+	log("[MVE] PlayerJoined:"@P.PlayerReplicationInfo.PlayerName@"("$P$") with id"@P.PlayerReplicationInfo.PlayerID);
 
 	//Give this player a watcher
 	if ( InactiveList == none )
@@ -631,8 +614,8 @@ function PlayerKickVoted( MVPlayerWatcher Kicked, optional string OverrideReason
 		ForEach Kicked.Watched.ChildActors (class'Info', NexgenRPCI) //Issue a NexGen ban if possible
 			if ( NexgenRPCI.IsA('NexgenClientCore') )
 			{
-				class'MV_NexgenUtil'.static.banPlayer( Kicked.NexGenClient, NexgenRPCI, Reason);
-				Log("[MVE] Nexgen Ban issued: "$ Kicked.NexGenClient @ NexgenRPCI, 'MapVote');
+				// class'MV_NexgenUtil'.static.banPlayer( Kicked.NexGenClient, NexgenRPCI, Reason);
+				// Log("[MVE] Nexgen Ban issued: "$ Kicked.NexGenClient @ NexgenRPCI, 'MapVote');
 				return;
 			}
 	}
