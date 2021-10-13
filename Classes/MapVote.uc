@@ -29,6 +29,7 @@ enum EIDType
 var() config EIDType PlayerIDType;
 
 var() config bool bFirstRun;
+var() config bool bShutdownServerOnTravel;
 var() config bool bWelcomeWindow;
 var() config bool bSpecsAllowed;
 var() config bool bAutoOpen;
@@ -1068,7 +1069,9 @@ final function string CapNumberWord( int Number)
 
 final function ExecuteTravel(){
 	Level.ServerTravel( TravelString,False);
-	ConsoleCommand("exit");
+	if (bShutdownServerOnTravel){
+		ConsoleCommand("exit");
+	}
 }
 
 final function LoadAliases()
