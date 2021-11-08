@@ -366,7 +366,17 @@ function bool HandleEndGame ()
 }
 
 function bool ShouldHandleEndgame(){
-	return !CheckForTie() && !IsAssaultAndNeedsToSwitchTeams();
+	return IsMonsterHunt() || // always show mapvote for monsterhunt
+		(!CheckForTie() && !IsAssaultAndNeedsToSwitchTeams());
+}
+
+function bool IsMonsterHunt(){
+	local string name;
+	name = Caps(Level.Game$"");
+	if (InStr(name, "MONSTER") != -1 && InStr(name, "HUNT") != -1){
+		return true;
+	}
+	return false;
 }
 
 function bool IsAssaultAndNeedsToSwitchTeams(){
