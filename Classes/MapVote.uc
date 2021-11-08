@@ -342,44 +342,51 @@ function Mutate( string MutateString, PlayerPawn Sender)
 			PlayerVoted( Sender, Mid(MutateString,15) );
 		else if ( Mid(MutateString,11,5) ~= "KICK " )
 			PlayerKickVote( Sender, Mid(MutateString, 17, 3));
-//		else
-//			Log( "[MVE]" @ MutateString, 'MapVote');
+		else
 		return;
 	}
-
 	if ( NextMutator != none )
 		NextMutator.Mutate( MutateString, Sender);
 }
 
 function bool HandleEndGame ()
 {
-	local Pawn aPawn;
-
+	// notify next mutator of end game
 	Super.HandleEndGame();
-	if ( CheckForTie() )
-		return False;
-	if ( Level.Game.IsA('Assault') && !Assault(Level.Game).bDefenseSet )
-		return False;
-	DeathMatchPlus(Level.Game).bDontRestart = True;
-	if ( !bVotingStage )
-		GotoState('Voting','PreBegin');
-	ScoreBoardTime=ScoreBoardDelay;
-	SetTimer(Level.TimeDilation,True);
+
+	if (ShouldHandleEndgame()){
+		HandleAssaultReset();
+		DeathMatchPlus(Level.Game).bDontRestart = True;
+		if ( !bVotingStage )
+			GotoState('Voting','PreBegin');
+		ScoreBoardTime=ScoreBoardDelay;
+		SetTimer(Level.TimeDilation,True);
+	}
+	return false; // return value isn't properly used
 }
 
-event Timer()
-{
-	if ( ScoreBoardTime > 0 )
-	{
-		ScoreBoardTime--;
-		if ( ScoreBoardTime == 0 )
-		{
-			EndGameTime=Level.TimeSeconds;
-			if ( bAutoOpen )
-				OpenAllWindows();
-		}
-		return;
+function bool ShouldHandleEndgame(){
+	return !CheckForTie() && !IsAssaultAndNeedsToSwitchTeams();
+}
+
+function bool IsAssaultAndNeedsToSwitchTeams(){
+	local Assault a;
+	a = Assault(Level.Game);
+	if (a == None){
+		return false;
 	}
+	if (a.bDefenseSet){
+		return false;
+	}
+	return true;
+}
+
+function HandleAssaultReset(){
+	local Assault a;
+	a = Assault(Level.Game);
+	if (a != None) {
+		a.ResetGame();
+	} 
 }
 
 function bool CheckForTie ()
@@ -410,6 +417,21 @@ function bool CheckForTie ()
 		For ( P=Level.PawnList ; P!= none ; P=P.NextPawn )
 			if ( P.bIsPlayer && (BestP != P) && (P.PlayerReplicationInfo.Score == BestP.PlayerReplicationInfo.Score) )
 				return True;
+	}
+}
+
+event Timer()
+{
+	if ( ScoreBoardTime > 0 )
+	{
+		ScoreBoardTime--;
+		if ( ScoreBoardTime == 0 )
+		{
+			EndGameTime=Level.TimeSeconds;
+			if ( bAutoOpen )
+				OpenAllWindows();
+		}
+		return;
 	}
 }
 
