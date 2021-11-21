@@ -395,8 +395,16 @@ function HandleAssaultReset(){
 	local Assault a;
 	a = Assault(Level.Game);
 	if (a != None) {
-		a.ResetGame();
-	} 
+		Log("[MVE] Resetting assault game!");
+		a.bDefenseSet = False;
+		a.NumDefenses = 0;
+		a.CurrentDefender = 0;
+		a.SavedTime = 0;
+		a.GameCode = "";
+		a.Part = 1;
+		a.bTiePartOne = false;
+		a.SaveConfig();
+	}
 }
 
 function bool CheckForTie ()
@@ -1215,6 +1223,7 @@ defaultproperties
 	//HTTPMapListLocation="192.168.1.2:27011"
 	//TravelString="CTF-Face?Game=BotPack.CTFGame"
 	//TravelIdx=3
+	ASClass="Botpack.Assault"
 	ScoreBoardDelay=5
 	VoteTimeLimit=60
 	//HTTPMapListPort=27011
