@@ -818,6 +818,12 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 		return;
 	}
 
+	if (W.PlayerVote == MapString)
+	{
+		Sender.ClientMessage("Already voted: "$MapString);
+		return;
+	}
+	
 	W.PlayerVote = MapString;
 	iU = int(Extension.ByDelimiter( W.PlayerVote,":",1));
 
