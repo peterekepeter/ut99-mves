@@ -818,7 +818,7 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 		return;
 	}
 
-	if (W.PlayerVote == MapString)
+	if (W.PlayerVote == MapString && !Sender.bAdmin)
 	{
 		Sender.ClientMessage("Already voted: "$MapString);
 		return;
@@ -1229,7 +1229,6 @@ defaultproperties
 	//HTTPMapListLocation="192.168.1.2:27011"
 	//TravelString="CTF-Face?Game=BotPack.CTFGame"
 	//TravelIdx=3
-	ASClass="Botpack.Assault"
 	ScoreBoardDelay=5
 	VoteTimeLimit=60
 	//HTTPMapListPort=27011
