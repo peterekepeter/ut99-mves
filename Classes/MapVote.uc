@@ -846,16 +846,18 @@ function CountMapVotes( optional bool bForceTravel)
 	local int i, iU, iBest, j;
 	local float Total, Current;
 	local bool bTie;
-
+	
 	if ( !bVotingStage )
 	{
 		For ( W=WatcherList ; W!=none ; W=W.nextWatcher )
+		{
 			if ( CanVote(W.Watched) )
 			{
 				Total += 1;
 				if ( W.PlayerVote != "" )
 					Current += 1;
 			}
+		}
 		if ( (Current * 100 / Total) >= MidGameVotePercent )
 		{
 			BroadcastMessage("Mid game voting has initiated!!",True);
@@ -1017,9 +1019,18 @@ final function float VotePriority( int i)
 	return CustomGame[i].VotePriority;
 }
 
-final function bool CanVote( PlayerPawn Sender)
+final function bool CanVote(PlayerPawn Sender)
 {
-	return !( (Sender.IsA('Spectator') && !bSpecsAllowed) || bLevelSwitchPending );
+	if (Sender.Player == None) {
+		return false; // is not a human player, thus cannot vote (sorry bots)
+	}
+	if (bLevelSwitchPending){
+		return false; // can't vote when mapvote is about to switch levels
+	}
+	if (!bSpecsAllowed && Sender.IsA('Spectator')){
+		return false;
+	}
+	return true;
 }
 
 //Validity assumed
