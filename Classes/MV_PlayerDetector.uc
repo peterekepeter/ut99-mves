@@ -10,20 +10,32 @@ function Initialize(MapVote mv)
 
 function Timer()
 {
-	local Pawn P;
-	local PlayerPawn PP;
+	// safety net to detect players joined even when 
+	// the Level.Game.CurrentID != CurrentID change detection fails
+	// this is needed for mapvote to work properly for rejoining players on JailBreak
+	DetectPlayers();
+}
 
+function DetectPlayers()
+{
+	local Pawn P;
 	for ( P=Level.PawnList ; P!=None ; P=P.nextPawn )
 	{
-		if (!P.bIsPlayer)
-		{
-			continue;
-		}
-		PP = PlayerPawn(P);
-		if (ShouldJoinMapVote(PP))
-		{
-			MapVote.PlayerJoined(PP);
-		}
+		DetectPlayer(P);
+	}
+}
+
+function DetectPlayer(Pawn P)
+{
+	local PlayerPawn PP;
+	if (!P.bIsPlayer)
+	{
+		return;
+	}
+	PP = PlayerPawn(P);
+	if (ShouldJoinMapVote(PP))
+	{
+		MapVote.PlayerJoined(PP);
 	}
 }
 

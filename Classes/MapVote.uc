@@ -94,6 +94,9 @@ var int iKickVotes;
 
 var string BanList[32];
 
+var MV_PlayerDetector PlayerDetector;
+var int CurrentID;
+
 //XC_GameEngine and Unreal 227 interface
 native(1718) final function bool AddToPackageMap( optional string PkgName);
 
@@ -316,10 +319,12 @@ event PostBeginPlay()
 	if ( bResetServerPackages && bOverrideServerPackages )
 	{
 		MainServerPackages = ConsoleCommand("Get ini:Engine.Engine.GameEngine ServerPackages");
-		bResetServerPackages = false;
+		bResetServerPackages = False;
 		SaveConfig();
 	}
-	Spawn(class'MV_PlayerDetector').Initialize(self);
+	// init player detector
+	PlayerDetector = Spawn(class'MV_PlayerDetector');
+	PlayerDetector.Initialize(self);
 }
 
 function Mutate( string MutateString, PlayerPawn Sender)
@@ -455,12 +460,19 @@ event Timer()
 
 event Tick( float DeltaTime)
 {
+	if ( Level.Game.CurrentID != CurrentID )
+	{
+		PlayerDetector.DetectPlayers();
+		CurrentID = Level.Game.CurrentID;
+	}
 	if ( Level.NextURL != "" && !bMapChangeIssued )
+	{
 		MapChangeIssued();
+	}
 	if ( bMapChangeIssued && (Level.NextSwitchCountdown < 0) && (Level.NextURL == "") ) //Handle switch failure
 	{
-		bLevelSwitchPending = false;
-		bMapChangeIssued = false;
+		bLevelSwitchPending = False;
+		bMapChangeIssued = False;
 		Level.NextSwitchCountDown = 4;
 		Extension.RemoveMapVotes( WatcherList);
 		if ( bVotingStage )
