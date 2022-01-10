@@ -2,36 +2,40 @@ class MV_PlayerDetector expands Info;
 
 var MapVote MapVote;
 
-function Initialize(MapVote mv){
-    MapVote = mv;
+function Initialize(MapVote mv)
+{
+	MapVote = mv;
 	SetTimer(4.87, True);
 }
 
 function Timer()
 {
-	local pawn P;
+	local Pawn P;
+	local PlayerPawn PP;
 
-	For ( P=Level.PawnList ; P!=none ; P=P.nextPawn )
+	for ( P=Level.PawnList ; P!=None ; P=P.nextPawn )
 	{
-		DetectNewPlayer(P);
+		if (!P.bIsPlayer)
+		{
+			continue;
+		}
+		PP = PlayerPawn(P);
+		if (ShouldJoinMapVote(PP))
+		{
+			MapVote.PlayerJoined(PP);
+		}
 	}
 }
 
-function DetectNewPlayer(Pawn Pawn)
+
+function bool ShouldJoinMapVote(PlayerPawn PP)
 {
-	// called by GameInfo.RestartPlayer()
-	local PlayerPawn P;
-	local MVPlayerWatcher watcher;
-	P = PlayerPawn(Pawn);
-
-	if (P != none) {
-		if (P.PlayerReplicationInfo != none)
-		{
-			watcher = MapVote.GetWatcherFor(P);
-			if (watcher == none) {
-				MapVote.PlayerJoined(P);
-			}
-		} 
-
+	if (PP == None ||
+		PP.PlayerReplicationInfo == None ||
+		PP.Player == None || 
+		MapVote.GetWatcherFor(PP) != None)
+	{
+		return False; 
 	}
+	return True;
 }
