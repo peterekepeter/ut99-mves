@@ -1,8 +1,7 @@
 //================================================================================
 // MapVote.
 //================================================================================
-class MapVote expands Mutator
-	config(MVE_Config);
+class MapVote expands Mutator config(MVE_Config);
 
 var() config string ClientPackage;		//Load this package
 var() config string ServerInfoURL;
@@ -24,7 +23,8 @@ enum EIDType
 {
 	PID_Default,
 	PID_NexGen
-};
+}
+;
 
 var() config EIDType PlayerIDType;
 
@@ -58,7 +58,8 @@ struct GameType
 	var() config string MutatorList;
 	var() config string Settings;
 	var() config string Packages;
-};
+}
+;
 var() config string DefaultSettings;
 var int pos;
 var() config GameType CustomGame[63];
@@ -104,37 +105,37 @@ state Voting
 {
 	event BeginState()
 	{
-		bVotingStage = true;
+		bVotingStage = True;
 		CountMapVotes(); //Call again if mid game, now we do check the maps
 	}
-PreBegin:
+	PreBegin:
 	Sleep( 5);
-Begin:
+	Begin:
 	if ( VoteTimeLimit < 5 )
-		Goto('Vote_5');
+		goto('Vote_5');
 	if ( VoteTimeLimit < 10 )
 	{
 		Sleep(VoteTimeLimit - 5);
-		Goto('Vote_5');
+		goto('Vote_5');
 	}
 	if ( VoteTimeLimit < 30 )
 	{
 		Sleep(VoteTimeLimit - 10);
-		Goto('Vote_10');
+		goto('Vote_10');
 	}
 	if ( VoteTimeLimit < 60 )
 	{
 		Sleep(VoteTimeLimit - 30);
-		Goto('Vote_30');
+		goto('Vote_30');
 	}
 	Sleep( VoteTimeLimit - 60);
-Vote_60:
+	Vote_60:
 	Extension.TimedMessage( 12);
 	Sleep(30 * Level.TimeDilation);
-Vote_30:
+	Vote_30:
 	Extension.TimedMessage( 11);
 	Sleep(20 * Level.TimeDilation);
-Vote_10:
+	Vote_10:
 	Extension.TimedMessage( 10);
 	Sleep(1 * Level.TimeDilation);
 	Extension.TimedMessage( 9);
@@ -145,7 +146,7 @@ Vote_10:
 	Sleep(1 * Level.TimeDilation);
 	Extension.TimedMessage( 6);
 	Sleep(1 * Level.TimeDilation);
-Vote_5:
+	Vote_5:
 	Extension.TimedMessage( 5);
 	Sleep(1 * Level.TimeDilation);
 	Extension.TimedMessage( 4);
@@ -156,18 +157,18 @@ Vote_5:
 	Sleep(1 * Level.TimeDilation);
 	Extension.TimedMessage( 1);
 	Sleep(1 * Level.TimeDilation);
-Vote_End:
+	Vote_End:
 	Sleep(0.0);
-	CountMapVotes( true);
+	CountMapVotes( True);
 }
 
 state DelayedTravel
 {
 	event BeginState()
 	{
-		bLevelSwitchPending = true;
+		bLevelSwitchPending = True;
 	}
-Begin:
+	Begin:
 	Sleep(4);
 	bMapChangeIssued = True;
 	ExecuteTravel();
@@ -182,12 +183,15 @@ function ExecuteSetting (string Setting, bool bIsDefaultSetting)
 
 	Property=Left(Setting,InStr(Setting,"="));
 	Value=Mid(Setting,InStr(Setting,"=") + 1);
-/* 	if ( bIsDefaultSetting )
+	/* 	if ( bIsDefaultSetting )
 	{
 		Log("[MVE] Execute default Setting:" @ Setting);
-	} else {
+	} 
+	else 
+	{
 		Log("[MVE] Execute Setting:" @ Setting);
-	} */
+	} 
+	*/
 	Prev=Level.Game.GetPropertyText(Property);
 	Level.Game.SetPropertyText(Property,Value);
 	Next=Level.Game.GetPropertyText(Property);
@@ -198,30 +202,36 @@ event PostBeginPlay()
 	local class<MV_MainExtension> ExtensionC;
 	local string Cmd, NextParm, aStr, Settings;
 	local Actor A;
-	local Class<Actor> ActorClass;
+	local class<Actor> ActorClass;
 	local int MapIdx;
 
 	log(" !MVE: PostBeginPlay!");
 	if ( bFirstRun )
 	{
-		bFirstRun = false;
+		bFirstRun = False;
 		SaveConfig();
 	}
 	LoadAliases();
 
 	//if ( int(ConsoleCommand("get ini:Engine.Engine.GameEngine XC_Version")) >= 11 ) //Only XC_GameEngine contains this variable
 	//{
-		bXCGE_DynLoader = false;
-		//default.bXCGE_DynLoader = true; //So we get to see if it worked from clients!
-		//AddToPackageMap( ClientPackage);
+	bXCGE_DynLoader = False;
+	//default.bXCGE_DynLoader = true; //So we get to see if it worked from clients!
+	//AddToPackageMap( ClientPackage);
 	//}
 	if ( ExtensionClass != "" )
+	{
 		ExtensionC = class<MV_MainExtension>( DynamicLoadObject(ExtensionClass,class'class') );
-	if ( ExtensionC == none )
+	}
+	if ( ExtensionC == None )
+	{
 		ExtensionC = class'MV_MainExtension';
+	}
 	Extension = new ExtensionC;
 	if ( bEnableHTTPMapList && (Level.NetMode != NM_Standalone) )
+	{
 		Extension.SetupWebApp();
+	}
 	MapList = Spawn(class'MV_MapList');
 	MapList.Mutator = self;
 	RegisterMessageMutator();
@@ -241,7 +251,9 @@ event PostBeginPlay()
 			{
 				ExecuteSetting(Settings,True);
 				Settings="";
-			} else {
+			} 
+			else 
+			{
 				ExecuteSetting(Left(Settings,pos),True);
 				Settings=Mid(Settings,pos + 1);
 			}
@@ -258,7 +270,7 @@ event PostBeginPlay()
 		DEFAULT_MODE:
 		Cmd = CustomGame[TravelIdx].Settings;
 		//Log("[MVE] Loading settings:",'MapVote');
-		While ( Cmd != "" )
+		while ( Cmd != "" )
 		{
 			NextParm = Extension.NextParameter( Cmd, ",");
 			Log("[MVE] Execute Setting: "$NextParm,'MapVote');
@@ -268,7 +280,7 @@ event PostBeginPlay()
 		Cmd = ParseAliases(CustomGame[TravelIdx].MutatorList);
 		if ( Cmd != "" )
 			Log("[MVE] Spawning Mutators",'MapVote');
-		While ( Cmd != "" )
+		while ( Cmd != "" )
 		{
 			NextParm = Extension.NextParameter( Cmd, ",");
 			if ( InStr(NextParm,".") < 0 )
@@ -283,7 +295,7 @@ event PostBeginPlay()
 			Cmd = CustomGame[TravelIdx].Packages;
 			if ( InStr( Cmd, "<") >= 0 )
 				Cmd = ParseAliases( Cmd);
-			While ( Cmd != "" )
+			while ( Cmd != "" )
 			{
 				NextParm = Extension.NextParameter( Cmd, ",");
 				if ( NextParm != "" )
@@ -297,17 +309,17 @@ event PostBeginPlay()
 		NEXT_MATCHING_MAP:
 		if ( MapIdx >= 0 )
 			NextParm = MapList.MapGames( MapIdx);
-		if ( (string(Level.Game.Class) ~= ParseAliases(CustomGame[DefaultGameTypeIdx].GameClass)) && (InStr(NextParm, MapList.TwoDigits(DefaultGameTypeIdx)) >= 0) ) //Map is in default game mode list and matches gametype
+		if ( (string(Level.Game.class) ~= ParseAliases(CustomGame[DefaultGameTypeIdx].GameClass)) && (InStr(NextParm, MapList.TwoDigits(DefaultGameTypeIdx)) >= 0) ) //Map is in default game mode list and matches gametype
 		{
 			TravelIdx = DefaultGameTypeIdx;
-			Goto DEFAULT_MODE;
+			goto DEFAULT_MODE;
 		}
-//		Log( Level.Game.Class @ CustomGame[DefaultGameTypeIdx].GameClass @ MapIdx @ NextParm @ MapList.TwoDigits(DefaultGameTypeIdx));
+		//		Log( Level.Game.Class @ CustomGame[DefaultGameTypeIdx].GameClass @ MapIdx @ NextParm @ MapList.TwoDigits(DefaultGameTypeIdx));
 		if ( MapIdx >= 0 )
 		{
 			MapIdx = MapList.FindMap( Cmd, MapIdx+1);
 			if ( MapIdx > 0 )
-				Goto NEXT_MATCHING_MAP;
+				goto NEXT_MATCHING_MAP;
 		}
 		CurrentMode = Level.Game.GameName @ "- Crashed";
 		TravelIdx = -1;
@@ -348,18 +360,19 @@ function Mutate( string MutateString, PlayerPawn Sender)
 		else if ( Mid(MutateString,11,5) ~= "KICK " )
 			PlayerKickVote( Sender, Mid(MutateString, 17, 3));
 		else
-		return;
+			return;
 	}
-	if ( NextMutator != none )
+	if ( NextMutator != None )
 		NextMutator.Mutate( MutateString, Sender);
 }
 
 function bool HandleEndGame ()
 {
 	// notify next mutator of end game
-	Super.HandleEndGame();
+	super.HandleEndGame();
 
-	if (ShouldHandleEndgame()){
+	if (ShouldHandleEndgame())
+	{
 		HandleAssaultReset();
 		DeathMatchPlus(Level.Game).bDontRestart = True;
 		if ( !bVotingStage )
@@ -367,39 +380,47 @@ function bool HandleEndGame ()
 		ScoreBoardTime=ScoreBoardDelay;
 		SetTimer(Level.TimeDilation,True);
 	}
-	return false; // return value isn't properly used
+	return False; // return value isn't properly used
 }
 
-function bool ShouldHandleEndgame(){
+function bool ShouldHandleEndgame()
+{
 	return IsMonsterHunt() || // always show mapvote for monsterhunt
-		(!CheckForTie() && !IsAssaultAndNeedsToSwitchTeams());
+	(!CheckForTie() && !IsAssaultAndNeedsToSwitchTeams());
 }
 
-function bool IsMonsterHunt(){
+function bool IsMonsterHunt()
+{
 	local string name;
 	name = Caps(Level.Game$"");
-	if (InStr(name, "MONSTER") != -1 && InStr(name, "HUNT") != -1){
-		return true;
+	if (InStr(name, "MONSTER") != -1 && InStr(name, "HUNT") != -1)
+	{
+		return True;
 	}
-	return false;
+	return False;
 }
 
-function bool IsAssaultAndNeedsToSwitchTeams(){
+function bool IsAssaultAndNeedsToSwitchTeams()
+{
 	local Assault a;
 	a = Assault(Level.Game);
-	if (a == None){
-		return false;
+	if (a == None)
+	{
+		return False;
 	}
-	if (a.bDefenseSet){
-		return false;
+	if (a.bDefenseSet)
+	{
+		return False;
 	}
-	return true;
+	return True;
 }
 
-function HandleAssaultReset(){
+function HandleAssaultReset()
+{
 	local Assault a;
 	a = Assault(Level.Game);
-	if (a != None) {
+	if (a != None) 
+	{
 		Log("[MVE] Resetting assault game!");
 		a.bDefenseSet = False;
 		a.NumDefenses = 0;
@@ -407,37 +428,37 @@ function HandleAssaultReset(){
 		a.SavedTime = 0;
 		a.GameCode = "";
 		a.Part = 1;
-		a.bTiePartOne = false;
+		a.bTiePartOne = False;
 		a.SaveConfig();
 	}
 }
 
 function bool CheckForTie ()
 {
-  local TeamInfo Best;
-  local int i;
-  local Pawn P;
-  local Pawn BestP;
-  local PlayerPawn Player;
+	local TeamInfo Best;
+	local int i;
+	local Pawn P;
+	local Pawn BestP;
+	local PlayerPawn Player;
 
 	if ( Level.Game.IsA('Assault') || Level.Game.IsA('Domination') )
 		return False;
 	if ( Level.Game.IsA('TeamGamePlus') )
 	{
-		For ( i=0 ; i<TeamGamePlus(Level.Game).MaxTeams ; i++ )
-			if ( (Best == None) || (Best.Score < TeamGamePlus(Level.Game).Teams[i].Score) )
-				Best = TeamGamePlus(Level.Game).Teams[i];
-		For ( i=0 ; i<TeamGamePlus(Level.Game).MaxTeams ; i++ )
-			if ( (Best.TeamIndex != i) && (Best.Score == TeamGamePlus(Level.Game).Teams[i].Score) )
-				return True;
+		for ( i=0 ; i<TeamGamePlus(Level.Game).MaxTeams ; i++ )
+		if ( (Best == None) || (Best.Score < TeamGamePlus(Level.Game).Teams[i].Score) )
+			Best = TeamGamePlus(Level.Game).Teams[i];
+		for ( i=0 ; i<TeamGamePlus(Level.Game).MaxTeams ; i++ )
+		if ( (Best.TeamIndex != i) && (Best.Score == TeamGamePlus(Level.Game).Teams[i].Score) )
+			return True;
 	}
 	else
 	{
 
-		For ( P=Level.PawnList ; P!= none ; P=P.NextPawn )
-			if ( P.bIsPlayer && ((BestP == None) || (P.PlayerReplicationInfo.Score > BestP.PlayerReplicationInfo.Score)) )
-				BestP = P;
-		For ( P=Level.PawnList ; P!= none ; P=P.NextPawn )
+	for ( P=Level.PawnList ; P!= None ; P=P.NextPawn )
+		if ( P.bIsPlayer && ((BestP == None) || (P.PlayerReplicationInfo.Score > BestP.PlayerReplicationInfo.Score)) )
+			BestP = P;
+		for ( P=Level.PawnList ; P!= None ; P=P.NextPawn )
 			if ( P.bIsPlayer && (BestP != P) && (P.PlayerReplicationInfo.Score == BestP.PlayerReplicationInfo.Score) )
 				return True;
 	}
@@ -483,19 +504,19 @@ event Tick( float DeltaTime)
 	if ( bSaveConfig )
 	{
 		SaveConfig();
-		bSaveConfig = false;
+		bSaveConfig = False;
 	}
 	if ( bGenerateMapList )
 	{
 		GenerateMapList();
-		bGenerateMapList = false;
+		bGenerateMapList = False;
 	}
 	LastMsg = "";
 }
 
 function GenerateMapList()
 {
-	if ( MapList == none )
+	if ( MapList == None )
 	{
 		MapList = Spawn(class'MV_MapList');
 		MapList.Mutator = self;
@@ -509,7 +530,7 @@ function MapChangeIssued()
 {
 	local string aStr;
 
-	bMapChangeIssued = true;
+	bMapChangeIssued = True;
 	Log("Map change issued with URL: "$ Level.NextURL,'MapVote');
 	aStr = Extension.ByDelimiter( Level.NextURL, "?");
 	aStr = Extension.ByDelimiter( aStr, "#" )  $ ":" $ string(TravelIdx) ; //Map name plus current IDX
@@ -517,8 +538,8 @@ function MapChangeIssued()
 		aStr = Mid( aStr, 1);
 	if ( MapList.ValidMap( aStr) )
 	{
-		if ( Level.bNextItems )			BroadcastMessage( Extension.ByDelimiter( aStr, ":") $ GameRuleCombo(TravelIdx) @ "has been selected as next map.", true);
-		else			BroadcastMessage( Extension.ByDelimiter( aStr, ":") $ GameRuleCombo(TravelIdx) @ "has been forced.", true);
+		if ( Level.bNextItems )			BroadcastMessage( Extension.ByDelimiter( aStr, ":") $ GameRuleCombo(TravelIdx) @ "has been selected as next map.", True);
+		else			BroadcastMessage( Extension.ByDelimiter( aStr, ":") $ GameRuleCombo(TravelIdx) @ "has been forced.", True);
 		TravelString = Level.NextURL;
 	}
 	else
@@ -531,8 +552,10 @@ function PlayerJoined( PlayerPawn P)
 	local MVPlayerWatcher MVEPV;
 	log("[MVE] PlayerJoined:"@P.PlayerReplicationInfo.PlayerName@"("$P$") with id"@P.PlayerReplicationInfo.PlayerID);
 
+	// P.ClientSetMusic(Music(DynamicLoadObject("Mannodermaus-20200222.20200222", class'Music')), 0, 0, MTRAN_Instant );
+
 	//Give this player a watcher
-	if ( InactiveList == none )
+	if ( InactiveList == None )
 	{
 		MVEPV = Spawn(class'MVPlayerWatcher');
 		MVEPV.Mutator = self;
@@ -547,14 +570,14 @@ function PlayerKickVote( PlayerPawn Sender, string KickId)
 {
 	local MVPlayerWatcher W, ToKick;
 	local string Error;
-	For ( W=WatcherList ; W!=none ; W=W.nextWatcher )
+	for ( W=WatcherList ; W!=None ; W=W.nextWatcher )
 		if ( W.PlayerId == KickId )
 		{
 			ToKick = W;
-			break;
-		}
+		break;
+	}
 	W = GetWatcherFor( Sender);
-	if ( (ToKick == none) || (W == none) )
+	if ( (ToKick == None) || (W == None) )
 		return;
 	if ( !W.Watched.bAdmin )
 	{
@@ -567,10 +590,10 @@ function PlayerKickVote( PlayerPawn Sender, string KickId)
 	}
 	else
 	{
-		BroadcastMessage( ToKick.Watched.PlayerReplicationInfo.PlayerName @ "has been removed from the game by" @ W.Watched.PlayerReplicationInfo.PlayerName, true);
+		BroadcastMessage( ToKick.Watched.PlayerReplicationInfo.PlayerName @ "has been removed from the game by" @ W.Watched.PlayerReplicationInfo.PlayerName, True);
 		Log("[MVE]" @ ToKick.Watched.PlayerReplicationInfo.PlayerName @ "has been removed from the game by" @ W.Watched.PlayerReplicationInfo.PlayerName,'MapVote');
 		PlayerKickVoted( ToKick);
-		CountKickVotes( true);
+		CountKickVotes( True);
 		return;
 	}
 	if ( Error != "" )
@@ -578,13 +601,13 @@ function PlayerKickVote( PlayerPawn Sender, string KickId)
 		if ( W.KickVoteCode != "" )
 		{
 			W.KickVoteCode = "";
-			CountKickVotes( true);
+			CountKickVotes( True);
 		}
 		Sender.ClientMessage( Error);
 		return;
 	}
 	W.KickVoteCode = ToKick.PlayerCode;
-	BroadcastMessage( W.Watched.PlayerReplicationInfo.PlayerName @ "has placed a kick vote on" @ ToKick.Watched.PlayerReplicationInfo.PlayerName, true);
+	BroadcastMessage( W.Watched.PlayerReplicationInfo.PlayerName @ "has placed a kick vote on" @ ToKick.Watched.PlayerReplicationInfo.PlayerName, True);
 	CountKickVotes();
 }
 
@@ -595,44 +618,44 @@ function CountKickVotes( optional bool bNoKick)
 	local float Pct;
 
 	iKickVotes = 0;
-	For ( W=WatcherList ; W!=none ; W=W.NextWatcher )
+	for ( W=WatcherList ; W!=None ; W=W.NextWatcher )
 	{
-		if ( Spectator(W.Watched) == none )
+		if ( Spectator(W.Watched) == None )
 			pCount++;
 		if ( W.KickVoteCode != "" )
 		{
-			For ( i=0 ; i<iKickVotes ; i++ )
+			for ( i=0 ; i<iKickVotes ; i++ )
 				if ( StrKickVotes[i] == W.KickVoteCode )
 				{
 					KickVoteCount[i]++;
-					Goto DO_CONTINUE;
-				}
+				goto DO_CONTINUE;
+			}
 			StrKickVotes[iKickVotes] = W.KickVoteCode;
 			KickVoteCount[iKickVotes++] = 1;
 		}
 		DO_CONTINUE:
 	}
 	i = 0;
-	While ( i < iKickVotes )
+	while ( i < iKickVotes )
 	{
 		W = WatcherList;
-		While ( W!=none )
+		while ( W!=None )
 		{
 			if ( W.PlayerCode == StrKickVotes[i] )
 				break;
 			W = W.NextWatcher;
 		}
-		if ( (W != none) && !bNoKick && (pCount > 4) )
+		if ( (W != None) && !bNoKick && (pCount > 4) )
 		{
 			Pct = (float( KickVoteCount[i]) / float( pCount)) * 100.0;
 			if ( Pct >= KickPercent )
 			{
-				BroadcastMessage( W.Watched.PlayerReplicationInfo.PlayerName @ "has been removed from the game.", true);
+				BroadcastMessage( W.Watched.PlayerReplicationInfo.PlayerName @ "has been removed from the game.", True);
 				PlayerKickVoted( W);
-				W = none;
+				W = None;
 			}
 		}
-		if ( W == none )
+		if ( W == None )
 		{
 			StrKickVotes[i] = StrKickVotes[--iKickVotes];
 			KickVoteCount[i] = KickVoteCount[iKickVotes];
@@ -652,27 +675,27 @@ function PlayerKickVoted( MVPlayerWatcher Kicked, optional string OverrideReason
 	local Info NexgenRPCI;
 	local string Reason, LastPlayer;
 
-	if ( Kicked.Watched == none || Kicked.Watched.bDeleteMe )
+	if ( Kicked.Watched == None || Kicked.Watched.bDeleteMe )
 		return;
 
-	For ( W=WatcherList ; W!=none ; W=W.nextWatcher )
+	for ( W=WatcherList ; W!=None ; W=W.nextWatcher )
 		if ( W.KickVoteCode == Kicked.PlayerCode )
 			W.KickVoteCode = ""; //Clear
 	
 	if ( OverrideReason != "" ) Reason = OverrideReason;
 	
-	if ( Kicked.NexGenClient != none )
+	if ( Kicked.NexGenClient != None )
 	{
-		ForEach Kicked.Watched.ChildActors (class'Info', NexgenRPCI) //Issue a NexGen ban if possible
-			if ( NexgenRPCI.IsA('NexgenClientCore') )
-			{
-				// class'MV_NexgenUtil'.static.banPlayer( Kicked.NexGenClient, NexgenRPCI, Reason);
-				// Log("[MVE] Nexgen Ban issued: "$ Kicked.NexGenClient @ NexgenRPCI, 'MapVote');
-				return;
-			}
+		foreach Kicked.Watched.ChildActors (class'Info', NexgenRPCI) //Issue a NexGen ban if possible
+		if ( NexgenRPCI.IsA('NexgenClientCore') )
+		{
+			// class'MV_NexgenUtil'.static.banPlayer( Kicked.NexGenClient, NexgenRPCI, Reason);
+			// Log("[MVE] Nexgen Ban issued: "$ Kicked.NexGenClient @ NexgenRPCI, 'MapVote');
+			return;
+		}
 	}
 
-	While ( (i<32) && (BanList[i] != "") )		i++;
+	while ( (i<32) && (BanList[i] != "") )		i++;
 	if ( i==32 )	i = Rand(32);
 	BanList[i] = Kicked.PlayerCode;
 	Log("[MVE] Added "$Kicked.PlayerCode @ "to banlist ID" @i,'MapVote');
@@ -682,12 +705,12 @@ function PlayerKickVoted( MVPlayerWatcher Kicked, optional string OverrideReason
 function bool IpBanned( string Address)
 {
 	local int i;
-	For ( i=0 ; i<32 ; i++ )
+	for ( i=0 ; i<32 ; i++ )
 	{
 		if ( BanList[i] == "" )
-			return false;
+			return False;
 		if ( BanList[i] == Address )
-			return true;
+			return True;
 	}
 }
 
@@ -697,7 +720,7 @@ function CleanRules()
 	local int i, j;
 	local bool bSave;
 	
-	For ( j=0 ; j<63 ; j++ )
+	for ( j=0 ; j<63 ; j++ )
 	{
 		if ( j != i )
 		{
@@ -705,7 +728,7 @@ function CleanRules()
 			{
 				CustomGame[i++] = CustomGame[j];
 				CustomGame[j] = EmptyGame;
-				bSave = true;
+				bSave = True;
 			}
 		}
 		else if ( CustomGame[j].GameClass != "" && CustomGame[j].RuleName != "" )
@@ -723,7 +746,7 @@ function CountFilters()
 	
 	if ( MapFilters[512] != "" ) //Optimization
 		lastE = 513;
-	For ( i=lastE ; i<1024 ; i++ )
+	for ( i=lastE ; i<1024 ; i++ )
 	{
 		if ( MapFilters[i] != "" )
 			lastE = i+1;
@@ -731,7 +754,7 @@ function CountFilters()
 	iFilter = lastE;
 	
 	lastE = 0;
-	For ( i=0 ; i<32 ; i++ )
+	for ( i=0 ; i<32 ; i++ )
 		if ( ExcludeFilters[i] != "" )
 			lastE = i+1;
 	iExclF = lastE;
@@ -741,14 +764,14 @@ function UpdateMapListCaches()
 {
 	local MVPlayerWatcher aList;
 	
-	For ( aList=WatcherList ; aList!=none ; aList=aList.nextWatcher )
+	for ( aList=WatcherList ; aList!=None ; aList=aList.nextWatcher )
 	{
 		if ( aList.bInitialized )
 		{
-			if ( aList.MapListCacheActor != none )
+			if ( aList.MapListCacheActor != None )
 			{
 				aList.MapListCacheActor.Destroy();
-				aList.MapListCacheActor = none;
+				aList.MapListCacheActor = None;
 			}
 			aList.GotoState('Initializing','GetCache');
 		}
@@ -766,13 +789,13 @@ function OpenWindowFor( PlayerPawn Sender, optional MVPlayerWatcher W)
 		Sender.ClientMessage("Map Vote not setup, load map list using MUTATE BDBMAPVOTE RELOAD");
 		return;
 	}
-	if ( W == none )
+	if ( W == None )
 		W = GetWatcherFor( Sender);
-	if ( W != none )
+	if ( W != None )
 	{
-		if ( W.MapListCacheActor == none )
+		if ( W.MapListCacheActor == None )
 			Sender.ClientMessage("Please wait, Map List Cache not retrieved");
-		else if ( W.MapVoteWRIActor != none )
+		else if ( W.MapVoteWRIActor != None )
 		{
 		}
 		else
@@ -790,8 +813,8 @@ function OpenAllWindows()
 {
 	local MVPlayerWatcher W;
 	if ( bLevelSwitchPending )		return;
-	For ( W=WatcherList ; W!=none ; W=W.nextWatcher )
-		if ( CanVote(W.Watched) && (W.MapVoteWRIActor == none) )
+	for ( W=WatcherList ; W!=None ; W=W.nextWatcher )
+		if ( CanVote(W.Watched) && (W.MapVoteWRIActor == None) )
 			OpenWindowFor( W.Watched, W);
 }
 
@@ -811,7 +834,7 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 		return;
 	}
 	W = GetWatcherFor( Sender);
-	if ( W == none || W.bOverflow )
+	if ( W == None || W.bOverflow )
 		return;
 	if ( Left( MapString, 3) == "[X]" )
 	{
@@ -823,7 +846,7 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 			return;
 		}
 	}
-	W.bOverflow = true;
+	W.bOverflow = True;
 	if ( !MapList.ValidMap(MapString) ) //String is normalized, safe to cast equals
 	{
 		Sender.ClientMessage("Cannot vote, bad map code: "$MapString);
@@ -841,7 +864,7 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 
 	if ( Sender.bAdmin )
 	{
-		GotoMap(MapString,true);
+		GotoMap(MapString,True);
 		SaveConfig();
 		BroadcastMessage("Server Admin has force a map switch to " $ Extension.ByDelimiter(MapString,":") @ GameRuleCombo(iU),True);
 		return;
@@ -861,7 +884,7 @@ function CountMapVotes( optional bool bForceTravel)
 	
 	if ( !bVotingStage )
 	{
-		For ( W=WatcherList ; W!=none ; W=W.nextWatcher )
+		for ( W=WatcherList ; W!=None ; W=W.nextWatcher )
 		{
 			if ( CanVote(W.Watched) )
 			{
@@ -879,18 +902,18 @@ function CountMapVotes( optional bool bForceTravel)
 		Total = 0;
 	}
 	
-	For ( W=WatcherList ; W!=none ; W=W.nextWatcher )
+	for ( W=WatcherList ; W!=None ; W=W.nextWatcher )
 	{
 		if ( CanVote(W.Watched) )
 			Total += 1;
 		if ( W.PlayerVote != "" )
 		{
-			For ( i=0 ; i<iU ; i++ )
+			for ( i=0 ; i<iU ; i++ )
 			{
 				if ( UniqueVotes[i].PlayerVote == W.PlayerVote )
 				{
 					UniqueCount[i] += VotePriority( int(Extension.ByDelimiter(W.PlayerVote,":",1)) );
-					Goto NEXT_PLAYER;
+					goto NEXT_PLAYER;
 				}
 			}
 			UniqueVotes[iU] = W;
@@ -907,37 +930,37 @@ function CountMapVotes( optional bool bForceTravel)
 		FMapVotes[0] = UniqueCount[0];
 		StrMapVotes[0] = string(j) $ "," $ Extension.ByDelimiter( UniqueVotes[0].PlayerVote,":") $ "," $ GameName(j) $ "," $ RuleName(j) $ "," $ string(UniqueCount[0]);
 	}
-	For ( i=1 ; i<iU ; i++ )
+	for ( i=1 ; i<iU ; i++ )
 	{
 		j = int(Extension.ByDelimiter( UniqueVotes[i].PlayerVote,":",1));
 		FMapVotes[i] = UniqueCount[i];
 		StrMapVotes[i] = string(j) $ "," $ Extension.ByDelimiter( UniqueVotes[i].PlayerVote,":") $ "," $ GameName(j) $ "," $ RuleName(j) $ "," $ string(UniqueCount[i]);
 		if ( UniqueCount[i] == UniqueCount[iBest] )
-			bTie = true;
+			bTie = True;
 		else if ( UniqueCount[i] > UniqueCount[iBest] )
 		{
 			iBest = i;
-			bTie = false;
+			bTie = False;
 		}
 	}
 
-	if ( bForceTravel && UniqueVotes[iBest] == none ) //Random map
+	if ( bForceTravel && UniqueVotes[iBest] == None ) //Random map
 	{
 		iU = Rand( MapList.iMapList);
 		iBest = MapList.RandomGame(iU);
-		GotoMap( MapList.MapName(iU) $ ":" $ string(iBest), false );
+		GotoMap( MapList.MapName(iU) $ ":" $ string(iBest), False );
 		BroadcastMessage( "No votes sent, " $ MapList.MapName(iU) @ GameRuleCombo( iBest) @ "has been selected",True);
 	}
 	else if ( (UniqueCount[iBest] / Total) >= 0.51 ) //Absolute majority
 	{
-		GotoMap( UniqueVotes[iBest].PlayerVote, false);
+		GotoMap( UniqueVotes[iBest].PlayerVote, False);
 		iU = int(Extension.ByDelimiter( UniqueVotes[iBest].PlayerVote,":",1));
 		BroadcastMessage( Extension.ByDelimiter(UniqueVotes[iBest].PlayerVote,":") @ GameRuleCombo( iU) @ "has won by absolute majority.",True);
 	}
 	else if ( bForceTravel && bTie )
 	{
 		Current = 1;
-		For ( i=iBest+1 ; i<iU ; i++ )
+		for ( i=iBest+1 ; i<iU ; i++ )
 		{
 			if ( UniqueCount[i] == UniqueCount[iBest] )
 			{
@@ -946,13 +969,13 @@ function CountMapVotes( optional bool bForceTravel)
 					iBest = i;
 			}
 		}
-		GotoMap( UniqueVotes[iBest].PlayerVote, false);
+		GotoMap( UniqueVotes[iBest].PlayerVote, False);
 		iU = int(Extension.ByDelimiter( UniqueVotes[iBest].PlayerVote,":",1));
 		BroadcastMessage( CapNumberWord(Current)$"map draw,"@Extension.ByDelimiter(UniqueVotes[iBest].PlayerVote,":") @ GameRuleCombo( iU) @ "selected.",True);
 	}
 	else if ( bForceTravel )
 	{
-		GotoMap( UniqueVotes[iBest].PlayerVote, false);
+		GotoMap( UniqueVotes[iBest].PlayerVote, False);
 		iU = int(Extension.ByDelimiter( UniqueVotes[iBest].PlayerVote,":",1));
 		BroadcastMessage( Extension.ByDelimiter(UniqueVotes[iBest].PlayerVote,":") @ GameRuleCombo( iU) @ "has won by simple majority.",True);
 	}
@@ -960,7 +983,7 @@ function CountMapVotes( optional bool bForceTravel)
 	if ( !bForceTravel ) //Do not update rankings if we're leaving the map
 	{
 		i = 1;
-		While ( i<iMapVotes )
+		while ( i<iMapVotes )
 		{
 			if ( FMapVotes[i] > FMapVotes[i-1] )
 			{
@@ -977,13 +1000,13 @@ function CountMapVotes( optional bool bForceTravel)
 				i++;
 		}
 		RankMapVotes[0] = 0;
-		For ( i=1 ; i<iMapVotes ; i++ )
+		for ( i=1 ; i<iMapVotes ; i++ )
 		{
 			if ( FMapVotes[i] == FMapVotes[i-1] )
 				RankMapVotes[i] = RankMapVotes[i-1];
 			else
 				RankMapVotes[i] = i;
-//			Log("RANK="$string(RankMapVotes[i]) @ "COUNT="$string(FMapVotes[i]) @ "STR="$StrMapVotes[i]);
+			//			Log("RANK="$string(RankMapVotes[i]) @ "COUNT="$string(FMapVotes[i]) @ "STR="$StrMapVotes[i]);
 		}
 
 		Extension.UpdateMapVotes( WatcherList);
@@ -1033,16 +1056,19 @@ final function float VotePriority( int i)
 
 final function bool CanVote(PlayerPawn Sender)
 {
-	if (Sender.Player == None) {
-		return false; // is not a human player, thus cannot vote (sorry bots)
+	if (Sender.Player == None) 
+	{
+		return False; // is not a human player, thus cannot vote (sorry bots)
 	}
-	if (bLevelSwitchPending){
-		return false; // can't vote when mapvote is about to switch levels
+	if (bLevelSwitchPending)
+	{
+		return False; // can't vote when mapvote is about to switch levels
 	}
-	if (!bSpecsAllowed && Sender.IsA('Spectator')){
-		return false;
+	if (!bSpecsAllowed && Sender.IsA('Spectator'))
+	{
+		return False;
 	}
-	return true;
+	return True;
 }
 
 //Validity assumed
@@ -1058,7 +1084,7 @@ final function string SetTravelString( string MapString, out int GameIdx)
 	//RANDOM MAP CHOSEN!
 	if ( result ~= "Random" )
 		result = MapList.RandomMap( idx);
-	if ( DynamicLoadObject(ParseAliases(CustomGame[idx].GameClass),Class'Class') == none )
+	if ( DynamicLoadObject(ParseAliases(CustomGame[idx].GameClass),class'Class') == None )
 		Log("Bad game class: "$CustomGame[idx].GameClass );
 	else
 	{
@@ -1104,7 +1130,7 @@ final function RegisterMessageMutator()
 final function MVPlayerWatcher GetWatcherFor( PlayerPawn Other)
 {
 	local MVPlayerWatcher W;
-	For ( W=WatcherList ; W!=none ; W=W.nextWatcher )
+	for ( W=WatcherList ; W!=None ; W=W.nextWatcher )
 		if ( W.Watched == Other )
 			return W;
 }
@@ -1119,9 +1145,11 @@ final function string CapNumberWord( int Number)
 	return "Multi-";
 }
 
-final function ExecuteTravel(){
+final function ExecuteTravel()
+{
 	Level.ServerTravel( TravelString,False);
-	if (bShutdownServerOnTravel){
+	if (bShutdownServerOnTravel)
+	{
 		ConsoleCommand("exit");
 	}
 }
@@ -1130,7 +1158,7 @@ final function LoadAliases()
 {
 	local int i, j;
 	
-	For ( i=0 ; i<32 ; i++ )
+	for ( i=0 ; i<32 ; i++ )
 	{
 		if ( Left(Aliases[i],1) == "<" )
 		{
@@ -1144,7 +1172,7 @@ final function LoadAliases()
 		}
 	}
 	//Single pass multi alias post processing
-	For ( i=0 ; i<iAlias ; i++ )
+	for ( i=0 ; i<iAlias ; i++ )
 		if ( InStr(PostAlias[i], "<") >= 0 )
 			PostAlias[i] = ParseAliases( PostAlias[i]);
 }
@@ -1155,7 +1183,7 @@ final function string ParseAliases( string Command)
 	local int i;
 	
 	i = InStr( Command, "<");
-	While ( i >= 0 )
+	while ( i >= 0 )
 	{
 		preStr = Left( Command, i); //Split command in two
 		Command = Mid( Command, i);
@@ -1166,12 +1194,12 @@ final function string ParseAliases( string Command)
 		{
 			aStr = Caps(Left( Command, i+1)); //Now remove the alias text from command
 			Command = Mid( Command, i+1); //aStr is the alias, let's find it
-			For ( i=0 ; i<iAlias ; i++ )
+			for ( i=0 ; i<iAlias ; i++ )
 			{
 				if ( PreAlias[i] == aStr )
 				{
 					aStr = PostAlias[i];
-					Goto SUCCESS;
+					goto SUCCESS;
 				}
 			}
 			aStr = "";
@@ -1193,18 +1221,18 @@ function bool MutatorTeamMessage( Actor Sender, Pawn Receiver, PlayerReplication
 	local playerpawn P;
 
 	if ( S == LastMsg )
-		Goto END;
+		goto END;
 	LastMsg = S;
 	CommonCommands( Sender, S);
 
 	END:
 
 	if ( DontPass( S) )
-		return true;
+		return True;
 
 	if ( NextMessageMutator != None )
 		return NextMessageMutator.MutatorTeamMessage( Sender, Receiver, PRI, S, Type, bBeep );
-	return true;
+	return True;
 }
 
 function bool MutatorBroadcastMessage( Actor Sender, Pawn Receiver, out coerce string Msg, optional bool bBeep, out optional name Type )
@@ -1214,32 +1242,32 @@ function bool MutatorBroadcastMessage( Actor Sender, Pawn Receiver, out coerce s
 	local string orgMsg;
 
 	if ( Msg == LastMsg )
-		Goto END;
+		goto END;
 	LastMsg = Msg;
 	orgMsg = Msg;
-	While ( inStr( orgMsg, ":") > -1 )
-		orgMsg = Mid( orgMsg, inStr( orgMsg, ":")+1 );
+	while ( inStr( orgMsg, ":") > -1 );
+	orgMsg = Mid( orgMsg, inStr( orgMsg, ":")+1 );
 
 	CommonCommands( Sender, orgMsg);
 
 	END:
 	if ( DontPass( orgMsg ) )
-		return true;
+		return True;
 
 	if ( NextMessageMutator != None )
 		return NextMessageMutator.MutatorBroadcastMessage( Sender, Receiver, Msg, bBeep, Type );
-	return true;
+	return True;
 }
 
 function bool DontPass( string Msg)
 {
 	if ( (Msg ~= "!v") || (Msg ~= "!vote") || (Msg ~= "!mapvote") || (Msg ~= "!kickvote") )
-		return true;
+		return True;
 }
 
-function CommonCommands( Actor Sender, String S)
+function CommonCommands( Actor Sender, string S)
 {
-	if ( PlayerPawn(Sender) == none )
+	if ( PlayerPawn(Sender) == None )
 		return;
 
 	if ( (S ~= "!v") || (S ~= "!vote") || (S ~= "!mapvote") || (S ~= "!kickvote") )
@@ -1248,33 +1276,33 @@ function CommonCommands( Actor Sender, String S)
 
 defaultproperties
 {
-	ClientPackage="MVE2a"
+	ClientPackage="MVE2a";
 	//HTTPMapListLocation="192.168.1.2:27011"
 	//TravelString="CTF-Face?Game=BotPack.CTFGame"
 	//TravelIdx=3
-	ScoreBoardDelay=5
-	VoteTimeLimit=60
+	ScoreBoardDelay=5;
+	VoteTimeLimit=60;
 	//HTTPMapListPort=27011
 	//DefaultGameTypeIdx=3
-	ServerCodeName=UT-Server
-	MidGameVotePercent=51
-	KickPercent=51
+	ServerCodeName=UT-Server;
+	MidGameVotePercent=51;
+	KickPercent=51;
 	//MapCostAddPerLoad=5
 	//MapCostMaxAllow=2
-	bAutoOpen=True
-	bKickVote=True
-	bOverrideServerPackages=True
-	CustomGame(0)=(bEnabled=True,GameName="Assault",RuleName="Normal",GameClass="Botpack.Assault",FilterCode="as",VotePriority=1.000000)
-	CustomGame(1)=(bEnabled=True,GameName="Capture the Flag",RuleName="Normal",GameClass="Botpack.CTFGame",FilterCode="ctf",VotePriority=1.000000)
-	CustomGame(2)=(bEnabled=True,GameName="Deathmatch",RuleName="Normal",GameClass="Botpack.DeathMatchPlus",FilterCode="dm",VotePriority=1.000000)
-	CustomGame(3)=(bEnabled=True,GameName="Domination",RuleName="Normal",GameClass="Botpack.Domination",FilterCode="dom",VotePriority=1.000000)
-	CustomGame(4)=(bEnabled=True,GameName="Last Man Standing",RuleName="Normal",GameClass="Botpack.LastManStanding",FilterCode="lms",VotePriority=1.000000)
-	CustomGame(5)=(bEnabled=True,GameName="Team Deathmatch",RuleName="Normal",GameClass="Botpack.TeamGamePlus",FilterCode="tdm",VotePriority=1.000000)
-	MapFilters(0)="as AS-*"
-	MapFilters(1)="ctf CTF-*"
-	MapFilters(2)="dm DM-*"
-	MapFilters(3)="dom DOM-*"
-	MapFilters(4)="lms DM-*"
-	MapFilters(5)="tdm DM-*"
-	ExtensionClass="MVES.MV_SubExtension"
+	bAutoOpen=True;
+	bKickVote=True;
+	bOverrideServerPackages=True;
+	CustomGame(0)=(bEnabled=True,GameName="Assault",RuleName="Normal",GameClass="Botpack.Assault",FilterCode="as",VotePriority=1.000000);
+	CustomGame(1)=(bEnabled=True,GameName="Capture the Flag",RuleName="Normal",GameClass="Botpack.CTFGame",FilterCode="ctf",VotePriority=1.000000);
+	CustomGame(2)=(bEnabled=True,GameName="Deathmatch",RuleName="Normal",GameClass="Botpack.DeathMatchPlus",FilterCode="dm",VotePriority=1.000000);
+	CustomGame(3)=(bEnabled=True,GameName="Domination",RuleName="Normal",GameClass="Botpack.Domination",FilterCode="dom",VotePriority=1.000000);
+	CustomGame(4)=(bEnabled=True,GameName="Last Man Standing",RuleName="Normal",GameClass="Botpack.LastManStanding",FilterCode="lms",VotePriority=1.000000);
+	CustomGame(5)=(bEnabled=True,GameName="Team Deathmatch",RuleName="Normal",GameClass="Botpack.TeamGamePlus",FilterCode="tdm",VotePriority=1.000000);
+	MapFilters(0)="as AS-*";
+	MapFilters(1)="ctf CTF-*";
+	MapFilters(2)="dm DM-*";
+	MapFilters(3)="dom DOM-*";
+	MapFilters(4)="lms DM-*";
+	MapFilters(5)="tdm DM-*";
+	ExtensionClass="MVES.MV_SubExtension";
 }
