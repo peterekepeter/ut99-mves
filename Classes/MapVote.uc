@@ -38,6 +38,7 @@ var() config int ScoreBoardDelay;
 var float EndGameTime;
 var() config bool bKickVote;
 var() config bool bEnableHTTPMapList;
+var() config bool bEnableMapOverrides;
 var bool bLevelSwitchPending;
 var bool bVotingStage;
 var bool bMapChangeIssued;
@@ -74,7 +75,7 @@ var() config string MapFilters[1024], ExcludeFilters[32];
 var int iFilter, iExclF;
 
 
-var MVPlayerWatcher WatcherList, InactiveList;
+var MV_PlayerWatcher WatcherList, InactiveList;
 
 var MV_MapList MapList;
 var MV_MainExtension Extension;
@@ -204,6 +205,8 @@ event PostBeginPlay()
 	local Actor A;
 	local class<Actor> ActorClass;
 	local int MapIdx;
+	local MapOverridesConfig MapOverridesConfig;
+	local MV_MapOverrides MapOverrides;
 
 	log(" !MVE: PostBeginPlay!");
 	if ( bFirstRun )
@@ -212,6 +215,14 @@ event PostBeginPlay()
 		SaveConfig();
 	}
 	LoadAliases();
+
+	if (bEnableMapOverrides)
+	{
+		MapOverridesConfig = new class'MapOverridesConfig';
+		MapOverridesConfig.RunMigration();
+		MapOverrides = new class'MV_MapOverrides';
+		MapOverrides.Configure(MapOverridesConfig);
+	}
 
 	//if ( int(ConsoleCommand("get ini:Engine.Engine.GameEngine XC_Version")) >= 11 ) //Only XC_GameEngine contains this variable
 	//{
@@ -549,7 +560,7 @@ function MapChangeIssued()
 
 function PlayerJoined( PlayerPawn P)
 {
-	local MVPlayerWatcher MVEPV;
+	local MV_PlayerWatcher MVEPV;
 	log("[MVE] PlayerJoined:"@P.PlayerReplicationInfo.PlayerName@"("$P$") with id"@P.PlayerReplicationInfo.PlayerID);
 
 	// P.ClientSetMusic(Music(DynamicLoadObject("Mannodermaus-20200222.20200222", class'Music')), 0, 0, MTRAN_Instant );
@@ -557,7 +568,7 @@ function PlayerJoined( PlayerPawn P)
 	//Give this player a watcher
 	if ( InactiveList == None )
 	{
-		MVEPV = Spawn(class'MVPlayerWatcher');
+		MVEPV = Spawn(class'MV_PlayerWatcher');
 		MVEPV.Mutator = self;
 	}
 	else
@@ -568,7 +579,7 @@ function PlayerJoined( PlayerPawn P)
 
 function PlayerKickVote( PlayerPawn Sender, string KickId)
 {
-	local MVPlayerWatcher W, ToKick;
+	local MV_PlayerWatcher W, ToKick;
 	local string Error;
 	for ( W=WatcherList ; W!=None ; W=W.nextWatcher )
 		if ( W.PlayerId == KickId )
@@ -613,7 +624,7 @@ function PlayerKickVote( PlayerPawn Sender, string KickId)
 
 function CountKickVotes( optional bool bNoKick)
 {
-	local MVPlayerWatcher W;
+	local MV_PlayerWatcher W;
 	local int i, pCount;
 	local float Pct;
 
@@ -668,9 +679,9 @@ function CountKickVotes( optional bool bNoKick)
 }
 
 //This player was removed from the game
-function PlayerKickVoted( MVPlayerWatcher Kicked, optional string OverrideReason)
+function PlayerKickVoted( MV_PlayerWatcher Kicked, optional string OverrideReason)
 {
-	local MVPlayerWatcher W;
+	local MV_PlayerWatcher W;
 	local int i;
 	local Info NexgenRPCI;
 	local string Reason, LastPlayer;
@@ -762,7 +773,7 @@ function CountFilters()
 
 function UpdateMapListCaches()
 {
-	local MVPlayerWatcher aList;
+	local MV_PlayerWatcher aList;
 	
 	for ( aList=WatcherList ; aList!=None ; aList=aList.nextWatcher )
 	{
@@ -778,7 +789,7 @@ function UpdateMapListCaches()
 	}
 }
 
-function OpenWindowFor( PlayerPawn Sender, optional MVPlayerWatcher W)
+function OpenWindowFor( PlayerPawn Sender, optional MV_PlayerWatcher W)
 {
 	//local MapVoteWRI MVWRI;
 	
@@ -811,7 +822,7 @@ function OpenWindowFor( PlayerPawn Sender, optional MVPlayerWatcher W)
 
 function OpenAllWindows()
 {
-	local MVPlayerWatcher W;
+	local MV_PlayerWatcher W;
 	if ( bLevelSwitchPending )		return;
 	for ( W=WatcherList ; W!=None ; W=W.nextWatcher )
 		if ( CanVote(W.Watched) && (W.MapVoteWRIActor == None) )
@@ -820,7 +831,7 @@ function OpenAllWindows()
 
 function PlayerVoted( PlayerPawn Sender, string MapString)
 {
-	local MVPlayerWatcher W;
+	local MV_PlayerWatcher W;
 	local int iU;
 
 	if ( bLevelSwitchPending )
@@ -876,7 +887,7 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 
 function CountMapVotes( optional bool bForceTravel)
 {
-	local MVPlayerWatcher W, UniqueVotes[32];
+	local MV_PlayerWatcher W, UniqueVotes[32];
 	local float UniqueCount[32];
 	local int i, iU, iBest, j;
 	local float Total, Current;
@@ -1072,24 +1083,29 @@ final function bool CanVote(PlayerPawn Sender)
 }
 
 //Validity assumed
-final function string SetTravelString( string MapString, out int GameIdx)
+final function string SetupTravelString( string MapString, out int GameIdx)
 {
-	local string result, spk;
+	local string map, spk;
 	local int idx;
 	
 	if ( MapString == "" )
 		return "?restart";
-	result = Extension.NextParameter( MapString, ":");
-	idx = int( MapString);
+	map = Extension.NextParameter( MapString, ":");
+	idx = int(MapString);
 	//RANDOM MAP CHOSEN!
-	if ( result ~= "Random" )
-		result = MapList.RandomMap( idx);
+	if ( map ~= "Random" )
+	{
+		map = MapList.RandomMap( idx);
+	}
+
 	if ( DynamicLoadObject(ParseAliases(CustomGame[idx].GameClass),class'Class') == None )
 		Log("Bad game class: "$CustomGame[idx].GameClass );
 	else
 	{
-		result = result $ "?Game=" $ ParseAliases(CustomGame[idx].GameClass);
+		TravelString = map $ "?Game=" $ ParseAliases(CustomGame[idx].GameClass);
 		GameIdx = idx;
+		Log("[MVE] -> TravelString: "$TravelString);
+		Log("[MVE] -> GameIdx: "$idx);
 		if ( bOverrideServerPackages )
 		{
 			spk = Extension.GenerateSPList( CustomGame[idx].Packages );
@@ -1097,17 +1113,17 @@ final function string SetTravelString( string MapString, out int GameIdx)
 			if ( spk == "" )				spk = MainServerPackages;
 			if ( InStr( spk, "<") >= 0 )
 				spk = ParseAliases( spk);
+			Log("[MVE] -> ServerPackages: "$spk);
 			ConsoleCommand( "set ini:Engine.Engine.GameEngine ServerPackages "$spk);
 		}
 	}
-	return result;
 }
 
 final function GotoMap( string MapString, optional bool bImmediate)
 {
 	if ( Left(MapString,3) == "[X]" ) //Random sent me here
 		MapString = Mid(MapString,3);
-	TravelString = SetTravelString( MapString, TravelIdx);
+	SetupTravelString( MapString, TravelIdx);
 	SaveConfig();
 	Extension.CloseVoteWindows( WatcherList);
 	if ( bImmediate )
@@ -1127,9 +1143,9 @@ final function RegisterMessageMutator()
 	NextMessageMutator = aMut;
 }
 
-final function MVPlayerWatcher GetWatcherFor( PlayerPawn Other)
+final function MV_PlayerWatcher GetWatcherFor( PlayerPawn Other)
 {
-	local MVPlayerWatcher W;
+	local MV_PlayerWatcher W;
 	for ( W=WatcherList ; W!=None ; W=W.nextWatcher )
 		if ( W.Watched == Other )
 			return W;

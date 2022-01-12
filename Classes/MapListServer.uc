@@ -7,7 +7,7 @@ class MapListServer expands WebApplication;
 [UWeb.WebServer]
 Applications[0]="MapVote.MapListServer"
 ApplicationPaths[0]="/maplist"
-bEnabled=True
+bEnabled=True;
 
 http://server.ip.address/maplist/servercode
 */
@@ -18,11 +18,11 @@ event Query(WebRequest Request, WebResponse Response)
 {
 	local string aStr;
 	local int i;
-	local MVPlayerWatcher W;
+	local MV_PlayerWatcher W;
 
 	aStr = Mid(Request.URI, 1);
 
-	if ( MapList == none )
+	if ( MapList == None )
 	{
 		if ( !GetMapList() )
 		{
@@ -44,7 +44,7 @@ event Query(WebRequest Request, WebResponse Response)
 	aStr = Response.Connection.IpAddrToString(Response.Connection.RemoteAddr);
 	Log( "HTTP query from "$aStr, 'MapVote' ); //Safe to log?
 	W = ValidPlayerWithIP( RemovePort(aStr) );
-	if ( W == none )
+	if ( W == None )
 	{
 		Error401( Response);
 		return;
@@ -60,29 +60,29 @@ event Query(WebRequest Request, WebResponse Response)
 	//We can send up to 1kb, so the maplist will split it starting by the specified "$val=" property
 	//Each query is done every 0.5 second (scaled down to server speed) until list is finished
 	aStr = MapList.GetStringSection( aStr);
-	Response.SendText( aStr, true ); 
+	Response.SendText( aStr, True ); 
 	if ( InStr(aStr,chr(13)$"[END]") < InStr(aStr,chr(13)$"[NEXT]") )
 	{
 		W.TicksLeft = 1;
-		W.bHTTPLoading = false;
+		W.bHTTPLoading = False;
 	}
 	else
 	{
 		W.TicksLeft++;
-		W.bHTTPLoading = true;
+		W.bHTTPLoading = True;
 	}
 }
 
 
 function bool GetMapList()
 {
-	ForEach Level.AllActors (class'MV_MapList', MapList)
-		return true;
+	foreach Level.AllActors (class'MV_MapList', MapList)
+	return True;
 }
 
 function CleanUp()
 {
-	MapList = none;
+	MapList = None;
 }
 
 function Error503( WebResponse Response)
@@ -116,11 +116,11 @@ function string RemovePort( string IP)
 	return IP;
 }
 
-function MVPlayerWatcher ValidPlayerWithIP( string IP)
+function MV_PlayerWatcher ValidPlayerWithIP( string IP)
 {
-	local MVPlayerWatcher W;
+	local MV_PlayerWatcher W;
 	
-	For ( W=MapList.Mutator.WatcherList ; W!=none ; W=W.nextWatcher )
-		if ( W.PlayerIP == IP )
-			return W;
+	for ( W=MapList.Mutator.WatcherList ; W!=None ; W=W.nextWatcher )
+	if ( W.PlayerIP == IP )
+		return W;
 }
