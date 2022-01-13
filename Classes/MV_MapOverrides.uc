@@ -1,121 +1,43 @@
 class MV_MapOverrides expands MV_Util;
 
 
-struct OverrideRule
-{
-	var string Filter; 
-	var string SongPackage;
-	var string SongName;
-}
-;
-
 const RuleMaxCount = 1024;
-const EmptyString = "";
-var OverrideRule Rules[1024];
 var int RuleCount;
+var string Filter[1024]; 
+var string SongPackage[1024];
+var string SongName[1024];
 
-function Configure(MapOverridesConfig config)
-{
-	local int i, errorCount;
-	RuleCount = 0;
-	for (i=0; i<config.MapOverridesCount; i++)
-	{
-		errorCount = TryAddConfigLine(config.MapOverrides[i]);
-		if (errorCount > 0)
-		{
-			Err(errorCount$" errors in MapOverrides["$i$"]");
-		}
-	}
-	Nfo(RuleCount$" map override rules were loaded!");
-}
 
-function private int TryAddConfigLine(string line)
-{
-	local string rule, filter, properties;
-	local int errors;
-	errors = 0;
-	while (TrySplit(line, ";", rule, line))
-	{
-		if (RuleCount >= RuleMaxCount)
-		{
-			errors++;
-			Err("max rule count "$RuleMaxCount$" was reached");
-			return errors;
-		}
-		if (TryAddRule(rule))
-		{
-			RuleCount++;
-		}
-		else
-		{
-			errors++;
-			Err("error in rule `"$rule$"`");
-			ResetRuleIndex(RuleCount);
-		}
-	}
-	return errors;
-}
 
-function private bool TryAddRule(string rule)
+function MV_MapResult ApplyOverrides(MV_MapResult result)
 {
-	local string filter, properties, property;
-	if (!TrySplit(rule, "?", filter, properties))
-	{
-		Err("missing properties for rule, expected `?`");
-		return False;
-	}
-	Nfo("Parsed filter: "$filter);
-	while (TrySplit(properties, "?", property, properties))
-	{
-		if (TryAddRuleProperty(property))
-		{
-			Rules[RuleCount].Filter = filter;
-		}
-		else
-		{
-			Err("error in property `"$property$"`");
-			return False;
-		}
-	}
-	return True;
-}
-
-function private bool TryAddRuleProperty(string property)
-{
-	local string key, K, value, keyUpper, package;
+	local int i;
     
-	if (!TrySplit(property, "=", key, value))
+	for (i=0; i<RuleCount; i++)
 	{
-		Err("expected `=`");
-		return False;
-	}
-	K = Caps(key);
-	if (K == "SONG")
-	{   
-		if (!TrySplit(value, ".", package, value))
+		if (RuleMatches(result.Map, i))
 		{
-			Err("Song requires `Package.Name` format"); 
+			RuleApply(result, i);
 		}
-		Rules[RuleCount].SongPackage = package;
-		Rules[RuleCount].SongName = value;
-		Nfo("Rules[RuleCount].SongPackage"@Rules[RuleCount].SongPackage);
-		Nfo("Rules[RuleCount].SongName"@Rules[RuleCount].SongName);
 	}
-	else 
+}
+
+function private bool RuleMatches(string map, int i)
+{
+	local string mapCaps;
+	mapCaps = Caps(map);
+	if (Caps(Filter[i]) == mapCaps)
 	{
-		Err("unknown property key `"$key$"`");
+		return True;
 	}
-	return True;
+	return False;
 }
 
-function private ResetRuleIndex(int i)
+function private RuleApply(MV_MapResult result, int i)
 {
-	Rules[i].Filter = EmptyString;
-	Rules[i].SongName = EmptyString;
-	Rules[i].Filter = EmptyString;
-}
-
-function private bool TrySplit(string input, string separator, out string first, out string rest)
-{
-	return class'MV_Parser'.static.TrySplit(input, separator, first, rest);
+	if (SongName[i] != "")
+	{
+		result.Song = SongPackage[i] $"."$ SongName[i];
+		result.AddPackage(SongPackage[i]);
+	}
 }

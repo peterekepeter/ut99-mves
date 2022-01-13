@@ -99,6 +99,9 @@ var string BanList[32];
 var MV_PlayerDetector PlayerDetector;
 var int CurrentID;
 
+var MV_MapResult CurrentMap;
+var Music SongOverride;
+
 //XC_GameEngine and Unreal 227 interface
 native(1718) final function bool AddToPackageMap( optional string PkgName);
 
@@ -205,8 +208,6 @@ event PostBeginPlay()
 	local Actor A;
 	local class<Actor> ActorClass;
 	local int MapIdx;
-	local MapOverridesConfig MapOverridesConfig;
-	local MV_MapOverrides MapOverrides;
 
 	log(" !MVE: PostBeginPlay!");
 	if ( bFirstRun )
@@ -215,14 +216,6 @@ event PostBeginPlay()
 		SaveConfig();
 	}
 	LoadAliases();
-
-	if (bEnableMapOverrides)
-	{
-		MapOverridesConfig = new class'MapOverridesConfig';
-		MapOverridesConfig.RunMigration();
-		MapOverrides = new class'MV_MapOverrides';
-		MapOverrides.Configure(MapOverridesConfig);
-	}
 
 	//if ( int(ConsoleCommand("get ini:Engine.Engine.GameEngine XC_Version")) >= 11 ) //Only XC_GameEngine contains this variable
 	//{
@@ -272,6 +265,21 @@ event PostBeginPlay()
 	}
 	Cmd = Extension.ByDelimiter( string(self), ".");
 	Log("[MVE] Command: "$Cmd);
+	
+	CurrentMap = new class'MV_MapResult';
+	CurrentMap.Map = Cmd;
+	CurrentMap.GameIndex = TravelIdx;
+	if (bEnableMapOverrides)
+	{
+		ProcessMapOverrides(CurrentMap);
+		SongOverride = None;
+		if (CurrentMap.Song != "")
+		{
+			SongOverride = Music(DynamicLoadObject(CurrentMap.Song, class'Music'));
+			Log("[MVE] SongOverride configured to: `"$SongOverride$"`");
+		}
+	}
+
 	if ( Cmd ~= Left(TravelString, Len(Cmd) ) )  //CRASH DIDN'T HAPPEN, SETUP GAME
 	{
 		MapIdx = MapList.FindMapWithGame( Cmd, TravelIdx);
@@ -348,6 +356,8 @@ event PostBeginPlay()
 	// init player detector
 	PlayerDetector = Spawn(class'MV_PlayerDetector');
 	PlayerDetector.Initialize(self);
+	// self testing
+	// SetupTravelString("DM-Deck16][:1");
 }
 
 function Mutate( string MutateString, PlayerPawn Sender)
@@ -563,7 +573,10 @@ function PlayerJoined( PlayerPawn P)
 	local MV_PlayerWatcher MVEPV;
 	log("[MVE] PlayerJoined:"@P.PlayerReplicationInfo.PlayerName@"("$P$") with id"@P.PlayerReplicationInfo.PlayerID);
 
-	// P.ClientSetMusic(Music(DynamicLoadObject("Mannodermaus-20200222.20200222", class'Music')), 0, 0, MTRAN_Instant );
+	if (bEnableMapOverrides && SongOverride != None)
+	{
+		P.ClientSetMusic(SongOverride, 0, 0, MTRAN_Instant );
+	}
 
 	//Give this player a watcher
 	if ( InactiveList == None )
@@ -1083,47 +1096,79 @@ final function bool CanVote(PlayerPawn Sender)
 }
 
 //Validity assumed
-final function string SetupTravelString( string MapString, out int GameIdx)
+final function SetupTravelString( string MapString )
 {
-	local string map, spk;
-	local int idx;
+	local string spk, GameClassName;
+	local MV_MapOverrides MapOverrides;
+	local MV_MapResult Result;
 	
 	if ( MapString == "" )
-		return "?restart";
-	map = Extension.NextParameter( MapString, ":");
-	idx = int(MapString);
-	//RANDOM MAP CHOSEN!
-	if ( map ~= "Random" )
 	{
-		map = MapList.RandomMap( idx);
+		TravelString = "?restart";
+	}
+	Result = new class'MV_MapResult';
+	Result.Map = Extension.NextParameter( MapString, ":");
+	Result.GameIndex = int(MapString);
+	//RANDOM MAP CHOSEN!
+	if ( Result.Map ~= "Random" )
+	{
+		Result.Map = MapList.RandomMap(Result.GameIndex);
 	}
 
-	if ( DynamicLoadObject(ParseAliases(CustomGame[idx].GameClass),class'Class') == None )
-		Log("Bad game class: "$CustomGame[idx].GameClass );
-	else
+	GameClassName = CustomGame[Result.GameIndex].GameClass;
+
+	if ( DynamicLoadObject(ParseAliases(GameClassName),class'Class') == None )
 	{
-		TravelString = map $ "?Game=" $ ParseAliases(CustomGame[idx].GameClass);
-		GameIdx = idx;
-		Log("[MVE] -> TravelString: "$TravelString);
-		Log("[MVE] -> GameIdx: "$idx);
-		if ( bOverrideServerPackages )
-		{
-			spk = Extension.GenerateSPList( CustomGame[idx].Packages );
-			Log( spk );
-			if ( spk == "" )				spk = MainServerPackages;
-			if ( InStr( spk, "<") >= 0 )
-				spk = ParseAliases( spk);
-			Log("[MVE] -> ServerPackages: "$spk);
-			ConsoleCommand( "set ini:Engine.Engine.GameEngine ServerPackages "$spk);
-		}
+		Log("Bad game class: "$GameClassName );
+		return;
 	}
+
+	TravelString = Result.Map $ "?Game=" $ ParseAliases(GameClassName);
+	TravelIdx = Result.GameIndex;
+	Log("[MVE] -> TravelString: "$TravelString);
+	Log("[MVE] -> GameIdx: "$TravelIdx);
+		
+	if (bEnableMapOverrides)
+	{
+		ProcessMapOverrides(Result);
+	}
+
+	if ( bOverrideServerPackages )
+	{
+		Result.AddPackages(CustomGame[Result.GameIndex].Packages);
+		spk = Extension.GenerateSPList(Result.GetPackagesStringList());
+		if ( spk == "" )			
+		{	
+			spk = MainServerPackages;
+		}
+		if ( InStr( spk, "<") >= 0 )
+		{
+			spk = ParseAliases( spk);
+		}
+		Log("[MVE] -> ServerPackages: "$spk);
+		ConsoleCommand( "set ini:Engine.Engine.GameEngine ServerPackages "$spk);
+	}
+	Log("8.");
+}
+
+function ProcessMapOverrides(MV_MapResult map)
+{
+	local MapOverridesConfig MapOverridesConfig;
+	local MV_MapOverrides MapOverrides;
+	local MV_MapOverridesParser MapOverridesParser;
+	MapOverridesConfig = new class'MapOverridesConfig';
+	MapOverridesConfig.RunMigration();
+	MapOverrides = new class'MV_MapOverrides';
+	MapOverridesParser = new class'MV_MapOverridesParser';
+	MapOverridesParser.ParseConfiguration(MapOverrides, MapOverridesConfig);
+	MapOverrides.ApplyOverrides(map);
 }
 
 final function GotoMap( string MapString, optional bool bImmediate)
 {
 	if ( Left(MapString,3) == "[X]" ) //Random sent me here
 		MapString = Mid(MapString,3);
-	SetupTravelString( MapString, TravelIdx);
+	SetupTravelString( MapString );
 	SaveConfig();
 	Extension.CloseVoteWindows( WatcherList);
 	if ( bImmediate )

@@ -44,7 +44,7 @@ function UpdateMapVotes( MV_PlayerWatcher W)
 		{
 			class'WRI_Statics'.static.UpdateMapVoteResults( W.MapVoteWRIActor, "Clear", 0);
 			for ( i=0 ; i<Mutator.iMapVotes ; i++ )
-			class'WRI_Statics'.static.UpdateMapVoteResults( W.MapVoteWRIActor, Mutator.StrMapVotes[i], Mutator.RankMapVotes[i]);
+				class'WRI_Statics'.static.UpdateMapVoteResults( W.MapVoteWRIActor, Mutator.StrMapVotes[i], Mutator.RankMapVotes[i]);
 		}
 		W = W.nextWatcher;
 	}
@@ -62,7 +62,7 @@ function UpdateKickVotes( MV_PlayerWatcher W)
 		{
 			class'WRI_Statics'.static.UpdateKickVoteResults( W.MapVoteWRIActor, "Clear", 0);
 			for ( i=0 ; i<Mutator.iKickVotes ; i++ )
-			class'WRI_Statics'.static.UpdateKickVoteResults( W.MapVoteWRIActor, Mutator.StrKickVotes[i], Mutator.KickVoteCount[i]);
+				class'WRI_Statics'.static.UpdateKickVoteResults( W.MapVoteWRIActor, Mutator.StrKickVotes[i], Mutator.KickVoteCount[i]);
 		}
 		W = W.nextWatcher;
 	}
@@ -89,9 +89,9 @@ function AddPlayerToWindows( MV_PlayerWatcher Watcher)
 	aStr = WTeamCode(Watcher.Watched) $ Watcher.PlayerID $ Watcher.Watched.PlayerReplicationInfo.PlayerName;
 	
 	for ( W=Watcher.Mutator.WatcherList ; W!=None ; W=W.nextWatcher )
-	if ( W.MapVoteWRIActor != None )
-	{
-		class'WRI_Statics'.static.AddNewPlayer( W.MapVoteWRIActor, aStr, False);
+		if ( W.MapVoteWRIActor != None )
+		{
+			class'WRI_Statics'.static.AddNewPlayer( W.MapVoteWRIActor, aStr, False);
 		Log("Adding "$aStr$" to "$W.MapVoteWRIActor);
 	}
 }
@@ -101,8 +101,8 @@ function RemovePlayerFromWindows( MV_PlayerWatcher Watcher)
 	local MV_PlayerWatcher W;
 	
 	for ( W=Watcher.Mutator.WatcherList ; W!=None ; W=W.nextWatcher )
-	if ( W.MapVoteWRIActor != None )
-		class'WRI_Statics'.static.RemovePlayerName( W.MapVoteWRIActor, Watcher.PlayerID);
+		if ( W.MapVoteWRIActor != None )
+			class'WRI_Statics'.static.RemovePlayerName( W.MapVoteWRIActor, Watcher.PlayerID);
 }
 
 function PlayersToWindow( Info MapVoteWRI)
@@ -151,12 +151,16 @@ function string GenerateSPList( string NewPacks)
 	local int i;
 
 	if ( (MapVote(Outer) == None) || (MapVote(Outer).MainServerPackages == "") )
+	{
 		return "";
+	}
 
 	Result = MapVote(Outer).MainServerPackages;
 	Result = Left( Result, Len(Result)-1 );
 	while ( NewPacks != "" )
-	Result = Result $ "," $ chr(34) $ static.NextParameter(NewPacks,",") $ chr(34);
+	{
+		Result = Result $ "," $ chr(34) $ static.NextParameter(NewPacks,",") $ chr(34);
+	}
 	return Result $ ")";
 }
 
@@ -285,7 +289,7 @@ static function string ByDelimiter( string Str, string Delimiter, optional int s
 static function string PreFill( string Base, string Fill, int Req)
 {
 	while ( Len(Base) < Req )
-	Base = Fill $ Base;
+		Base = Fill $ Base;
 	return Base;
 }
 
