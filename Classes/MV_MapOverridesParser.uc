@@ -95,6 +95,6 @@ function private ResetRuleIndex(MV_MapOverrides target, int i)
 {
 	target.Filter[i] = "";
 	target.SongName[i] = "";
-	target.Filter[i] = "";
+	target.SongPackage[i] = "";
 }
 

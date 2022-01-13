@@ -1,5 +1,6 @@
 class MV_MapResult expands MV_Util;
 
+var string OriginalSong;
 var string Map;
 var string Song;
 var int GameIndex;

@@ -268,6 +268,7 @@ event PostBeginPlay()
 	
 	CurrentMap = new class'MV_MapResult';
 	CurrentMap.Map = Cmd;
+	CurrentMap.OriginalSong = ""$Level.Song;
 	CurrentMap.GameIndex = TravelIdx;
 	if (bEnableMapOverrides)
 	{
@@ -1109,6 +1110,7 @@ final function SetupTravelString( string MapString )
 	Result = new class'MV_MapResult';
 	Result.Map = Extension.NextParameter( MapString, ":");
 	Result.GameIndex = int(MapString);
+	Result.OriginalSong = GetOriginalSongName(Result);
 	//RANDOM MAP CHOSEN!
 	if ( Result.Map ~= "Random" )
 	{
@@ -1149,6 +1151,18 @@ final function SetupTravelString( string MapString )
 		ConsoleCommand( "set ini:Engine.Engine.GameEngine ServerPackages "$spk);
 	}
 	Log("8.");
+}
+
+function string GetOriginalSongName(MV_MapResult map)
+{
+	local LevelInfo info;
+	info = LevelInfo(DynamicLoadObject(map.Map $"."$"LevelInfo0", class'LevelInfo'));
+	if (info == None)
+	{
+		Log("[MVE] GetOriginalSongName failed for "$map.Map);
+		return "????"; // str should not match anyhing ? not valid in filename nor unreal names
+	}
+	return ""$info.Song;
 }
 
 function ProcessMapOverrides(MV_MapResult map)
