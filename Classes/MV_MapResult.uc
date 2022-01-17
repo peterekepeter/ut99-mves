@@ -46,6 +46,7 @@ function string GetPackagesStringList()
 	for (i=0; i<ServerPackageCount; i++)
 	{
 		result = result $ separator $ ServerPackages[i];
+		separator = ",";
 	}
 	return result;
 }

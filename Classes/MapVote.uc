@@ -270,6 +270,7 @@ event PostBeginPlay()
 	CurrentMap.Map = Cmd;
 	CurrentMap.OriginalSong = ""$Level.Song;
 	CurrentMap.GameIndex = TravelIdx;
+	
 	if (bEnableMapOverrides)
 	{
 		ProcessMapOverrides(CurrentMap);
@@ -285,7 +286,9 @@ event PostBeginPlay()
 	{
 		MapIdx = MapList.FindMapWithGame( Cmd, TravelIdx);
 		if ( MapIdx >= 0 )
+		{
 			MapList.History.NewMapPlayed( MapIdx, TravelIdx, MapCostAddPerLoad);
+		}
 		CurrentMode = CustomGame[TravelIdx].GameName @ "-" @ CustomGame[TravelIdx].RuleName;
 		DEFAULT_MODE:
 		Cmd = CustomGame[TravelIdx].Settings;
@@ -295,16 +298,22 @@ event PostBeginPlay()
 			NextParm = Extension.NextParameter( Cmd, ",");
 			Log("[MVE] Execute Setting: "$NextParm,'MapVote');
 			if ( InStr(NextParm,"=") > 0 )
+			{
 				Level.Game.SetPropertyText( Extension.NextParameter(NextParm,"=") , NextParm );
+			}
 		}
 		Cmd = ParseAliases(CustomGame[TravelIdx].MutatorList);
 		if ( Cmd != "" )
+		{
 			Log("[MVE] Spawning Mutators",'MapVote');
+		}
 		while ( Cmd != "" )
 		{
 			NextParm = Extension.NextParameter( Cmd, ",");
 			if ( InStr(NextParm,".") < 0 )
+			{
 				NextParm = "Botpack."$NextParm;
+			}
 			ActorClass = class<Actor>(DynamicLoadObject(NextParm, class'Class'));	
 			A=Spawn(ActorClass);
 			Level.Game.BaseMutator.AddMutator(Mutator(A));
@@ -314,12 +323,16 @@ event PostBeginPlay()
 		{
 			Cmd = CustomGame[TravelIdx].Packages;
 			if ( InStr( Cmd, "<") >= 0 )
+			{
 				Cmd = ParseAliases( Cmd);
+			}
 			while ( Cmd != "" )
 			{
 				NextParm = Extension.NextParameter( Cmd, ",");
 				if ( NextParm != "" )
+				{
 					AddToPackageMap( NextParm);
+				}
 			}
 		}
 	}
@@ -720,7 +733,10 @@ function PlayerKickVoted( MV_PlayerWatcher Kicked, optional string OverrideReaso
 		}
 	}
 
-	while ( (i<32) && (BanList[i] != "") )		i++;
+	while ( (i<32) && (BanList[i] != "") )
+	{
+		i++;
+	}		
 	if ( i==32 )	i = Rand(32);
 	BanList[i] = Kicked.PlayerCode;
 	Log("[MVE] Added "$Kicked.PlayerCode @ "to banlist ID" @i,'MapVote');
@@ -1313,40 +1329,53 @@ function bool MutatorTeamMessage( Actor Sender, Pawn Receiver, PlayerReplication
 function bool MutatorBroadcastMessage( Actor Sender, Pawn Receiver, out coerce string Msg, optional bool bBeep, out optional name Type )
 {
 	local int i;
-	local playerpawn P;
+	local PlayerPawn P;
 	local string orgMsg;
 
-	if ( Msg == LastMsg )
-		goto END;
-	LastMsg = Msg;
-	orgMsg = Msg;
-	while ( inStr( orgMsg, ":") > -1 );
-	orgMsg = Mid( orgMsg, inStr( orgMsg, ":")+1 );
+	if ( Msg != LastMsg )
+	{
+		LastMsg = Msg;
+		orgMsg = Msg;
+		while ( inStr( orgMsg, ":") > -1 )
+		{
+			orgMsg = Mid( orgMsg, inStr( orgMsg, ":")+1 );
+		}
 
-	CommonCommands( Sender, orgMsg);
+		CommonCommands( Sender, orgMsg);
+	}
 
-	END:
+
 	if ( DontPass( orgMsg ) )
+	{
 		return True;
+	}
 
 	if ( NextMessageMutator != None )
+	{
 		return NextMessageMutator.MutatorBroadcastMessage( Sender, Receiver, Msg, bBeep, Type );
+	}
 	return True;
 }
 
 function bool DontPass( string Msg)
 {
 	if ( (Msg ~= "!v") || (Msg ~= "!vote") || (Msg ~= "!mapvote") || (Msg ~= "!kickvote") )
+	{
 		return True;
+	}
 }
 
 function CommonCommands( Actor Sender, string S)
 {
 	if ( PlayerPawn(Sender) == None )
+	{
 		return;
+	}
 
 	if ( (S ~= "!v") || (S ~= "!vote") || (S ~= "!mapvote") || (S ~= "!kickvote") )
+	{
 		Mutate( "BDBMAPVOTE VOTEMENU", PlayerPawn(Sender) );
+	}
 }
 
 defaultproperties
