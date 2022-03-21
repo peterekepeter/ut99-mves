@@ -231,14 +231,16 @@ function CacheCodes()
 	For ( i=0 ; i<Mutator.iGames ; i++ )
 	{
 		tmpCode = Mutator.MutatorCode(i) $ " ";
-		if ( tmpCode != " " )
+		if ( tmpCode != " " ) 
 		{
 			For ( j=0 ; j<k ; j++ )
+			{
 				if ( TmpCodes[j] == tmpCode )
 				{
 					GameTags[j] = GameTags[j] $ ":" $ TwoDigits(i);
 					Goto END_LOOP;
 				}
+			}
 			if ( Left(tmpCode,7) ~= "premade" )
 				IsPremade[k] = 1;
 			GameTags[k] = ":" $ TwoDigits(i);
@@ -295,37 +297,42 @@ function CacheCodes()
 
 function EnumerateGames()
 {
-	local int i, j, k;
-	local string TC;
+	local int i, j;
+	local string gameName;
 	local float fPri;
+	local bool found;
 	
 	iRules = 0;
 	GameCount = 0;
-	For ( i=0 ; i<Mutator.iGames ; i++ )
+	for ( i=0 ; i<Mutator.iGames ; i++ )
 	{
 		if ( Mutator.MutatorCode(i) != "" )
 		{
-			TC = Mutator.GameName(i);
-			GameNames[i] = TC;
+			gameName = Mutator.GameName(i);
+			GameNames[i] = gameName;
 			RuleNames[i] = Mutator.RuleName(i);
 			VotePriority[i] = Mutator.VotePriority(i);
 			GameCount++;
 			iGameC = i+1;
-			k += len(TC);
-			For ( j=0 ; j<iRules ; j++ )
+			found = False;
+			for ( j=0 ; j<iRules ; j++ )
 			{
-				if ( TmpGameName[j] ~= TC )
+				if ( TmpGameName[j] ~= gameName )
 				{
+					// add to existing rule from RuleList
 					RuleList[j] = RuleList[j] $ ":" $ TwoDigits(i);
-					Goto END_LOOP;
+					found = True;
 				}
 			}
-			TmpGameName[iRules] = TC;
-			RuleList[iRules++] = ":" $ TwoDigits(i);
+			if (!found)
+			{
+				// add new entry into RuleList
+				TmpGameName[iRules] = gameName;
+				RuleList[iRules] = ":" $ TwoDigits(i);
+				iRules++;
+			}
 		}
-		END_LOOP:
 	}
-	k += iRules;
 }
 
 function bool ValidMap( out string MapString)
