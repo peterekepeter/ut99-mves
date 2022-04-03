@@ -22,7 +22,7 @@ function Info SpawnVoteWRIActor( PlayerPawn Victim)
 	return Victim.Spawn( class<Info>(DynamicLoadObject( MapVote(Outer).ClientPackage$".MapVoteWRI",class'class')), Victim,,vect(0,0,0));
 }
 
-function RemoveMapVotes( MV_PlayerWatcher W)
+function RemoveMapVotes( MVPlayerWatcher W)
 {
 	MapVote(Outer).iMapVotes = 0;
 	while ( W != None )
@@ -32,7 +32,7 @@ function RemoveMapVotes( MV_PlayerWatcher W)
 	}
 }
 
-function UpdateMapVotes( MV_PlayerWatcher W)
+function UpdateMapVotes( MVPlayerWatcher W)
 {
 	local MapVote Mutator;
 	local int i;
@@ -50,7 +50,7 @@ function UpdateMapVotes( MV_PlayerWatcher W)
 	}
 }
 
-function UpdateKickVotes( MV_PlayerWatcher W)
+function UpdateKickVotes( MVPlayerWatcher W)
 {
 	local MapVote Mutator;
 	local int i;
@@ -68,7 +68,7 @@ function UpdateKickVotes( MV_PlayerWatcher W)
 	}
 }
 
-static function CloseVoteWindows( MV_PlayerWatcher W)
+static function CloseVoteWindows( MVPlayerWatcher W)
 {
 	while ( W != None )
 	{
@@ -81,9 +81,9 @@ static function CloseVoteWindows( MV_PlayerWatcher W)
 	}
 }
 
-function AddPlayerToWindows( MV_PlayerWatcher Watcher)
+function AddPlayerToWindows( MVPlayerWatcher Watcher)
 {
-	local MV_PlayerWatcher W;
+	local MVPlayerWatcher W;
 	local string aStr;
 	
 	aStr = WTeamCode(Watcher.Watched) $ Watcher.PlayerID $ Watcher.Watched.PlayerReplicationInfo.PlayerName;
@@ -96,9 +96,9 @@ function AddPlayerToWindows( MV_PlayerWatcher Watcher)
 	}
 }
 
-function RemovePlayerFromWindows( MV_PlayerWatcher Watcher)
+function RemovePlayerFromWindows( MVPlayerWatcher Watcher)
 {
-	local MV_PlayerWatcher W;
+	local MVPlayerWatcher W;
 	
 	for ( W=Watcher.Mutator.WatcherList ; W!=None ; W=W.nextWatcher )
 		if ( W.MapVoteWRIActor != None )
@@ -107,7 +107,7 @@ function RemovePlayerFromWindows( MV_PlayerWatcher Watcher)
 
 function PlayersToWindow( Info MapVoteWRI)
 {
-	local MV_PlayerWatcher W;
+	local MVPlayerWatcher W;
 	local string aStr;
 	
 	for ( W=MapVote(Outer).WatcherList ; W!=None ; W=W.nextWatcher )

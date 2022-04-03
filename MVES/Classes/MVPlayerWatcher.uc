@@ -2,7 +2,7 @@
 // Player watcher for players
 //
 
-class MV_PlayerWatcher expands Info;
+class MVPlayerWatcher expands Info;
 
 var MapVote Mutator;
 var PlayerPawn Watched;
@@ -12,7 +12,7 @@ var string PlayerID;
 var string PlayerVote;
 var int KickVoteID;
 var string KickVoteCode;
-var MV_PlayerWatcher nextWatcher;
+var MVPlayerWatcher nextWatcher;
 var int TicksLeft;
 var bool bInitialized;
 var bool bHooked;
@@ -195,7 +195,7 @@ state Inactive
 
 function RemoveFromActive()
 {
-	local MV_PlayerWatcher PW;
+	local MVPlayerWatcher PW;
 
 	if ( Mutator.WatcherList == self )
 		Mutator.WatcherList = nextWatcher;

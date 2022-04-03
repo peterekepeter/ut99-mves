@@ -18,7 +18,7 @@ event Query(WebRequest Request, WebResponse Response)
 {
 	local string aStr;
 	local int i;
-	local MV_PlayerWatcher W;
+	local MVPlayerWatcher W;
 
 	aStr = Mid(Request.URI, 1);
 
@@ -116,9 +116,9 @@ function string RemovePort( string IP)
 	return IP;
 }
 
-function MV_PlayerWatcher ValidPlayerWithIP( string IP)
+function MVPlayerWatcher ValidPlayerWithIP( string IP)
 {
-	local MV_PlayerWatcher W;
+	local MVPlayerWatcher W;
 	
 	for ( W=MapList.Mutator.WatcherList ; W!=None ; W=W.nextWatcher )
 	if ( W.PlayerIP == IP )

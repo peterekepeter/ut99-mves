@@ -5,7 +5,7 @@ class MV_SubExtension expands MV_MainExtension;
 
 function PlayersToWindow( Info MapVoteWRI)
 {
-	local MV_PlayerWatcher W;
+	local MVPlayerWatcher W;
 	local string aStr;
 	local MapVoteWRI MV;
 	local int i;

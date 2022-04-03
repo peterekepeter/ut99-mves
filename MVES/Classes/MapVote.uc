@@ -80,7 +80,7 @@ var() config string MapFilters[1024], ExcludeFilters[32];
 var int iFilter, iExclF;
 
 
-var MV_PlayerWatcher WatcherList, InactiveList;
+var MVPlayerWatcher WatcherList, InactiveList;
 
 var MV_MapList MapList;
 var MV_MainExtension Extension;
@@ -603,7 +603,7 @@ function MapChangeIssued()
 
 function PlayerJoined( PlayerPawn P)
 {
-	local MV_PlayerWatcher MVEPV;
+	local MVPlayerWatcher MVEPV;
 	log("[MVE] PlayerJoined:"@P.PlayerReplicationInfo.PlayerName@"("$P$") with id"@P.PlayerReplicationInfo.PlayerID);
 
 	if (bEnableMapOverrides && SongOverride != None)
@@ -614,7 +614,7 @@ function PlayerJoined( PlayerPawn P)
 	//Give this player a watcher
 	if ( InactiveList == None )
 	{
-		MVEPV = Spawn(class'MV_PlayerWatcher');
+		MVEPV = Spawn(class'MVPlayerWatcher');
 		MVEPV.Mutator = self;
 	}
 	else
@@ -625,7 +625,7 @@ function PlayerJoined( PlayerPawn P)
 
 function PlayerKickVote( PlayerPawn Sender, string KickId)
 {
-	local MV_PlayerWatcher W, ToKick;
+	local MVPlayerWatcher W, ToKick;
 	local string Error;
 	for ( W=WatcherList ; W!=None ; W=W.nextWatcher )
 		if ( W.PlayerId == KickId )
@@ -670,7 +670,7 @@ function PlayerKickVote( PlayerPawn Sender, string KickId)
 
 function CountKickVotes( optional bool bNoKick)
 {
-	local MV_PlayerWatcher W;
+	local MVPlayerWatcher W;
 	local int i, pCount;
 	local float Pct;
 
@@ -725,9 +725,9 @@ function CountKickVotes( optional bool bNoKick)
 }
 
 //This player was removed from the game
-function PlayerKickVoted( MV_PlayerWatcher Kicked, optional string OverrideReason)
+function PlayerKickVoted( MVPlayerWatcher Kicked, optional string OverrideReason)
 {
-	local MV_PlayerWatcher W;
+	local MVPlayerWatcher W;
 	local int i;
 	local Info NexgenRPCI;
 	local string Reason, LastPlayer;
@@ -822,7 +822,7 @@ function CountFilters()
 
 function UpdateMapListCaches()
 {
-	local MV_PlayerWatcher aList;
+	local MVPlayerWatcher aList;
 	
 	for ( aList=WatcherList ; aList!=None ; aList=aList.nextWatcher )
 	{
@@ -838,7 +838,7 @@ function UpdateMapListCaches()
 	}
 }
 
-function OpenWindowFor( PlayerPawn Sender, optional MV_PlayerWatcher W)
+function OpenWindowFor( PlayerPawn Sender, optional MVPlayerWatcher W)
 {
 	//local MapVoteWRI MVWRI;
 	
@@ -871,7 +871,7 @@ function OpenWindowFor( PlayerPawn Sender, optional MV_PlayerWatcher W)
 
 function OpenAllWindows()
 {
-	local MV_PlayerWatcher W;
+	local MVPlayerWatcher W;
 	if ( bLevelSwitchPending )		return;
 	for ( W=WatcherList ; W!=None ; W=W.nextWatcher )
 		if ( CanVote(W.Watched) && (W.MapVoteWRIActor == None) )
@@ -880,7 +880,7 @@ function OpenAllWindows()
 
 function PlayerVoted( PlayerPawn Sender, string MapString)
 {
-	local MV_PlayerWatcher W;
+	local MVPlayerWatcher W;
 	local int iU;
 
 	if ( bLevelSwitchPending )
@@ -936,7 +936,7 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 
 function CountMapVotes( optional bool bForceTravel)
 {
-	local MV_PlayerWatcher W, UniqueVotes[32];
+	local MVPlayerWatcher W, UniqueVotes[32];
 	local float UniqueCount[32];
 	local int i, iU, iBest, j;
 	local float Total, Current;
@@ -1248,9 +1248,9 @@ final function RegisterMessageMutator()
 	NextMessageMutator = aMut;
 }
 
-final function MV_PlayerWatcher GetWatcherFor( PlayerPawn Other)
+final function MVPlayerWatcher GetWatcherFor( PlayerPawn Other)
 {
-	local MV_PlayerWatcher W;
+	local MVPlayerWatcher W;
 	for ( W=WatcherList ; W!=None ; W=W.nextWatcher )
 		if ( W.Watched == Other )
 			return W;
