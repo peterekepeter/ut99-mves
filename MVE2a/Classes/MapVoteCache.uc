@@ -7,10 +7,10 @@ class MapVoteCache extends Object
 var config bool bCached;
 var config string ServerName;
 var config string LastUpdate;
-var config string RuleList[63];
+var config string RuleList[512];
 var config int RuleListCount;
-var config string GameModeName[63];
-var config string RuleName[63];
+var config string GameModeName[ArrayCount(RuleList)];
+var config string RuleName[ArrayCount(RuleList)];
 var config int RuleCount;
 var config float VotePriority[63];
 var config string MapList1[256];
@@ -30,6 +30,7 @@ var config string MapList14[256];
 var config string MapList15[256];
 var config string MapList16[256];
 var config int MapCount;
+var int iNewMaps[32];
 
 simulated function CacheClear ()
 {
@@ -72,4 +73,16 @@ simulated function CacheClear ()
     goto JL006D;
   }
   MapCount = 0;
+  for (i = 0; i < ArrayCount(iNewMaps); i++)
+	iNewMaps[i] = 0;
+}
+
+final simulated function float GetVotePriority( int Idx)
+{
+	return VotePriority[Idx];
+}
+
+final simulated function SetVotePriority( int Idx, float Value)
+{
+	VotePriority[Idx] = Value;
 }

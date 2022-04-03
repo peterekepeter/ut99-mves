@@ -64,4 +64,9 @@ function Tick (float DeltaTime)
 
 defaultproperties
 {
+      ReportText=""
+      X=0
+      MVWRI=None
+      bSendResults=False
+      History=None
 }

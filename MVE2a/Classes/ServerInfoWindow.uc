@@ -139,9 +139,22 @@ simulated function SetInfoServerAddress (string p_ServerInfoURL, string p_MapInf
 
 defaultproperties
 {
-     QueryText="Querying Server..."
-     FailureText="The server did not respond."
-     LinkClass=Class'ServerInfoLink'
-     TextAreaClass=Class'UBrowser.UBrowserUpdateServerTextArea'
-     NumTries=3
+      VSplitter=None
+      Link=None
+      TextArea=None
+      QueryText="Querying Server..."
+      FailureText="The server did not respond."
+      LinkClass=Class'ServerInfoLink'
+      TextAreaClass=Class'UBrowser.UBrowserUpdateServerTextArea'
+      bGotMOTD=False
+      StatusBarText=""
+      bHadInitialQuery=False
+      tries=0
+      NumTries=3
+      WebServer=""
+      FilePath=""
+      Port=0
+      ServerInfoURL=""
+      MapInfoURL=""
+      version=""
 }

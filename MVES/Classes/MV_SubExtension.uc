@@ -54,10 +54,13 @@ function MLC_Rules( Info MapListCacheActor)
 	{
 		MLC.GameModeName[i] = MapList.GameNames[i];
 		MLC.RuleName[i] = MapList.RuleNames[i];
-		MLC.VotePriority[i] = MapList.VotePriority[i];
+		MLC.SetVotePriority(i, MapList.GetVotePriority(i));
 	}
 	for ( i=0 ; i<MapList.iRules ; i++ )
-	MLC.RuleList[i] = MapList.RuleList[i];
+		MLC.RuleList[i] = MapList.RuleList[i];
+
+	for ( i=0 ; i<ArrayCount(MapList.iNewMaps) ; i++ )
+		MLC.iNewMaps[i] = MapList.iNewMaps[i];
 
 }
 
@@ -221,4 +224,8 @@ function MLC_MapList_16( Info MapListCacheActor)
 	k = MapList.iClientMapList - l;
 	if ( k > 256 ) k = 256;
 	for ( i=0 ; i<k ; i++ )		MLC.MapList16[ i ] = MapList.GetMapList( i + l );
+}
+
+defaultproperties
+{
 }

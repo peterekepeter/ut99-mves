@@ -47,6 +47,6 @@ function HTTPReceivedData (string Data)
 
 defaultproperties
 {
-    UpdateServerTimeout=10
-
+      UpdateServerTimeout=10
+      UpdateWindow=None
 }

@@ -149,5 +149,12 @@ function Close (bool ByParent)
 
 defaultproperties
 {
-     bShowWelcomeWindow=True
+      ServerInfoButton=None
+      MapInfoButton=None
+      ReportButton1=None
+      ReportButton2=None
+      TipsButton=None
+      AboutButton=None
+      CloseButton=None
+      bShowWelcomeWindow=True
 }

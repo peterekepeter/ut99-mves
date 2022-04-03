@@ -18,3 +18,13 @@ function int Compare (UWindowList t, UWindowList B)
 	}
 	return 1;
 }
+
+defaultproperties
+{
+      rank=0
+      MapName=""
+      GameModeName=""
+      RuleName=""
+      VoteCount=0
+      CGNum=0
+}

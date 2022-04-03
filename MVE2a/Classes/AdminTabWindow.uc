@@ -9,3 +9,7 @@ function Created ()
 	FixedAreaClass = None;
 	Super.Created();
 }
+
+defaultproperties
+{
+}

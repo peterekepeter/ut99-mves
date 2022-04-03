@@ -139,7 +139,15 @@ function DestroyWRI ()
 
 defaultproperties
 {
-	DestroyOnClose=True
-	RemoteRole=ROLE_SimulatedProxy
-	NetPriority=2.00
+      WindowClass=None
+      WinLeft=0
+      WinTop=0
+      WinWidth=0
+      WinHeight=0
+      DestroyOnClose=True
+      TheWindow=None
+      TicksPassed=0
+      bDestroyRequested=False
+      RemoteRole=ROLE_SimulatedProxy
+      NetPriority=2.000000
 }

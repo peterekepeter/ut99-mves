@@ -79,6 +79,7 @@ JL00C1:
 
 defaultproperties
 {
-	ClientClass=Class'MVKeyBinderClientWindow'
-	WindowTitle="Map Vote Key Binder"
+      bHasStartWindow=False
+      ClientClass=Class'MVKeyBinderClientWindow'
+      WindowTitle="Map Vote Key Binder"
 }

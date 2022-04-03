@@ -268,6 +268,22 @@ function Nfo(coerce string message)
 
 defaultproperties
 {
-	KickVoteID=-1;
-	RemoteRole=ROLE_None;
+      Mutator=None
+      Watched=None
+      PlayerIP=""
+      PlayerCode=""
+      PlayerID=""
+      PlayerVote=""
+      KickVoteID=-1
+      KickVoteCode=""
+      nextWatcher=None
+      TicksLeft=0
+      bInitialized=False
+      bHooked=False
+      bHTTPLoading=False
+      bOverflow=False
+      MapListCacheActor=None
+      MapVoteWRIActor=None
+      NexGenClient=None
+      RemoteRole=ROLE_None
 }

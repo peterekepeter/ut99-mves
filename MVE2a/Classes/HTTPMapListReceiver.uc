@@ -128,6 +128,7 @@ final function dlog (string S)
 
 defaultproperties
 {
-	UpdateServerTimeout=5
-	RemoteRole=None
+      UpdateServerTimeout=5
+      C=None
+      bDebugMode=False
 }

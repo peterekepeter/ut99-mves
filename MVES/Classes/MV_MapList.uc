@@ -15,20 +15,23 @@ var int iClientMapList; //Current loop position during initial generation
 //var() config int LastPlayed[4096]; //Does not affect the string, said properties must be replicated differently to avoid caching
 var() config int GameCount;
 var() config int iGameC;
-var() config string GameNames[63];
-var() config string RuleNames[63];
-var() config float VotePriority[63];
+var() config string GameNames[512];
+var() config string RuleNames[ArrayCount(GameNames)];
+var() config float VotePriority[ArrayCount(GameNames)];
 
-var string TmpGameName[63];
-var() config string RuleList[63];
+var string TmpGameName[ArrayCount(GameNames)];
+var() config string RuleList[ArrayCount(GameNames)];
 var() config int iRules;
 
-var(Debug) string TmpCodes[63];
-var(Debug) string GameTags[63];
-var(Debug) int IsPremade[63];
-var(Debug) int FStart[63], FEnd[63];
-var(Debug) int EStart[63], EEnd[63];
+var(Debug) string TmpCodes[ArrayCount(GameNames)];
+var(Debug) string GameTags[ArrayCount(GameNames)];
+var(Debug) int IsPremade[ArrayCount(GameNames)];
+var(Debug) int FStart[ArrayCount(GameNames)], FEnd[ArrayCount(GameNames)];
+var(Debug) int EStart[ArrayCount(GameNames)], EEnd[ArrayCount(GameNames)];
 var(Debug) int iTmpC;
+
+var config int iNewMaps[32], iM;
+var config string M[16384];
 
 var string MapListString; //Send this over the net!
 var MapHistory History;
@@ -100,10 +103,10 @@ function SetupClientList()
 //Else add to list and find rules that use it
 function GlobalLoad()
 {
-	local string FirstMap, CurMap;
+	local string FirstMap, CurMap, ClearMap, NewMaps, Maps[16384];
 	local int iSeek;
 	local string CurFP, CurRules;
-	local int i, j, k, iLen;
+	local int i, j, k, iLen, iMaps;
 	local string sTest;
 	local bool bAddTag;
 
@@ -119,7 +122,7 @@ function GlobalLoad()
 	iSeek = 1;
 
 	//Random!!!
-	For ( i=0 ; i<63 ; i++ )
+	For ( i=0 ; i<ArrayCount(GameNames) ; i++ )
 	{
 		if ( Mutator.MutatorCode( i) == "" )
 			continue;
@@ -138,6 +141,45 @@ function GlobalLoad()
 	CHECK_FINISH:
 	if ( CurMap == FirstMap || CurMap == "" )
 	{
+		Log("Remove old + add new maps...");
+		NewMaps = ":";
+		for (i = 0; i < iMaps; i++)
+			NewMaps = NewMaps $ Maps[i] $ ":";		
+	
+		ClearMap = ":";
+		j = 0;
+		for (i = 0; i < iM; i++) {
+			if (InStr(NewMaps, ":" $ M[i] $ ":") != -1) {
+				ClearMap = ClearMap $ M[i] $ ":";
+				if (i != j)
+					M[j] = M[i];
+				j++;
+			}			
+		}
+		NewMaps = "";
+		
+		for (i = 0; i < iMaps; i++) {
+			if (InStr(ClearMap, ":" $ Maps[i] $ ":") == -1)
+				M[j++] = Maps[i];
+		}
+		iM = j;
+		For ( i=j ; i<ArrayCount(M) ; i++ )
+			M[i] = "";
+			
+		ClearMap = ":";
+		for (i = 0; i < iMapList; i++)
+			ClearMap = ClearMap $ MapList[i] $ ":" $ i $ ":";	
+		
+		for (j = 0; j < ArrayCount(iNewMaps) && iM - j > 0; j++) {
+			NewMaps = Maps[iM - j - 1];
+			k = InStr(ClearMap, ":" $ NewMaps $ ":");
+			if (k == -1) {
+				iNewMaps[j] = 0;
+			} else {
+				iNewMaps[j] = int(Mid(ClearMap, k + 2 + Len(NewMaps), 4));
+			}
+		}
+		
 		Log("CHECKING PREMADE LISTS...");
 		For ( i=0 ; i<iTmpC ; i++ )
 		{
@@ -212,7 +254,9 @@ function GlobalLoad()
 	}
 	if ( CurRules != "" )
 	{
-		MapList[ iMapList ] = RemoveExtension(CurMap) $ CurRules $ ";";
+		ClearMap = RemoveExtension(CurMap);
+		Maps[iMaps++] = ClearMap;
+		MapList[ iMapList ] = ClearMap $ CurRules $ ";";
 		ClientMapList[ iMapList ] = MapList[ iMapList ];
 		iMapList++;
 		MapCount += Len(CurRules) / 3;
@@ -559,4 +603,9 @@ final function string RandomMap( int Game)
 		}
 	}
 	return class'MV_MainExtension'.static.ByDelimiter(Result,":");
+}
+
+final simulated function float GetVotePriority( int Idx)
+{
+	return VotePriority[Idx];
 }

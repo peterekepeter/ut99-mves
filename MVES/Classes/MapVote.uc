@@ -59,11 +59,16 @@ struct GameType
 	var() config string MutatorList;
 	var() config string Settings;
 	var() config string Packages;
+	var() config int TickRate;
+	var() config string ServerActors;
+	var() config bool bAvoidRandom;
 }
 ;
 var() config string DefaultSettings;
+var() config int DefaultTickRate;
 var int pos;
-var() config GameType CustomGame[63];
+const CustomGameCount = 512;
+var() config GameType CustomGame[CustomGameCount];
 var GameType EmptyGame;
 var int iGames;
 
@@ -103,7 +108,7 @@ var MV_MapResult CurrentMap;
 var Music SongOverride;
 
 //XC_GameEngine and Unreal 227 interface
-native(1718) final function bool AddToPackageMap( optional string PkgName);
+//native(1718) final function bool AddToPackageMap( optional string PkgName);
 
 state Voting
 {
@@ -302,6 +307,20 @@ event PostBeginPlay()
 				Level.Game.SetPropertyText( Extension.NextParameter(NextParm,"=") , NextParm );
 			}
 		}
+		
+		Cmd = ParseAliases(CustomGame[TravelIdx].ServerActors);
+		if ( Cmd != "" )
+			Log("[MVE] Spawning ServerActors",'MapVote');
+		While ( Cmd != "" )
+		{
+			NextParm = Extension.NextParameter( Cmd, ",");
+			if ( InStr(NextParm,".") < 0 )
+				NextParm = "Botpack."$NextParm;
+			ActorClass = class<Actor>(DynamicLoadObject(NextParm, class'Class'));	
+			A=Spawn(ActorClass);
+			Log("[MVE] ===> "$string(ActorClass));
+		}
+
 		Cmd = ParseAliases(CustomGame[TravelIdx].MutatorList);
 		if ( Cmd != "" )
 		{
@@ -761,7 +780,7 @@ function CleanRules()
 	local int i, j;
 	local bool bSave;
 	
-	for ( j=0 ; j<63 ; j++ )
+	For ( j=0 ; j<ArrayCount(CustomGame) ; j++ )
 	{
 		if ( j != i )
 		{
@@ -987,10 +1006,16 @@ function CountMapVotes( optional bool bForceTravel)
 
 	if ( bForceTravel && UniqueVotes[iBest] == None ) //Random map
 	{
-		iU = Rand( MapList.iMapList);
-		iBest = MapList.RandomGame(iU);
-		GotoMap( MapList.MapName(iU) $ ":" $ string(iBest), False );
-		BroadcastMessage( "No votes sent, " $ MapList.MapName(iU) @ GameRuleCombo( iBest) @ "has been selected",True);
+		// very dumb way
+		for (i = 0; i < 1024; i++) {
+			iU = Rand( MapList.iMapList);
+			iBest = MapList.RandomGame(iU);
+			if (!CustomGame[iBest].bAvoidRandom || i == 1023) {
+				GotoMap( MapList.MapName(iU) $ ":" $ string(iBest), false );
+				BroadcastMessage( "No votes sent, " $ MapList.MapName(iU) @ GameRuleCombo( iBest) @ "has been selected",True);
+				break;
+			}
+		}
 	}
 	else if ( (UniqueCount[iBest] / Total) >= 0.51 ) //Absolute majority
 	{
@@ -1116,6 +1141,7 @@ final function bool CanVote(PlayerPawn Sender)
 final function SetupTravelString( string MapString )
 {
 	local string spk, GameClassName;
+	local int idx, TickRate;
 	local MV_MapOverrides MapOverrides;
 	local MV_MapResult Result;
 	
@@ -1166,7 +1192,11 @@ final function SetupTravelString( string MapString )
 		Log("[MVE] -> ServerPackages: "$spk);
 		ConsoleCommand( "set ini:Engine.Engine.GameEngine ServerPackages "$spk);
 	}
-	Log("8.");
+	TickRate = DefaultTickRate;
+	if (CustomGame[idx].TickRate != 0)
+		TickRate = CustomGame[idx].TickRate;
+	ConsoleCommand( "set ini:Engine.Engine.NetworkDevice NetServerMaxTickRate "$CustomGame[idx].TickRate);
+	ConsoleCommand( "set ini:Engine.Engine.NetworkDevice LanServerMaxTickRate "$CustomGame[idx].TickRate);
 }
 
 function string GetOriginalSongName(MV_MapResult map)

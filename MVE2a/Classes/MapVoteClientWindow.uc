@@ -10,9 +10,9 @@ const VOTE_WAIT = 0.625;
 
 var GameModeListBox GMListBox;
 var DummyListBox RListDummy;
-var RuleListBox RListBox[63];
-var DummyListBox MapVoteListDummy;
-var MapVoteListBox MapListBox[63];
+var RuleListBox RListBox[512];
+var MapVoteListBox MapVoteListDummy;
+var MapVoteListBox MapListBox[ArrayCount(RListBox)];
 var UWindowSmallButton CloseButton;
 var UWindowSmallButton VoteButton;
 var UWindowSmallButton InfoButton;
@@ -88,7 +88,7 @@ struct ST_MapvoteList
   var byte Column;
 };
 
-var ST_MapvoteList SearchList[63];
+var ST_MapvoteList SearchList[ArrayCount(RListBox)];
 
 function NextSearchItem(optional bool bPrev)
 {
@@ -168,12 +168,17 @@ function SelectMapFromSearch(int Index)
  */
 function MapVoteListBox GetMapVoteList(int Num)
 {
+	if (Num < 0)
+		return MapVoteListDummy;
     return MapListBox[Num];
 }
 
 function int GetMapVoteListNum(MapVoteListBox MLB)
 {
     local int i;
+    if (MLB == MapVoteListDummy) {
+    	return UMenuMapVoteList(MapVoteListDummy.SelectedItem).CGNum;
+    }
 
     for (i = 0; i < ArrayCount(MapListBox); ++ i)
     {
@@ -387,9 +392,10 @@ function Created ()
 	GMListBox = GameModeListBox(CreateControl(Class'GameModeListBox',10.0,26.0,MapListwidth,ListHeight / 2));
 	GMListBox.Items.Clear();
 	RListDummy = DummyListBox(CreateControl(Class'DummyListBox',20.0 + MapListwidth,26.0,MapListwidth,ListHeight / 2));
-	MapVoteListDummy = DummyListBox(CreateControl(Class'DummyListBox',40.0 + 2 * MapListwidth + PlayerListwidth,26.0,MapListwidth * 2 + 10,ListHeight + 12));
+	MapVoteListDummy = MapVoteListBox(CreateControl(Class'MapVoteListBox',40.0 + 2 * MapListwidth + PlayerListwidth,26.0,MapListwidth * 2 + 10,ListHeight + 12));
+	MapVoteListDummy.CW = self;
 	
-	for ( i = 0; i < 63; i++ )
+	for ( i = 0; i < ArrayCount(RListBox); i++ )
 	{
 		RListBox[i] = RuleListBox(CreateControl(Class'RuleListBox',20.0 + MapListwidth,26.0,0.0,0.0));
 		RListBox[i].Items.Clear();
@@ -479,7 +485,7 @@ function Created ()
 	lblTitle3.SetFont(1);
 	lblTitle3.Align=TA_Center;
 	lblTitle3.SetTextColor(TextColorTitles);
-	lblTitle3.SetText("Map");
+	lblTitle3.SetText("New Maps");
 	lblTitle3.SetTextColor(TitleColor3);
 	lblTitle4 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',15.0 + 2 * MapListwidth,197.0,PlayerListwidth + 30,20.0));
 	lblTitle4.SetFont(1);
@@ -542,7 +548,7 @@ function DeSelectAllOtherMapListBoxItems (MapVoteListBox selListBox, int listNum
 			}
 		}
 	}
-	if(listNum >= 0 && listnum < 63)  
+	if(listNum >= 0 && listnum < ArrayCount(RListBox))  
 		selListBox.MakeSelectedVisible();
 }
 
@@ -651,8 +657,9 @@ function Notify (UWindowDialogControl C, byte E)
 					MapVoteListDummy.WinWidth = MapListwidth * 2 + 10;
 					MapVoteListDummy.WinHeight = ListHeight + 12;
 					MapVoteListDummy.Resized();
+					lblTitle3.SetText("New maps");
 					
-					for ( i = 0; i < 63; i++ )
+					for ( i = 0; i < ArrayCount(RListBox); i++ )
 					{
 						if ( MapListBox[i].SelectedItem != None )
 						{

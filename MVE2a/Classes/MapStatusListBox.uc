@@ -78,6 +78,6 @@ function DoubleClickItem (UWindowListBoxItem i)
 
 defaultproperties
 {
-	ItemHeight=13.000000
-	ListClass=Class'MapStatusListItem'
+      ItemHeight=13.000000
+      ListClass=Class'MapStatusListItem'
 }

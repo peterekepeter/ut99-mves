@@ -318,3 +318,7 @@ static function string SingleHEX( int N)
 		return string(N);
 	return chr( 55 + N);
 }
+
+defaultproperties
+{
+}

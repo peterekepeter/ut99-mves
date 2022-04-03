@@ -938,26 +938,68 @@ function SaveMapVoteConfig ()
 
 defaultproperties
 {
-    RedColor=(R=255,G=0,B=0,A=0),
-    PurpleColor=(R=128,G=0,B=128,A=0),
-    LightBlueColor=(R=0,G=100,B=255,A=0),
-    TurquoiseColor=(R=0,G=255,B=255,A=0),
-    GreenColor=(R=0,G=255,B=0,A=0),
-    OrangeColor=(R=255,G=120,B=0,A=0),
-    YellowColor=(R=255,G=255,B=0,A=0),
-    PinkColor=(R=255,G=0,B=255,A=0),
-    WhiteColor=(R=255,G=255,B=255,A=0),
-    DeepBlueColor=(R=0,G=0,B=255,A=0),
-    BlackColor=(R=0,G=0,B=0,A=0),
-    ColorCol(0)="Red"
-    ColorCol(1)="Purple"
-    ColorCol(2)="Light Blue"
-    ColorCol(3)="Turquoise"
-    ColorCol(4)="Green"
-    ColorCol(5)="Orange"
-    ColorCol(6)="Yellow"
-    ColorCol(7)="Pink"
-    ColorCol(8)="White"
-    ColorCol(9)="Deep Blue"
-    ColorCol(10)="Black"
+      CloseButton=None
+      lblKeyBind=None
+      lblMenuKey=None
+      ButMenuKey=None
+      OldMenuKey=""
+      bMenu=False
+      RSlider=None
+      GSlider=None
+      BSlider=None
+      RBSlider=None
+      GBSlider=None
+      BBSlider=None
+      BXT=None
+      Title1=None
+      Title2=None
+      Title3=None
+      Title4=None
+      Title5=None
+      Title6=None
+      sldMsgTimeOut=None
+      BXTL=None
+      TitleText1=None
+      TitleText2=None
+      TitleText3=None
+      TitleText4=None
+      TitleText5=None
+      TitleText6=None
+      lblMLT1=None
+      lblMLT2=None
+      lblMLT3=None
+      lblMLT4=None
+      lblMLT5=None
+      lblMLT6=None
+      lblMT=None
+      lblBXT=None
+      lblBG=None
+      lblHMT=None
+      lblHMT2=None
+      lblMS=None
+      lblMsgTimeOut=None
+      bSliderInited=False
+      cbUseMsgTimeout=None
+      ColorCol(0)="Red"
+      ColorCol(1)="Purple"
+      ColorCol(2)="Light Blue"
+      ColorCol(3)="Turquoise"
+      ColorCol(4)="Green"
+      ColorCol(5)="Orange"
+      ColorCol(6)="Yellow"
+      ColorCol(7)="Pink"
+      ColorCol(8)="White"
+      ColorCol(9)="Deep Blue"
+      ColorCol(10)="Black"
+      WhiteColor=(R=255,G=255,B=255,A=0)
+      BlackColor=(R=0,G=0,B=0,A=0)
+      RedColor=(R=255,G=0,B=0,A=0)
+      PurpleColor=(R=128,G=0,B=128,A=0)
+      LightBlueColor=(R=0,G=100,B=255,A=0)
+      TurquoiseColor=(R=0,G=255,B=255,A=0)
+      GreenColor=(R=0,G=255,B=0,A=0)
+      OrangeColor=(R=255,G=120,B=0,A=0)
+      YellowColor=(R=255,G=255,B=0,A=0)
+      PinkColor=(R=255,G=0,B=255,A=0)
+      DeepBlueColor=(R=0,G=0,B=255,A=0)
 }

@@ -50,3 +50,7 @@ static function SendReportText( Info MapVoteWRI, string p_ReportText)
 	if ( MapVoteWRI.IsA('MapVoteWRI') )
 		MapVoteWRI(MapVoteWRI).SendReportText( p_ReportText);
 }
+
+defaultproperties
+{
+}

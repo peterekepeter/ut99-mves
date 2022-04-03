@@ -137,9 +137,10 @@ simulated function bool HotKeyBound ()
 
 defaultproperties
 {
-	WindowClass=Class'MVWelcomeWindow'
-	//WinLeft=50
-	//WinTop=30
-	WinWidth=600
-	WinHeight=450
+      ServerInfoURL=""
+      MapInfoURL=""
+      bHasStartWindow=False
+      WindowClass=Class'MVWelcomeWindow'
+      WinWidth=600
+      WinHeight=450
 }

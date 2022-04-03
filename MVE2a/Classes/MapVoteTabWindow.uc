@@ -46,6 +46,8 @@ function AddMapName (int listNum, string MapName)
 	L.Count++;
 	i = UMenuMapVoteList(L.Items.Append(Class'UMenuMapVoteList'));
 	i.MapName = MapName;
+	if (listNum < 0)
+		i.CGNum = -listNum;
 }
 
 function AddGameMode (int listNum, string MapName)
@@ -64,7 +66,7 @@ function AddGameRule (int listNum, string MapName, int RuleNum)
 	local UMenuRuleVoteList i;
 	local RuleListBox L;
 
-	L = MapWindow.RListBox[listNum];
+	L = MapWindow.GetRListBox(listNum);
 	i = UMenuRuleVoteList(L.Items.Append(Class'UMenuRuleVoteList'));
 	i.MapName = MapName;
 	i.listNum = RuleNum;
@@ -245,4 +247,20 @@ simulated function UpdateKickVoteResults (string Text, int i)
 	KickStatusListItem(Item).VoteCount=C;
 	if ( (PrevSelectedPlayer != "") && (PrevSelectedPlayer == PlayerName) )
 		MapWindow.lstKickStatus.SelectPlayer(PrevSelectedPlayer);
+}
+
+defaultproperties
+{
+      Pages=None
+      MapWindow=None
+      ConfigWindow=None
+      AdminWindow=None
+      InfoWindow=None
+      PrevSelectedMap=""
+      PrevSelectedPlayer=""
+      MapCount=0
+      InfoServerAddress=""
+      InfoServerPort=0
+      InfoFilePath=""
+      ServerInfoFile=""
 }

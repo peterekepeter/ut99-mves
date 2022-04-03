@@ -10,3 +10,6 @@ function KeyDown (int Key, float X, float Y)
   ParentWindow.KeyDown(Key,X,Y);
 }
 
+defaultproperties
+{
+}

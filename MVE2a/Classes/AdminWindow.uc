@@ -12,7 +12,7 @@ var UWindowCheckbox cbLoadCTF;
 var UWindowCheckbox cbAutoDetect;
 var UWindowCheckbox cbCheckOtherGameTie;
 var UWindowCheckbox cbReloadMapsOnRequestOnly;
-var UWindowCheckbox cbCustGame[63];
+var UWindowCheckbox cbCustGame[512];
 var UWindowSmallButton RemoteSaveButton;
 var UWindowSmallButton ReloadMapsButton;
 var UWindowSmallButton CloseButton;
@@ -43,7 +43,7 @@ var UMenuLabelControl lblMapInfoURL;
 var UMenuLabelControl lblASClass;
 var UMenuLabelControl lblActGame;
 var UMenuLabelControl lblActPrefix;
-var UMenuLabelControl lblCustGame[63];
+var UMenuLabelControl lblCustGame[ArrayCount(cbCustGame)];
 var UMenuLabelControl lblTemp;
 var UWindowCheckbox cbUseMapList;
 var UWindowCheckbox cbAutoOpen;
@@ -651,7 +651,7 @@ function Notify (UWindowDialogControl C, byte E)
 			GetPlayerOwner().ConsoleCommand("ADMIN SET MVES.MapVote bRemoveCrashedMaps " $ string(cbRemoveCrashedMaps.bChecked));
 			GetPlayerOwner().ConsoleCommand("ADMIN SET MVES.MapVote bReloadMapsOnRequestOnly " $ string(cbReloadMapsOnRequestOnly.bChecked));
 			GetPlayerOwner().ConsoleCommand("ADMIN SET MVES.MapVote bUseExcludeFilter " $ string(cbUseExcludeFilter.bChecked));
-			for ( i=0; i<63; i++ )
+			for ( i=0; i<ArrayCount(cbCustGame); i++ )
 			{
 				if ( cbCustGame[i].bChecked )
 				{
@@ -753,4 +753,48 @@ function Paint (Canvas C, float MouseX, float MouseY)
 	//DrawStretchedTexture(C,10.0,220.0,380.0,2.0,Texture'ListsBoxBackground');
 	//DrawStretchedTexture(C,10.0,320.0,380.0,2.0,Texture'ListsBoxBackground');
 	//DrawStretchedTexture(C,405.0,20.0,2.0,490.0,Texture'ListsBoxBackground');
+}
+
+final simulated function UWindowCheckbox GetcbCustGame( int Idx)
+{
+	return cbCustGame[Idx];
+}
+
+final simulated function UMenuLabelControl GetlblCustGame( int Idx)
+{
+	return lblCustGame[Idx];
+}
+
+defaultproperties
+{
+      cbLoadDM=None
+      cbLoadLMS=None
+      cbLoadTDM=None
+      cbLoadAS=None
+      cbLoadDOM=None
+      cbLoadCTF=None
+      cbAutoDetect=None
+      cbCheckOtherGameTie=None
+      cbReloadMapsOnRequestOnly=None
+      lblTemp=None
+      cbUseMapList=None
+      cbAutoOpen=None
+      cbKickVote=None
+      cbEntryWindows=None
+      sldScoreBoardDelay=None
+      lblScoreBoardDelay=None
+      cbSortWithPreFix=None
+      cbDebugMode=None
+      txtList1Title=None
+      txtList2Title=None
+      txtList3Title=None
+      txtList4Title=None
+      txtMapVoteTitle=None
+      txtList1Priority=None
+      txtList2Priority=None
+      txtList3Priority=None
+      txtList4Priority=None
+      txtASClass=None
+      cbRemoveCrashedMaps=None
+      cbUseExcludeFilter=None
 }

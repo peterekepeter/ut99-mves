@@ -7,3 +7,9 @@ class MapListTemp extends Info
 var config string PrefixDictionary;
 var config int MapCount;
 var config string M[8192];
+
+defaultproperties
+{
+      PrefixDictionary=""
+      MapCount=0
+}

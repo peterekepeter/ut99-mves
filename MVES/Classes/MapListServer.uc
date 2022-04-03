@@ -124,3 +124,8 @@ function MV_PlayerWatcher ValidPlayerWithIP( string IP)
 	if ( W.PlayerIP == IP )
 		return W;
 }
+
+defaultproperties
+{
+      MapList=None
+}

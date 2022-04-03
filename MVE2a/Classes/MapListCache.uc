@@ -7,12 +7,12 @@ class MapListCache extends Info
 var Class<MapListCacheHelper> Helper;
 var string ServerCode;
 var string LastUpdate;
-var string RuleList[63];
+var string RuleList[512];
 var int RuleListCount;
-var string GameModeName[63];
-var string RuleName[63];
+var string GameModeName[ArrayCount(RuleList)];
+var string RuleName[ArrayCount(RuleList)];
 var int RuleCount;
-var float VotePriority[63];
+var float VotePriority[ArrayCount(RuleList)];
 var string MapList1[256];
 var string MapList2[256];
 var string MapList3[256];
@@ -30,6 +30,7 @@ var string MapList14[256];
 var string MapList15[256];
 var string MapList16[256];
 var int MapCount;
+var int iNewMaps[32];
 var bool bInitialized;
 var bool bClientLoadEnd;
 var bool bChaceCheck;
@@ -44,6 +45,7 @@ var HTTPMapListReceiver Link;
 var bool bHTTPReceiving;
 var string HTTPLastParameter;
 var bool bHTTPError;
+var int iNewMaps[32];
 
 replication
 {
@@ -490,12 +492,12 @@ final simulated function ChaceCheck()
     i = 0;
     J0x172:
     // End:0x208 [Loop If]
-    if(i < 63)
+    if(i < ArrayCount(RuleList))
     {
         RuleList[i] = MVC.RuleList[i];
         GameModeName[i] = MVC.GameModeName[i];
         RuleName[i] = MVC.RuleName[i];
-        VotePriority[i] = MVC.VotePriority[i];
+        VotePriority[i] = MVC.GetVotePriority(i);
         ++ i;
         // [Loop Continue]
         goto J0x172;
@@ -505,7 +507,7 @@ final simulated function ChaceCheck()
     i = 0;
     J0x237:
     // End:0x450 [Loop If]
-    if(i < 256)
+  if ( i < ArrayCount(RuleList) )
     {
         MapList1[i] = MVC.MapList1[i];
         MapList2[i] = MVC.MapList2[i];
@@ -666,8 +668,38 @@ final function dlog (string S)
   Log(S,Class.Name);
 }
 
+final simulated function float GetVotePriority( int Idx)
+{
+	return VotePriority[Idx];
+}
+
+final simulated function SetVotePriority( int Idx, float Value)
+{
+	VotePriority[Idx] = Value;
+}
+
+
 defaultproperties
 {
-    RemoteRole=ROLE_SimulatedProxy
-    NetUpdateFrequency=100.00
+      helper=None
+      ServerCode=""
+      LastUpdate=""
+      RuleListCount=0
+      RuleCount=0
+      bInitialized=False
+      bClientLoadEnd=False
+      bChaceCheck=False
+      bNeedServerMapList=False
+      LoadMapCount=0
+      LoadRuleCount=0
+      LoadPercentage=0.000000
+      MVC=None
+      bDebugMode=False
+      HTTPMapListLocation=""
+      Link=None
+      bHTTPReceiving=False
+      HTTPLastParameter=""
+      bHTTPError=False
+      RemoteRole=ROLE_SimulatedProxy
+      NetUpdateFrequency=100.000000
 }

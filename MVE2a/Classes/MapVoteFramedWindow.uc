@@ -49,3 +49,8 @@ function Close (optional bool bByParent)
 	C.CloseUWindow();
 	Super.Close(bByParent);
 }
+
+defaultproperties
+{
+      TitleStr=""
+}

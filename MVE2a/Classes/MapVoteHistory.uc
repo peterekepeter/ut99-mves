@@ -46,3 +46,7 @@ function string GetLeastPlayedMap ()
 function string GetMostPlayedMap ()
 {
 }
+
+defaultproperties
+{
+}

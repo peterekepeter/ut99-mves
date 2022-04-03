@@ -5,12 +5,12 @@
 class MapVoteWRI extends WRI;
 
 var string MapList[4096];
-var string RuleList[63];
+var string RuleList[512];
 var int RuleListCount;
-var string GameModeName[63];
-var string RuleName[63];
+var string GameModeName[ArrayCount(RuleList)];
+var string RuleName[ArrayCount(RuleList)];
 var int RuleCount;
-var float VotePriority[63];
+var float VotePriority[ArrayCount(RuleList)];
 var string MapList1[256];
 var string MapList2[256];
 var string MapList3[256];
@@ -28,6 +28,7 @@ var string MapList14[256];
 var string MapList15[256];
 var string MapList16[256];
 var int MapCount;
+var int iNewMaps[32];
 var bool bSetVoteList;
 var bool bSetAdminWindow;
 var string PlayerName[32];
@@ -60,7 +61,7 @@ var bool bRemoveCrashedMaps;
 var string ActGameClass;
 var string ActGamePrefix;
 var string MapVoteTitle;
-var string CustomGames[63];
+var string CustomGames[ArrayCount(RuleList)];
 var string CustomGamesState;
 var string PrefixDictionary;
 //var string ASClass;
@@ -81,7 +82,11 @@ var Class<MapListCacheHelper> Helper;
 replication
 {
   reliable if ( Role == ROLE_Authority )
-    SendBTRecord,SendReportText,UpdateKickVoteResults,UpdateMapVoteResults,UpdatePlayerVoted,RemovePlayerName,AddNewPlayer,PlayerName,bKickVote,MapVoteResults,KickVoteResults,GameTypes,OtherClass,VoteTimeLimit,KickPercent,bAutoOpen,ScoreBoardDelay,bCheckOtherGameTie,ServerInfoURL,MapInfoURL,Mode,RepeatLimit,MapVoteHistoryType,MidGameVotePercent,MinMapCount,MapPreFixOverRide,PreFixSwap,OtherPreFix,HasStartWindow,bEntryWindows,bDebugMode,bRemoveCrashedMaps,ActGameClass,ActGamePrefix,MapVoteTitle,CustomGames,CustomGamesState,PrefixDictionary,LogoTexture;
+    SendBTRecord,SendReportText,UpdateKickVoteResults,UpdateMapVoteResults,UpdatePlayerVoted,RemovePlayerName,AddNewPlayer,
+    PlayerName,bKickVote,MapVoteResults,KickVoteResults,GameTypes,OtherClass,VoteTimeLimit,KickPercent,bAutoOpen,
+    ScoreBoardDelay,bCheckOtherGameTie,ServerInfoURL,MapInfoURL,Mode,RepeatLimit,MapVoteHistoryType,MidGameVotePercent,
+    MinMapCount,MapPreFixOverRide,PreFixSwap,OtherPreFix,HasStartWindow,bEntryWindows,bDebugMode,bRemoveCrashedMaps,
+    ActGameClass,ActGamePrefix,MapVoteTitle,CustomGames,CustomGamesState,PrefixDictionary,LogoTexture;
   reliable if ( Role < ROLE_Authority )
     ClientNeedBTRecord;
 }
@@ -133,12 +138,12 @@ simulated function GetMapList()
     i = 0;
     J0x78:
     // End:0x10E [Loop If]
-    if(i < 63)
+    if(i < ArrayCount(RuleList))
     {
         RuleList[i] = ClientCache.RuleList[i];
         GameModeName[i] = ClientCache.GameModeName[i];
         RuleName[i] = ClientCache.RuleName[i];
-        VotePriority[i] = ClientCache.VotePriority[i];
+        VotePriority[i] = ClientCache.GetVotePriority(i);
         ++ i;
         // [Loop Continue]
         goto J0x78;
@@ -170,6 +175,8 @@ simulated function GetMapList()
         // [Loop Continue]
         goto J0x13D;
     }
+    for (i = 0; i < ArrayCount(iNewMaps); i++)
+    	iNewMaps[i] = ClientCache.iNewMaps[i];
     bMapListLoad = true;
 }
 
@@ -218,8 +225,8 @@ simulated function SetVoteList()
 {
     local int i;
     local string temp;
-    local int iTemp, iGameMode, Count;
-    local string RuleStr, MapName, SList;
+    local int iTemp, iGameMode, Count, iNewMap;
+    local string RuleStr, MapName, SList, sNewMaps[ArrayCount(iNewMaps)];
 
     i = 0;
     J0x07:
@@ -304,18 +311,23 @@ simulated function SetVoteList()
             // [Explicit Continue]
             goto J0x3D1;
         }
+        for (iNewMap = 0; iNewMap < ArrayCount(iNewMaps); iNewMap++)
+	    	if (i != 0 && iNewMaps[iNewMap] == i)
+	    		break;
         MapList[i] = temp;
         MapName = MapList[i];
         SList = MapList[i];
         MapName = Left(MapName, InStr(MapName, ":"));
         SList = Mid(SList, InStr(SList, ":"));
-        MapList[i] = MapName;
+        MapList[i] = MapName;       
+        if (iNewMap != ArrayCount(iNewMaps))
+        	 sNewMaps[iNewMap] = SList;
         J0x364:
         // End:0x3D1 [Loop If]
         if(InStr(SList, ":") != -1)
         {
             iTemp = int(Mid(SList, InStr(SList, ":") + 1, 2));
-            CWindow.AddMapName(iTemp, MapList[i]);
+            CWindow.AddMapName(iTemp, MapList[i]);            
             SList = Mid(SList, InStr(SList, ":") + 1);
             J0x3D1:
             // [Loop Continue]
@@ -324,13 +336,17 @@ simulated function SetVoteList()
         ++ i;
         goto J0x07;
     }
+    for (i = 0; i < ArrayCount(iNewMaps); i++)
+    	for (SList = sNewMaps[i]; InStr(SList, ":") != -1; SList = Mid(SList, InStr(SList, ":") + 1)) {
+    		CWindow.AddMapName(-int(Mid(SList, InStr(SList, ":") + 1, 2)), MapList[iNewMaps[i]]);
+    	}
     i = 0;
     J0x3E2:
     // End:0x4F9 [Loop If]
-    if(i < 63)
+    if(i < ArrayCount(RuleList))
     {
         temp = RuleList[i];
-        CWindow.MapWindow.MapListBox[i].VotePriority = VotePriority[i];
+        CWindow.MapWindow.GetMapListBox(i).VotePriority = VotePriority[i];
         // End:0x440
         if(temp == "")
         {
@@ -406,24 +422,24 @@ simulated function bool SetAdminWindow()
     {
         i = 0;
         J0x3EF:
-        if(i < 63)
+        if(i < ArrayCount(RuleList))
         {
             if(Mid(CustomGamesState, i, 1) == "1")
             {
-                Window.cbCustGame[i].bChecked = true;
+                Window.GetCbCustGame(i).bChecked = true;
             }
             else
             {
-                Window.cbCustGame[i].bChecked = false;
+                Window.GetCbCustGame(i).bChecked = false;
             }
             if(CustomGames[i] != "")
             {
-                Window.lblCustGame[i].SetText(CustomGames[i]);
-                Window.cbCustGame[i].bDisabled = false;
+                Window.GetLblCustGame(i).SetText(CustomGames[i]);
+                Window.GetCbCustGame(i).bDisabled = false;
                 goto J0x4F6;
             }
-            Window.lblCustGame[i].SetText("empty");
-            Window.cbCustGame[i].bDisabled = true;
+            Window.GetLblCustGame(i).SetText("empty");
+            Window.GetCbCustGame(i).bDisabled = true;
             J0x4F6:
             ++ i;
             goto J0x3EF;
@@ -729,11 +745,55 @@ function GetServerConfig ()
 
 defaultproperties
 {
-    WindowClass=Class'MapVoteFramedWindow'
-    WinLeft=50
-    WinTop=20
-    WinWidth=670
-    WinHeight=550
-	NetUpdateFrequency=10.000000
-	NetPriority=3.000000
+      RuleCount=0
+      MapCount=0
+      bSetVoteList=False
+      bSetAdminWindow=False
+      GameTypes=""
+      OtherClass=""
+      VoteTimeLimit=0
+      KickPercent=0
+      bAutoOpen=False
+      ScoreBoardDelay=0
+      bCheckOtherGameTie=False
+      ServerInfoURL=""
+      MapInfoURL=""
+      ReportText=""
+      Mode=""
+      RepeatLimit=0
+      MapVoteHistoryType=""
+      MidGameVotePercent=0
+      MinMapCount=0
+      MapPreFixOverRide=""
+      PreFixSwap=""
+      OtherPreFix=""
+      HasStartWindow=""
+      bEntryWindows=False
+      bDebugMode=False
+      bRemoveCrashedMaps=False
+      ActGameClass=""
+      ActGamePrefix=""
+      MapVoteTitle=""
+      CustomGamesState=""
+      PrefixDictionary=""
+      bUpdated=False
+      blastCheck=False
+      gAdminChechsum=0
+      gPlayerChecksum=0
+      bAdminDone=False
+      LogoTexture=""
+      bOpenWindowDispatched=False
+      bSetupWindowDelayDone=False
+      ClientCache=None
+      bMapListLoad=False
+      ClientConf=None
+      CWindow=None
+      helper=None
+      WindowClass=Class'MapVoteFramedWindow'
+      WinLeft=50
+      WinTop=20
+      WinWidth=670
+      WinHeight=550
+      NetPriority=3.000000
+      NetUpdateFrequency=10.000000
 }

@@ -16,3 +16,8 @@ function int Compare (UWindowList t, UWindowList B)
   return 1;
 }
 
+defaultproperties
+{
+      MapName=""
+      listNum=0
+}

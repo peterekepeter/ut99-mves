@@ -72,6 +72,6 @@ function DoubleClickItem (UWindowListBoxItem i)
 
 defaultproperties
 {
-    ItemHeight=13.00
-    ListClass=Class'KickStatusListItem'
+      ItemHeight=13.000000
+      ListClass=Class'KickStatusListItem'
 }

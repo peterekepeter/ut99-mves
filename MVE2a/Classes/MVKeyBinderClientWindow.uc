@@ -150,4 +150,8 @@ function Paint (Canvas C, float MouseX, float MouseY)
 
 defaultproperties
 {
+      lstKeyList=None
+      SaveButton=None
+      CloseRequestTime=0.000000
+      lblMessage=None
 }
