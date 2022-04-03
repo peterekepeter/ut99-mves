@@ -12,7 +12,7 @@ var config int RuleListCount;
 var config string GameModeName[ArrayCount(RuleList)];
 var config string RuleName[ArrayCount(RuleList)];
 var config int RuleCount;
-var config float VotePriority[63];
+var config float VotePriority[ArrayCount(RuleList)];
 var config string MapList1[256];
 var config string MapList2[256];
 var config string MapList3[256];
@@ -38,7 +38,7 @@ simulated function CacheClear ()
 
   i = 0;
   JL0007:
-  if ( i < 63 )
+  if ( i < ArrayCount(RuleList) )
   {
     RuleList[i] = "";
     GameModeName[i] = "";
