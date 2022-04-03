@@ -168,10 +168,10 @@ function GlobalLoad()
 			
 		ClearMap = ":";
 		for (i = 0; i < iMapList; i++)
-			ClearMap = ClearMap $ MapList[i] $ ":" $ i $ ":";	
+			ClearMap = ClearMap $ Left(MapList[i], InStr(MapList[i], ":")) $ ":" $ i $ ":";	
 		
 		for (j = 0; j < ArrayCount(iNewMaps) && iM - j > 0; j++) {
-			NewMaps = Maps[iM - j - 1];
+			NewMaps = M[iM - j - 1];
 			k = InStr(ClearMap, ":" $ NewMaps $ ":");
 			if (k == -1) {
 				iNewMaps[j] = 0;
@@ -275,16 +275,14 @@ function CacheCodes()
 	For ( i=0 ; i<Mutator.iGames ; i++ )
 	{
 		tmpCode = Mutator.MutatorCode(i) $ " ";
-		if ( tmpCode != " " ) 
+		if ( tmpCode != " " )
 		{
 			For ( j=0 ; j<k ; j++ )
-			{
 				if ( TmpCodes[j] == tmpCode )
 				{
 					GameTags[j] = GameTags[j] $ ":" $ TwoDigits(i);
 					Goto END_LOOP;
 				}
-			}
 			if ( Left(tmpCode,7) ~= "premade" )
 				IsPremade[k] = 1;
 			GameTags[k] = ":" $ TwoDigits(i);
