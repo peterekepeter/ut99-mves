@@ -12,3 +12,6 @@ static function Nfo(coerce string message)
 	Log(LogToken$" "$message$".");
 }
 
+defaultproperties
+{
+}

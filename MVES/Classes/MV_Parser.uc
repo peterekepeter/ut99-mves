@@ -28,3 +28,7 @@ static function bool TrySplit(string input, string separator, out string first, 
 		return True;
 	}
 }
+
+defaultproperties
+{
+}

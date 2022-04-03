@@ -45,5 +45,5 @@ function DrawItem (Canvas C, UWindowList Item, float X, float Y, float W, float 
 defaultproperties
 {
       ItemHeight=13.000000
-      ListClass=Class'KeyBinderListItem'
+      ListClass=Class'MVE2c.KeyBinderListItem'
 }

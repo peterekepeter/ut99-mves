@@ -271,5 +271,5 @@ defaultproperties
       BXTC=(R=0,G=0,B=0,A=0)
       CW=None
       ItemHeight=12.000000
-      ListClass=Class'UMenuMapVoteList'
+      ListClass=Class'MVE2c.UMenuMapVoteList'
 }

@@ -25,5 +25,5 @@ function Paint (Canvas C, float MouseX, float MouseY)
 defaultproperties
 {
       ItemHeight=12.000000
-      ListClass=Class'UMenuGameModeVoteList'
+      ListClass=Class'MVE2c.UMenuGameModeVoteList'
 }

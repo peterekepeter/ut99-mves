@@ -1389,6 +1389,7 @@ defaultproperties
       MapCostMaxAllow=0
       PlayerIDType=PID_Default
       bFirstRun=False
+      bShutdownServerOnTravel=False
       bWelcomeWindow=False
       bSpecsAllowed=False
       bAutoOpen=True
@@ -1397,6 +1398,7 @@ defaultproperties
       EndGameTime=0.000000
       bKickVote=True
       bEnableHTTPMapList=False
+      bEnableMapOverrides=False
       bLevelSwitchPending=False
       bVotingStage=False
       bMapChangeIssued=False
@@ -3076,7 +3078,6 @@ defaultproperties
       ExcludeFilters(31)=""
       iFilter=0
       iExclF=0
-      CurrentID=0
       WatcherList=None
       InactiveList=None
       MapList=None
@@ -3279,4 +3280,8 @@ defaultproperties
       BanList(29)=""
       BanList(30)=""
       BanList(31)=""
+      PlayerDetector=None
+      CurrentID=0
+      CurrentMap=None
+      SongOverride=None
 }

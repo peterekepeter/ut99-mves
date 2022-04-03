@@ -98,3 +98,6 @@ function private ResetRuleIndex(MV_MapOverrides target, int i)
 	target.SongPackage[i] = "";
 }
 
+defaultproperties
+{
+}

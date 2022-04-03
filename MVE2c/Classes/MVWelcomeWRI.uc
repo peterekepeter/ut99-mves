@@ -140,7 +140,7 @@ defaultproperties
       ServerInfoURL=""
       MapInfoURL=""
       bHasStartWindow=False
-      WindowClass=Class'MVWelcomeWindow'
+      WindowClass=Class'MVE2c.MVWelcomeWindow'
       WinWidth=600
       WinHeight=450
 }

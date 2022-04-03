@@ -11672,7 +11672,7 @@ defaultproperties
       ClientConf=None
       CWindow=None
       helper=None
-      WindowClass=Class'MapVoteFramedWindow'
+      WindowClass=Class'MVE2c.MapVoteFramedWindow'
       WinLeft=50
       WinTop=20
       WinWidth=670

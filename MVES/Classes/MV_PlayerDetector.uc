@@ -51,3 +51,8 @@ function bool ShouldJoinMapVote(PlayerPawn PP)
 	}
 	return True;
 }
+
+defaultproperties
+{
+      MapVote=None
+}
