@@ -564,6 +564,10 @@ function UWindowListBoxItem getSelectedItem(optional out int CGNum)
             return MapListBox[i].SelectedItem;
         }
     }
+	if (MapVoteListDummy.SelectedItem != None) {
+		CGNum = UMenuMapVoteList(MapVoteListDummy.SelectedItem).CGNum;
+		return MapVoteListDummy.SelectedItem;
+    }
 }
 
 function Notify (UWindowDialogControl C, byte E)
