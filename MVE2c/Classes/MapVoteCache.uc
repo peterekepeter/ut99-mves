@@ -89,7 +89,7 @@ final simulated function SetVotePriority( int Idx, float Value)
 
 defaultproperties
 {
-      bCached=True
+      bCached=False
       ServerName=""
       LastUpdate=""
       RuleList(0)=""
@@ -604,7 +604,7 @@ defaultproperties
       RuleList(509)=""
       RuleList(510)=""
       RuleList(511)=""
-      RuleListCount=12
+      RuleListCount=0
       GameModeName(0)=""
       GameModeName(1)=""
       GameModeName(2)=""
@@ -1629,7 +1629,7 @@ defaultproperties
       RuleName(509)=""
       RuleName(510)=""
       RuleName(511)=""
-      RuleCount=63
+      RuleCount=0
       VotePriority(0)=0.000000
       VotePriority(1)=0.000000
       VotePriority(2)=0.000000
@@ -6238,7 +6238,7 @@ defaultproperties
       MapList16(253)=""
       MapList16(254)=""
       MapList16(255)=""
-      MapCount=4339
+      MapCount=0
       iNewMaps(0)=0
       iNewMaps(1)=0
       iNewMaps(2)=0
