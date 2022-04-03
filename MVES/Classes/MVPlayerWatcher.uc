@@ -37,82 +37,82 @@ state Initializing
 		{
 			nextWatcher = Mutator.WatcherList;
 			Mutator.WatcherList = self;
-			bHooked = True;
+			bHooked = true;
 		}
-		bHTTPLoading = False;
+		bHTTPLoading = false;
 	}
 	event Tick( float DeltaTime)
 	{
-		if ( MapVoteWRIActor != None && MapVoteWRIActor.bDeleteMe )
-			MapVoteWRIActor = None;
-		if ( Watched == None || Watched.bDeleteMe )
+		if ( MapVoteWRIActor != none && MapVoteWRIActor.bDeleteMe )
+			MapVoteWRIActor = none;
+		if ( Watched == none || Watched.bDeleteMe )
 			GotoState('Inactive');
-		bOverflow = False;
+		bOverflow = false;
 	}
-	Begin:
+Begin:
 	if ( Mutator.PlayerIDType == PID_Default ) //15 ticks to retrieve ip
 	{
-		while( TicksLeft-- > 0 )
+		While( TicksLeft-- > 0 )
 			Sleep(0.0);
-		if ( Watched == None || Watched.bDeleteMe )
-			stop;
+		if ( Watched == none || Watched.bDeleteMe )
+			Stop;
 		PlayerCode = class'MV_MainExtension'.static.ByDelimiter( Watched.GetPlayerNetworkAddress(), ":"); //Remove port
 		if ( (PlayerCode != "") && Mutator.IpBanned(PlayerCode) )
 		{
 			//Broadcast a message later
 			Watched.Destroy();
-			stop;
+			Stop;
 		}
 	}
 	else if ( Mutator.PlayerIDType == PID_NexGen ) //6 seconds to retrieve NexGen ID
 	{
-		while ( TicksLeft-- > 0 )
+		While ( TicksLeft-- > 0 )
 		{
-			if ( Watched == None || Watched.bDeleteMe )
-				stop;
-			if ( NexGenClient == None )
+			if ( Watched == none || Watched.bDeleteMe )
+				Stop;
+			if ( NexGenClient == none )
 			{
 				NexGenClient = Mutator.Extension.FindNexgenClient( Watched);
-				if ( NexGenClient != None ) //Found! let's give more time
+				if ( NexGenClient != none ) //Found! let's give more time
 					TicksLeft += 6;
 			}
-			if ( (NexGenClient != None) && (NexGenClient.GetPropertyText("bInitialized") == GetPropertyText("bHooked")) && (NexGenClient.GetPropertyText("loginComplete") == GetPropertyText("bHooked")) )
+			if ( (NexGenClient != none) && (NexGenClient.GetPropertyText("bInitialized") == GetPropertyText("bHooked")) && (NexGenClient.GetPropertyText("loginComplete") == GetPropertyText("bHooked")) )
 			{
 				PlayerCode = NexGenClient.GetPropertyText("playerID");
 				if ( (PlayerCode == "") || Mutator.IpBanned(PlayerCode) )
 				{
 					//Broadcast a message later
 					Watched.Destroy();
-					stop;
+					Stop;
 				}
 				TicksLeft = 0;
-				goto('PostID');
+				Goto('PostID');
 			}
 			Sleep(0.80 * Level.TimeDilation);
 		}
-		if ( NexGenClient == None )
+		if ( NexGenClient == none )
 			Watched.ClientMessage("MVE: NexgenClient detection timeout");
 		else if (NexGenClient.GetPropertyText("bInitialized") != GetPropertyText("bHooked"))
 			Watched.ClientMessage("MVE: Unable to find initialization var on NexgenClient");
 		else
 			Watched.ClientMessage("MVE: Unable to find login var on NexgenClient");
 		Watched.Destroy();
-		stop;
+		Stop;
 	}
-	PostID:
+PostID:
 	PlayerIP = class'MV_MainExtension'.static.ByDelimiter( Watched.GetPlayerNetworkAddress(), ":"); //Remove port
-	bInitialized = True;
+	bInitialized = true;
 	if ( Mutator.bWelcomeWindow )
 		Mutator.Extension.WelcomeWindowTo( Watched);
 	PlayerID = class'MV_MainExtension'.static.NumberToByte( Watched.PlayerReplicationInfo.PlayerID);
 	PlayerID = class'MV_MainExtension'.static.PreFill( PlayerID, "0", 3);
 	Mutator.Extension.AddPlayerToWindows( self);
-	GetCache:
+GetCache:
 	Sleep( 1.5 + FRand() * 5 );
 	if ( !GetCacheActor() )
-		stop;
+		Stop;
 	TicksLeft = 15;
-	if ( ViewPort(Watched.Player) != None ) //Local player, proceed to hack the MLC
+	if ( ViewPort(Watched.Player) != none ) //Local player, proceed to hack the MLC
 	{
 		MapListCacheActor.SetPropertyText("bNeedServerMapList","1");
 		MapListCacheActor.SetPropertyText("bClientLoadEnd","1");
@@ -122,7 +122,7 @@ state Initializing
 		MapListCacheActor.SetPropertyText("LoadRuleCount", string(Mutator.MapList.GameCount) );
 		MapListCacheActor.SetPropertyText("LoadPercentage", "100" );
 	}
-	while ( TicksLeft-- > 0 )
+	While ( TicksLeft-- > 0 )
 	{
 		if ( NeedsFullCache() )
 		{
@@ -146,12 +146,12 @@ state Initializing
 			Mutator.Extension.MLC_MapList_14( MapListCacheActor);	Sleep(0.2 * Level.TimeDilation);
 			Mutator.Extension.MLC_MapList_15( MapListCacheActor);	Sleep(0.2 * Level.TimeDilation);
 			Mutator.Extension.MLC_MapList_16( MapListCacheActor);
-			stop;
+			Stop;
 		}
 		Sleep(0.33 * Level.TimeDilation); //Total: 5 secs
 	}
 	if ( bHTTPLoading ) //Started but not ended
-		goto('FullCache');
+		Goto('FullCache');
 }
 
 state Inactive
@@ -159,11 +159,11 @@ state Inactive
 	event BeginState()
 	{
 		RemoveFromActive();
-		Watched = None;		
+		Watched = none;		
 		nextWatcher = Mutator.InactiveList;
 		Mutator.InactiveList = self;
-		bInitialized = False;
-		bOverflow = False;
+		bInitialized = false;
+		bOverflow = false;
 		if ( PlayerVote != "" )
 		{
 			PlayerVote = "";
@@ -175,16 +175,16 @@ state Inactive
 		PlayerCode = "";
 		KickVoteID = -1;
 		KickVoteCode = "";
-		NexGenClient = None;
-		if ( MapListCacheActor != None )
+		NexGenClient = none;
+		if ( MapListCacheActor != none )
 		{
 			MapListCacheActor.Destroy();
-			MapListCacheActor = None;
+			MapListCacheActor = none;
 		}
-		if ( MapVoteWRIActor != None )
+		if ( MapVoteWRIActor != none )
 		{
 			MapVoteWRIActor.Destroy();
-			MapVoteWRIActor = None;
+			MapVoteWRIActor = none;
 		}
 	}
 	event EndState() //NEVER, EVER PULL THIS THING OUT OF THIS STATE IF IT ISN'T MUTATOR.INACTIVELIST
@@ -201,69 +201,59 @@ function RemoveFromActive()
 		Mutator.WatcherList = nextWatcher;
 	else
 	{
-	for ( PW=Mutator.WatcherList ; PW!=None ; PW=PW.nextWatcher )
-		if ( PW.nextWatcher == self )
-		{
-			PW.nextWatcher = nextWatcher;
-			break;
-		}
+		For ( PW=Mutator.WatcherList ; PW!=none ; PW=PW.nextWatcher )
+			if ( PW.nextWatcher == self )
+			{
+				PW.nextWatcher = nextWatcher;
+				break;
+			}
 	}
-	nextWatcher = None;
-	bHooked = False;
+	nextWatcher = none;
+	bHooked = false;
 }
 
 function bool GetCacheActor()
 {
-	if ( (Watched == None) || Watched.bDeleteMe || (Mutator.ServerCodeName == '') )
+	if ( (Watched == none) || Watched.bDeleteMe || (Mutator.ServerCodeName == '') )
 	{
-		Err("GetCacheActor called with incorrect parameters");
-		return False;
+		Log("ERROR: GetCacheActor called with incorrect parameters");
+		return false;
 	}
-	if ( MapListCacheActor != None )
+	if ( MapListCacheActor != none )
 	{
 		MapListCacheActor.SetOwner( Watched);
 		if ( Mutator.bEnableHTTPMapList )
 			MapListCacheActor.SetPropertyText( "HTTPMapListLocation", Mutator.HTTPMapListLocation $ "/MapList" $ chr(47) $ string(Mutator.ServerCodeName) ); //Reset just in case
-		return True;
+		return true;
 	}
 	MapListCacheActor = Spawn( class<Info>( DynamicLoadObject( Mutator.ClientPackage$".MapListCache",class'class')), Watched);
-	if ( MapListCacheActor == None )
+	if ( MapListCacheActor == none )
 	{
-		Err("ERROR SPAWNING "$Mutator.ClientPackage$".MapListCache");
-		return False;
+		Log("ERROR SPAWNING "$Mutator.ClientPackage$".MapListCache");
+		return false;
 	}
 	if ( Mutator.bEnableHTTPMapList  )
 		MapListCacheActor.SetPropertyText( "HTTPMapListLocation", Mutator.HTTPMapListLocation $ "/MapList" $ chr(47) $ string(Mutator.ServerCodeName));
 	MapListCacheActor.SetPropertyText( "ServerCode", string(Mutator.ServerCodeName) );
 	MapListCacheActor.SetPropertyText( "LastUpdate", Mutator.MapList.LastUpdate);
-	return True;
+	return true;
 }
 
 function bool NeedsFullCache()
 {
 	local string test;
-	if ( MapListCacheActor == None )
-		return False;
+	if ( MapListCacheActor == none )
+		return false;
 	if ( !Mutator.bEnableHTTPMapList )
-		return True;
+		return true;
 	test = GetPropertyText("bInitialized"); //Always true here
 	return (MapListCacheActor.GetPropertyText("HTTPMapListLocation") == "None" && MapListCacheActor.GetPropertyText("bNeedServerMapList") == test );
 }
 
 function bool IsModerator()
 {
-	if ( (NexGenClient != None) && (InStr(NexGenClient.GetPropertyText("rights"),"G") >= 0) )
-		return True;
-}
-
-function Err(coerce string message)
-{
-	class'MV_Util'.static.Err(message);
-}
-
-function Nfo(coerce string message)
-{
-	class'MV_Util'.static.Nfo(message);
+	if ( (NexGenClient != none) && (InStr(NexGenClient.GetPropertyText("rights"),"G") >= 0) )
+		return true;
 }
 
 defaultproperties
