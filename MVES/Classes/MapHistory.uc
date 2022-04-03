@@ -91,12 +91,12 @@ function int MapIdx( int idx)
 defaultproperties
 {
       MapList=None
-      Elements(0)=(mIdx=205,gIdx=3,Acc=3)
-      Elements(1)=(mIdx=251,gIdx=3,Acc=4)
-      Elements(2)=(mIdx=258,gIdx=3,Acc=5)
-      Elements(3)=(mIdx=215,gIdx=3,Acc=2)
-      Elements(4)=(mIdx=215,gIdx=3,Acc=4)
-      Elements(5)=(mIdx=99,gIdx=0,Acc=3)
+      Elements(0)=(mIdx=0,gIdx=0,Acc=0)
+      Elements(1)=(mIdx=0,gIdx=0,Acc=0)
+      Elements(2)=(mIdx=0,gIdx=0,Acc=0)
+      Elements(3)=(mIdx=0,gIdx=0,Acc=0)
+      Elements(4)=(mIdx=0,gIdx=0,Acc=0)
+      Elements(5)=(mIdx=0,gIdx=0,Acc=0)
       Elements(6)=(mIdx=0,gIdx=0,Acc=0)
       Elements(7)=(mIdx=0,gIdx=0,Acc=0)
       Elements(8)=(mIdx=0,gIdx=0,Acc=0)
