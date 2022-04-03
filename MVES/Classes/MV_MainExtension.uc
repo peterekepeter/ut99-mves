@@ -9,9 +9,9 @@ function WelcomeWindowTo( PlayerPawn Victim)
 
 	if ( Victim.IsA('Spectator') )
 		return;
-	foreach Victim.ChildActors( class'Info', I)
-	if ( I.IsA('MVWelcomeWRI') )
-		return;
+	ForEach Victim.ChildActors( class'Info', I)
+		if ( I.IsA('MVWelcomeWRI') )
+			return;
 	I = Victim.Spawn(class<Info>( DynamicLoadObject( MapVote(Outer).ClientPackage$".MVWelcomeWRI",class'class')), Victim,,vect(0,0,0) );
 	I.SetPropertyText("ServerInfoURL", MapVote(Outer).ServerInfoURL);
 	I.SetPropertyText("MapInfoURL", MapVote(Outer).MapInfoURL);
@@ -25,7 +25,7 @@ function Info SpawnVoteWRIActor( PlayerPawn Victim)
 function RemoveMapVotes( MVPlayerWatcher W)
 {
 	MapVote(Outer).iMapVotes = 0;
-	while ( W != None )
+	While ( W != none )
 	{
 		W.PlayerVote = "";
 		W = W.nextWatcher;
@@ -38,12 +38,12 @@ function UpdateMapVotes( MVPlayerWatcher W)
 	local int i;
 
 	Mutator = MapVote(Outer);
-	while ( W != None )
+	While ( W != none )
 	{
-		if ( W.MapVoteWRIActor != None )
+		if ( W.MapVoteWRIActor != none )
 		{
 			class'WRI_Statics'.static.UpdateMapVoteResults( W.MapVoteWRIActor, "Clear", 0);
-			for ( i=0 ; i<Mutator.iMapVotes ; i++ )
+			For ( i=0 ; i<Mutator.iMapVotes ; i++ )
 				class'WRI_Statics'.static.UpdateMapVoteResults( W.MapVoteWRIActor, Mutator.StrMapVotes[i], Mutator.RankMapVotes[i]);
 		}
 		W = W.nextWatcher;
@@ -56,12 +56,12 @@ function UpdateKickVotes( MVPlayerWatcher W)
 	local int i;
 
 	Mutator = MapVote(Outer);
-	while ( W != None )
+	While ( W != none )
 	{
-		if ( W.MapVoteWRIActor != None )
+		if ( W.MapVoteWRIActor != none )
 		{
 			class'WRI_Statics'.static.UpdateKickVoteResults( W.MapVoteWRIActor, "Clear", 0);
-			for ( i=0 ; i<Mutator.iKickVotes ; i++ )
+			For ( i=0 ; i<Mutator.iKickVotes ; i++ )
 				class'WRI_Statics'.static.UpdateKickVoteResults( W.MapVoteWRIActor, Mutator.StrKickVotes[i], Mutator.KickVoteCount[i]);
 		}
 		W = W.nextWatcher;
@@ -70,9 +70,9 @@ function UpdateKickVotes( MVPlayerWatcher W)
 
 static function CloseVoteWindows( MVPlayerWatcher W)
 {
-	while ( W != None )
+	While ( W != none )
 	{
-		if ( W.MapVoteWRIActor != None )
+		if ( W.MapVoteWRIActor != none )
 		{
 			class'WRI_Statics'.static.CloseWindow( W.MapVoteWRIActor);
 			W.MapVoteWRIActor.LifeSpan = 0.1;
@@ -88,20 +88,20 @@ function AddPlayerToWindows( MVPlayerWatcher Watcher)
 	
 	aStr = WTeamCode(Watcher.Watched) $ Watcher.PlayerID $ Watcher.Watched.PlayerReplicationInfo.PlayerName;
 	
-	for ( W=Watcher.Mutator.WatcherList ; W!=None ; W=W.nextWatcher )
-		if ( W.MapVoteWRIActor != None )
+	For ( W=Watcher.Mutator.WatcherList ; W!=none ; W=W.nextWatcher )
+		if ( W.MapVoteWRIActor != none )
 		{
-			class'WRI_Statics'.static.AddNewPlayer( W.MapVoteWRIActor, aStr, False);
-		Log("Adding "$aStr$" to "$W.MapVoteWRIActor);
-	}
+			class'WRI_Statics'.static.AddNewPlayer( W.MapVoteWRIActor, aStr, false);
+			Log("Adding "$aStr$" to "$W.MapVoteWRIActor);
+		}
 }
 
 function RemovePlayerFromWindows( MVPlayerWatcher Watcher)
 {
 	local MVPlayerWatcher W;
 	
-	for ( W=Watcher.Mutator.WatcherList ; W!=None ; W=W.nextWatcher )
-		if ( W.MapVoteWRIActor != None )
+	For ( W=Watcher.Mutator.WatcherList ; W!=none ; W=W.nextWatcher )
+		if ( W.MapVoteWRIActor != none )
 			class'WRI_Statics'.static.RemovePlayerName( W.MapVoteWRIActor, Watcher.PlayerID);
 }
 
@@ -110,13 +110,13 @@ function PlayersToWindow( Info MapVoteWRI)
 	local MVPlayerWatcher W;
 	local string aStr;
 	
-	for ( W=MapVote(Outer).WatcherList ; W!=None ; W=W.nextWatcher )
-	if ( W.PlayerID != "" )
-	{
-		aStr = WTeamCode(W.Watched) $ W.PlayerID $ W.Watched.PlayerReplicationInfo.PlayerName;
-		class'WRI_Statics'.static.AddNewPlayer( MapVoteWRI, aStr, W.PlayerVote != "");
-		Log("Adding "$aStr$" to "$MapVoteWRI);
-	}
+	For ( W=MapVote(Outer).WatcherList ; W!=none ; W=W.nextWatcher )
+		if ( W.PlayerID != "" )
+		{
+			aStr = WTeamCode(W.Watched) $ W.PlayerID $ W.Watched.PlayerReplicationInfo.PlayerName;
+			class'WRI_Statics'.static.AddNewPlayer( MapVoteWRI, aStr, W.PlayerVote != "");
+			Log("Adding "$aStr$" to "$MapVoteWRI);
+		}
 }
 
 function string WTeamCode( Pawn Other)
@@ -135,7 +135,7 @@ function TimedMessage( int ID)
 	else if ( ID == 5 )	Seconds = 30;
 	else if ( ID == 4 )	Seconds = 60;
 
-	foreach Actor(Outer).AllActors (class'PlayerPawn', ThisPawn)
+	ForEach Actor(Outer).AllActors (class'PlayerPawn', ThisPawn)
 	{
 		ThisPawn.ClearProgressMessages();
 		if ( ThisPawn.IsA('TournamentPlayer') )
@@ -150,17 +150,13 @@ function string GenerateSPList( string NewPacks)
 	local string Result;
 	local int i;
 
-	if ( (MapVote(Outer) == None) || (MapVote(Outer).MainServerPackages == "") )
-	{
+	if ( (MapVote(Outer) == none) || (MapVote(Outer).MainServerPackages == "") )
 		return "";
-	}
 
 	Result = MapVote(Outer).MainServerPackages;
 	Result = Left( Result, Len(Result)-1 );
-	while ( NewPacks != "" )
-	{
+	While ( NewPacks != "" )
 		Result = Result $ "," $ chr(34) $ static.NextParameter(NewPacks,",") $ chr(34);
-	}
 	return Result $ ")";
 }
 
@@ -201,7 +197,7 @@ function SetupWebApp()
 	DefStr = class'WebServer'.default.Applications[0];
 	aPort = class'WebServer'.default.ListenPort;
 	class'WebServer'.default.Applications[0] = "";
-	class'WebServer'.default.bEnabled = True;
+	class'WebServer'.default.bEnabled = true;
 	class'WebServer'.default.ListenPort = MapVote(Outer).HTTPMapListPort;
 
 	WS = MapVote(Outer).Spawn( class'WebServer');
@@ -211,19 +207,19 @@ function SetupWebApp()
 	class'WebServer'.default.ListenPort = aPort;
 
 	WS.ApplicationPaths[0] = "/MapList";
-	WS.ApplicationObjects[0] = new(None) class'MapListServer';
+	WS.ApplicationObjects[0] = New(None) class'MapListServer';
 	WS.ApplicationObjects[0].Level = WS.Level;
 	WS.ApplicationObjects[0].WebServer = WS;
 	WS.ApplicationObjects[0].Path = "/MapList";
-	WS.ApplicationObjects[0].init();
+	WS.ApplicationObjects[0].Init();
 }
 
 static function Info FindNexgenClient( PlayerPawn Player)
 {
 	local Info aInfo;
-	foreach Player.ChildActors (class'Info', aInfo)
-	if ( aInfo.IsA('NexgenClient') )
-		return aInfo;
+	ForEach Player.ChildActors (class'Info', aInfo)
+		if ( aInfo.IsA('NexgenClient') )
+			return aInfo;
 }
 
 //*****************************************************************************************************
@@ -235,8 +231,7 @@ static function string NextParameter( out string Commands, string Delimiter)
 	local int i;
 	
 	if ( Delimiter == "" )
-	{	
-		result = Commands;
+	{	result = Commands;
 		Commands = "";
 		return result;
 	}
@@ -261,7 +256,7 @@ static function string NextParameter( out string Commands, string Delimiter)
 //**************************************************************************************************
 //Parses a parameter from this command using a delimiter, can seek and doesn't modify initial string
 //**************************************************************************************************
-static function string ByDelimiter( string Str, string Delimiter, optional int skip)
+static function string ByDelimiter( string Str, string Delimiter, optional int Skip)
 {
 	local int i;
 
@@ -269,17 +264,17 @@ static function string ByDelimiter( string Str, string Delimiter, optional int s
 	i = InStr( Str, Delimiter);
 	if ( i < 0 )
 	{
-		if ( skip == 0 )
+		if ( Skip == 0 )
 			return Str;
 		return "";
 	}
 	else
 	{
-	if ( skip == 0 )
-		return Left( Str, i);
+		if ( Skip == 0 )
+			return Left( Str, i);
 		Str = Mid( Str, i + Len(Delimiter) );
-		skip--;
-		goto AGAIN;
+		Skip--;
+		Goto AGAIN;
 	}
 }
 
@@ -288,7 +283,7 @@ static function string ByDelimiter( string Str, string Delimiter, optional int s
 //***************************************************
 static function string PreFill( string Base, string Fill, int Req)
 {
-	while ( Len(Base) < Req )
+	While ( Len(Base) < Req )
 		Base = Fill $ Base;
 	return Base;
 }
@@ -301,11 +296,11 @@ static function string NumberToByte( int N, optional bool bStart)
 	local int d, i, test;
 	local string Result;
 
-	for ( i=7 ; i>=0 ; i-- )
+	For ( i=7 ; i>=0 ; i-- )
 	{
 		test = (N >>> (i*4) ) & 0x0F;
 		if ( test != 0 )
-			bStart = True;
+			bStart = true;
 		if ( bStart )
 			Result = Result $ SingleHEX(test);
 	}
