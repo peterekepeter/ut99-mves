@@ -4,15 +4,21 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "build client package",
             "type": "shell",
-            "command": "cd ../System && del MVES.u && ucc make ini=..\\MVES\\make.ini",
+            "command": "ucx build MVE2c",
+            "problemMatcher": []
+        },
+        {
+            "label": "build server package",
+            "type": "shell",
+            "command": "ucx build MVES",
             "problemMatcher": []
         },
         {
             "label": "run server",
             "type": "shell",
-            "command": "cd ../System && ucc server DM-Deck16][?mutator=MVES.MapVote",
+            "command": "ucx ucc server DM-Deck16][?mutator=MVES.MapVote",
             "problemMatcher": [
                 {
                     "pattern": [
@@ -42,7 +48,7 @@
         {
             "label": "join server",
             "type": "shell",
-            "command": "cd ../System && UnrealTournament.exe unreal://127.0.0.1:7777 -log",
+            "command": "ucx ut unreal://127.0.0.1:7777 -log",
             "problemMatcher": [],
             "presentation": {
                 "echo": true,
@@ -58,7 +64,7 @@
         {
             "label": "run standalone",
             "type": "shell",
-            "command": "cd ../System && UnrealTournament.exe DM-Deck16][?mutator=MVES.MapVote",
+            "command": "ucx ut DM-Deck16][?mutator=MVES.MapVote -log",
             "problemMatcher": [
                 {
                     "pattern": [
