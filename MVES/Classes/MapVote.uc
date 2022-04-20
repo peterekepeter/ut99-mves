@@ -105,7 +105,7 @@ var MV_MapResult CurrentMap;
 var Music SongOverride;
 
 //XC_GameEngine and Unreal 227 interface
-//native(1718) final function bool AddToPackageMap( optional string PkgName);
+native(1718) final function bool AddToPackageMap( optional string PkgName);
 
 state Voting
 {
