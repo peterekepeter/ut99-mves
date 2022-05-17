@@ -85,6 +85,6 @@ defaultproperties
 {
       StartTime=0.000000
       bHasStartWindow=False
-      ClientClass=Class'MVE2c.ServerInfoWindow'
+      ClientClass=Class'ServerInfoWindow'
       WindowTitle="Map Vote Welcome Window"
 }

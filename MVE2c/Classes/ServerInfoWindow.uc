@@ -144,7 +144,7 @@ defaultproperties
       TextArea=None
       QueryText="Querying Server..."
       FailureText="The server did not respond."
-      LinkClass=Class'MVE2c.ServerInfoLink'
+      LinkClass=Class'ServerInfoLink'
       TextAreaClass=Class'UBrowser.UBrowserUpdateServerTextArea'
       bGotMOTD=False
       StatusBarText=""

@@ -263,5 +263,5 @@ defaultproperties
       DeepBlueColor=(R=0,G=0,B=255,A=0)
       BXTC=(R=0,G=0,B=0,A=0)
       ItemHeight=12.000000
-      ListClass=Class'MVE2c.UMenuRuleVoteList'
+      ListClass=Class'UMenuRuleVoteList'
 }
