@@ -229,7 +229,9 @@ function bool GetCacheActor()
 	MapListCacheActor = Spawn( class<Info>( DynamicLoadObject( Mutator.ClientPackage$".MapListCache",class'class')), Watched);
 	if ( MapListCacheActor == none )
 	{
-		Log("ERROR SPAWNING "$Mutator.ClientPackage$".MapListCache");
+		Log("[MVE] !!! FATAL ERROR !!!");
+		Log("[MVE] failed to spawn "$Mutator.ClientPackage$".MapListCache");
+		Log("[MVE] make sure you have the correct client package in MVE_Config");
 		return false;
 	}
 	if ( Mutator.bEnableHTTPMapList  )
