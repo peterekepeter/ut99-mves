@@ -80,13 +80,23 @@ function PushList( int idx)
 
 
 function bool IsExcluded( int idx)
-{	return Elements[idx].Acc > MapList.Mutator.MapCostMaxAllow;	}
+{
+	// TODO investigate why bad idx is passed to this function
+	if (idx >= iMe){
+		return false;
+	}
+	return Elements[idx].Acc > MapList.Mutator.MapCostMaxAllow; 
+}
 
 function int GameIdx( int idx)
-{	return Elements[idx].gIdx;	}
+{
+	return Elements[idx].gIdx;	
+}
 
 function int MapIdx( int idx)
-{	return Elements[idx].mIdx;	}
+{
+	return Elements[idx].mIdx;	
+}
 
 defaultproperties
 {
