@@ -1,3 +1,19 @@
+# April 2022
+
+## Gametype Limit Increased
+
+The limit of 63 gametypes was lifted. It's now possible to have more gametypes.
+Currently 100 gametypes work properly. The gametype array has length of 512 but
+only the first 100 work properly without issues.'
+
+Having more than 100 gametypes currently crashes MVE.
+
+## New Maps Feature
+
+When new maps are scanned by MVE they get added to a special map list which is
+shown initially instead of the empty list. This way the new maps are more 
+visibile to players and are easier to discover.
+
 # January 2022
 
 ## MapOverrides
