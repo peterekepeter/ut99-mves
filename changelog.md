@@ -1,3 +1,36 @@
+# May 2022
+
+## Map Tags Feature
+
+In order to add more flexibility to the way map lists are built, it's now
+possible to tag specific maps. You can assign multiple tags per map.
+
+For example `DM-CliffyB4:RA` could mean that the map DM-CliffyB4 is suitable
+for rocket arena and that `CTF-Whatever:LG:SNI` is suitable for lowgrav and
+sniper matches. What the tags are and what they mean are up to the user.
+
+Filters have been extended to support tags. This way maps with speicifc
+tag can be added or removed from map lists using the filters.
+
+To enable this feature you need to set `bEnableMapTags` to true in the
+`[MVES.MapVote]` section of `MVE_Config.ini`
+
+Example configuration:
+
+```ini
+[MVES.MapVote]
+bEnableMapTags=True
+CustomGame[0]=(FilterCode="dm1on1", ...)
+MapFilters[0]=dm1on1 :1on1
+
+[MVES.MapTagsConfig]
+MapTagsVersion=1
+MapTags[0]=DM-Fractal:1on1
+MapTags[1]=DM-Morbias][:1on1
+MapTags[2]=DM-HyperBlast:1on1
+MapTags[3]=DM-Stalwart:1on1
+```
+
 # April 2022
 
 ## Gametype Limit Increased
@@ -13,6 +46,17 @@ Having more than 100 gametypes currently crashes MVE.
 When new maps are scanned by MVE they get added to a special map list which is
 shown initially instead of the empty list. This way the new maps are more 
 visibile to players and are easier to discover.
+
+## Extended Gametype Configuration
+
+- Added option Tickrate for each GameConfig. Also added DefaultTickRate globally. 
+But not sure if change on fly tickrate applied on map change. Anyway be request of it.
+
+- Added option ServerActors for each GameConfig, which allow spawn some actors,
+without try add it to Mutator list, as do option Mutators.
+
+- Added option bAvoidRandom for each GameConfig. Done in really dumb way. Random 
+still same, but if pick game mode which forbidden random restart. Up to 1024 times.
 
 # January 2022
 

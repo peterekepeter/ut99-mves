@@ -110,6 +110,12 @@ function GlobalLoad()
 	local int i, j, k, iLen, iMaps;
 	local string sTest;
 	local bool bAddTag;
+	local MV_MapTags MapTags;
+
+	if (Mutator.bEnableMapTags)
+	{
+		MapTags = GetMapTagsObject();
+	}
 
 	Mutator.CleanRules();
 	Mutator.CountFilters();
@@ -158,7 +164,9 @@ function GlobalLoad()
 				if ( !(Left( Mutator.GetMapFilter(j), iLen) ~= TmpCodes[i]) ) //Check that this IS a filter for this gamemode
 					continue;
 				sTest = Mid( Mutator.GetMapFilter(j), iLen);
-				if ( InStr(sTest,"*") < 0 ) //Exact match for map name
+				if ( Mutator.bEnableMapTags && InStr(sTest, ":") == 0 ) //Tag match
+					bAddTag = MapTags.TestTagMatch(RemoveExtension(CurMap), sTest);
+				else if ( InStr(sTest,"*") < 0 ) //Exact match for map name
 					bAddTag = (sTest ~= RemoveExtension(CurMap));
 				else
 				{
@@ -173,7 +181,9 @@ function GlobalLoad()
 				For ( j=EStart[i] ; j<EEnd[i] ; j++ )
 				{
 					sTest = Mid( Mutator.ExcludeFilters[j], iLen);
-					if ( InStr(sTest,"*") < 0 ) //Exact match for map name
+					if ( Mutator.bEnableMapTags && InStr(sTest, ":") == 0 ) //Tag match
+						bAddTag = !MapTags.TestTagMatch(RemoveExtension(CurMap), sTest);
+					else if ( InStr(sTest,"*") < 0 ) //Exact match for map name
 						bAddTag = !(sTest ~= RemoveExtension(CurMap));
 					else
 					{
@@ -619,6 +629,19 @@ final function string RandomMap( int Game)
 final simulated function float GetVotePriority( int Idx)
 {
 	return VotePriority[Idx];
+}
+
+function MV_MapTags GetMapTagsObject(){
+	local MapTagsConfig MapTagsConfig;
+	local MV_MapTags MapTags;
+	local MV_MapTagsFactory MapTagsFactory;
+
+	MapTagsConfig = new class'MapTagsConfig';
+	MapTagsConfig.RunMigration();
+	MapTagsFactory = new class'MV_MapTagsFactory';
+	MapTags = MapTagsFactory.CreateMapTags(MapTagsConfig);
+
+	return MapTags;
 }
 
 defaultproperties

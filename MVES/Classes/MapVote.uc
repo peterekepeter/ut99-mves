@@ -38,6 +38,7 @@ var float EndGameTime;
 var() config bool bKickVote;
 var() config bool bEnableHTTPMapList;
 var() config bool bEnableMapOverrides;
+var() config bool bEnableMapTags;
 var bool bLevelSwitchPending;
 var bool bVotingStage;
 var bool bMapChangeIssued;
@@ -208,7 +209,9 @@ event PostBeginPlay()
 	local class<Actor> ActorClass;
 	local int MapIdx;
 
-	log(" !MVE: PostBeginPlay!");
+	Log("[MVE] PostBeginPlay!");
+  // Log("[MVE] Debug regen map list");
+  // bGenerateMapList = True;
 	if ( bFirstRun )
 	{
 		bFirstRun = False;
@@ -387,8 +390,10 @@ function Mutate( string MutateString, PlayerPawn Sender)
 			PlayerVoted( Sender, Mid(MutateString,15) );
 		else if ( Mid(MutateString,11,5) ~= "KICK " )
 			PlayerKickVote( Sender, Mid(MutateString, 17, 3));
-		else
+		else {
+      Sender.ClientMessage("Unknown mapvote command");
 			return;
+    }
 	}
 
 	if ( NextMutator != none )
