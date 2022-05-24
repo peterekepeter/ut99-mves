@@ -15,20 +15,34 @@ tag can be added or removed from map lists using the filters.
 To enable this feature you need to set `bEnableMapTags` to true in the
 `[MVES.MapVote]` section of `MVE_Config.ini`
 
-Example configuration:
+Configuration example follows, note the following features:
+ - both maps and filters have multiple tags at the same time
+ - dm1on1 filter matches maps that are both :SMALL and :DM
+ - dmlowgrav filter matches maps that are both :LG and :DM
+ - dmsniper is either :LARGE:DM maps or :LG:DM maps
+ - dmnolowgrav contans all DM-* maps excluding maps tagged :LG
 
 ```ini
 [MVES.MapVote]
 bEnableMapTags=True
 CustomGame[0]=(FilterCode="dm1on1", ...)
-MapFilters[0]=dm1on1 :1on1
+MapFilters[0]=dm1on1 :SMALL:DM
+MapFilters[1]=dmlowgrav :LG:DM
+MapFilters[2]=dmsniper :LARGE:DM
+MapFilters[3]=dmsniper :LG:DM
+MapFilters[4]=dmmedium :MEDIUM:DM
+MapFilters[5]=dmnolowgrav DM-*
+ExcludeFilters[0]=dmnolowgrav :LG
 
 [MVES.MapTagsConfig]
 MapTagsVersion=1
-MapTags[0]=DM-Fractal:1on1
-MapTags[1]=DM-Morbias][:1on1
-MapTags[2]=DM-HyperBlast:1on1
-MapTags[3]=DM-Stalwart:1on1
+MapTags[0]=DM-Fractal:DM:SMALL
+MapTags[1]=DM-Morbias][:DM:SMALL
+MapTags[2]=DM-HyperBlast:DM:SMALL
+MapTags[3]=DM-Stalwart:DM:SMALL
+MapTags[4]=DM-Deck16][:DM:MEDIUM
+MapTags[5]=DM-Crane:DM:LARGE
+MapTags[6]=DM-Morpheus:DM:MEDIUM:LG
 ```
 
 # April 2022
