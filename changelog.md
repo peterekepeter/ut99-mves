@@ -25,7 +25,11 @@ Configuration example follows, note the following features:
 ```ini
 [MVES.MapVote]
 bEnableMapTags=True
-CustomGame[0]=(FilterCode="dm1on1", ...)
+CustomGame[0]=(RuleName="Normal",FilterCode="dmnolowgrav", ...)
+CustomGame[1]=(RuleName="1on1",FilterCode="dm1on1", ...)
+CustomGame[2]=(RuleName="Low Gravity",FilterCode="dmlowgrav", ...)
+CustomGame[3]=(RuleName="Sniper",FilterCode="dmsniper", ...)
+CustomGame[4]=(RuleName="Medium Sized",FilterCode="dmmedium", ...)
 MapFilters[0]=dm1on1 :SMALL:DM
 MapFilters[1]=dmlowgrav :LG:DM
 MapFilters[2]=dmsniper :LARGE:DM
