@@ -393,7 +393,8 @@ function Created ()
 	GMListBox.Items.Clear();
 	RListDummy = DummyListBox(CreateControl(Class'DummyListBox',20.0 + MapListwidth,26.0,MapListwidth,ListHeight / 2));
 	MapVoteListDummy = MapVoteListBox(CreateControl(Class'MapVoteListBox',40.0 + 2 * MapListwidth + PlayerListwidth,26.0,MapListwidth * 2 + 10,ListHeight + 12));
-	MapVoteListDummy.CW = self;
+	// commenting out next line disables prefix for new maps section
+  // MapVoteListDummy.CW = self; 
 	
 	for ( i = 0; i < ArrayCount(RListBox); i++ )
 	{
@@ -661,7 +662,7 @@ function Notify (UWindowDialogControl C, byte E)
 					MapVoteListDummy.WinWidth = MapListwidth * 2 + 10;
 					MapVoteListDummy.WinHeight = ListHeight + 12;
 					MapVoteListDummy.Resized();
-					lblTitle3.SetText("New maps");
+					lblTitle3.SetText("New Maps");
 					
 					for ( i = 0; i < ArrayCount(RListBox); i++ )
 					{

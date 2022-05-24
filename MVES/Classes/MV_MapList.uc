@@ -219,7 +219,7 @@ function GlobalLoad()
 	Log("[MVE] Remove old + add new maps...");
 	NewMaps = ":";
 	for (i = 0; i < iMaps; i++)
-		NewMaps = NewMaps $ Maps[i] $ ":";		
+		NewMaps = NewMaps $ Maps[i] $ ":";	
 
 	ClearMap = ":";
 	j = 0;

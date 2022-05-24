@@ -210,8 +210,8 @@ event PostBeginPlay()
 	local int MapIdx;
 
 	Log("[MVE] PostBeginPlay!");
-  // Log("[MVE] Debug regen map list");
-  // bGenerateMapList = True;
+  Log("[MVE] Debug regen map list");
+  bGenerateMapList = True;
 	if ( bFirstRun )
 	{
 		bFirstRun = False;

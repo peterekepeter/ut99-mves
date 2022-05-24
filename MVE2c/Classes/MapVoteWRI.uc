@@ -339,6 +339,7 @@ simulated function SetVoteList()
     for (i = 0; i < ArrayCount(iNewMaps); i++)
     	for (SList = sNewMaps[i]; InStr(SList, ":") != -1; SList = Mid(SList, InStr(SList, ":") + 1)) {
     		CWindow.AddMapName(-int(Mid(SList, InStr(SList, ":") + 1, 2)), MapList[iNewMaps[i]]);
+            break; // only shows each map once
     	}
     i = 0;
     J0x3E2:
