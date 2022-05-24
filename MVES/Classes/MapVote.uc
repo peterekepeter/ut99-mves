@@ -1377,7 +1377,7 @@ function CommonCommands( Actor Sender, String S)
 
 defaultproperties
 {
-      ClientPackage="MVE2c"
+      ClientPackage="MVE2d"
       ServerInfoURL=""
       MapInfoURL=""
       HTTPMapListLocation=""
