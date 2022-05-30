@@ -852,9 +852,18 @@ function SetMap(string MapName)
 		MapName = Left(MapName, i);
 	
     RealMapName = GetRealMapname(MapName);
-    Screenshot = Texture(DynamicLoadObject(RealMapName $ ".Screenshot", class'Texture'));
-    L = LevelSummary(DynamicLoadObject(RealMapName $ ".LevelSummary", class'LevelSummary'));
-	
+
+    if (MapName ~= "Random")
+    {
+        MapTitle = "Random";
+        MapAuthor = "";
+        IdealPlayerCount = "";
+        Screenshot = None;
+        return;
+    }
+    
+    Screenshot = GetScreenshot(RealMapName);
+
     if(Left(MapName, 3) == "[X]")
     {
         MapTitle = "You can not";
@@ -863,6 +872,7 @@ function SetMap(string MapName)
     }
     else
     {
+        L = LevelSummary(DynamicLoadObject(RealMapName $ ".LevelSummary", class'LevelSummary'));
         if(L != none)
         {
             MapTitle = L.Title;
@@ -901,6 +911,10 @@ function string GetRealMapname(string VirtualMap)
         }
     }
     return MapName;
+}
+
+function Texture GetScreenshot(string mapName){
+    return Texture(DynamicLoadObject(mapName$".Screenshot", class'Texture'));
 }
 
 function Paint (Canvas C, float MouseX, float MouseY)
