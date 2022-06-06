@@ -129,6 +129,7 @@ GetCache:
 			FullCache:
 			MapListCacheActor.SetPropertyText("bNeedServerMapList","1");
 			MapListCacheActor.SetPropertyText("HTTPMapListLocation","None");
+			MapListCacheActor.SetPropertyText("ClientScreenshotPackage", Mutator.ClientScreenshotPackage );
 			Mutator.Extension.MLC_Rules( MapListCacheActor);	Sleep(0.2 * Level.TimeDilation);
 			Mutator.Extension.MLC_MapList_1( MapListCacheActor);	Sleep(0.2 * Level.TimeDilation);
 			Mutator.Extension.MLC_MapList_2( MapListCacheActor);	Sleep(0.2 * Level.TimeDilation);

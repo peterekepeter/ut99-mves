@@ -542,6 +542,7 @@ simulated function Timer()
 	  }
     CWindow.MapWindow.lblTitle.SetText(MapVoteTitle);
     CWindow.MapWindow.LogoTexture = LogoTexture;
+    CWindow.MapWindow.ClientScreenshotPackage = ClientCache.ClientScreenshotPackage;
     if(ServerInfoURL != "")
     {
         CWindow.InfoWindow.SetInfoServerAddress(ServerInfoURL, MapInfoURL);

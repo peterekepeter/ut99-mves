@@ -45,6 +45,7 @@ var HTTPMapListReceiver Link;
 var bool bHTTPReceiving;
 var string HTTPLastParameter;
 var bool bHTTPError;
+var string ClientScreenshotPackage;
 
 replication
 {
@@ -64,7 +65,7 @@ replication
 
     reliable if(Role == ROLE_Authority)
         HTTPMapListLocation, LastUpdate, 
-        ServerCode, iNewMaps;
+        ServerCode, iNewMaps, ClientScreenshotPackage;
 
     reliable if(Role < ROLE_Authority)
         NeedServerMapList, bChaceCheck, 

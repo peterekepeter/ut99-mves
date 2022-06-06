@@ -55,6 +55,7 @@ var string IdealPlayerCount;
 var float LastVoteTime;
 var float SelectionTime;
 var string LogoTexture;
+var string ClientScreenshotPackage;
 var int MapListwidth;
 var int PlayerListwidth;
 var int ListHeight;
@@ -824,10 +825,16 @@ function int getListNum(string MapName, int CGNum)
 function Tick(float DeltaTime)
 {
     local string MapName;
+	local float debounceTime;
+
+	debounceTime = 1;
+	if (ClientScreenshotPackage != ""){
+		debounceTime = 0; // client package is fast, no need for debounce
+	}
 	
     Super(UWindowWindow).Tick(DeltaTime);
 	
-	if ( (SelectionTime != 0) && (GetPlayerOwner().Level.TimeSeconds > SelectionTime + 1) && (getSelectedItem() != None) )
+	if ( (SelectionTime != 0) && (GetPlayerOwner().Level.TimeSeconds > SelectionTime + debounceTime) && (getSelectedItem() != None) )
     {
         MapName = UMenuMapVoteList(getSelectedItem()).MapName;
         SetMap(MapName);
@@ -853,39 +860,7 @@ function SetMap(string MapName)
 	
     RealMapName = GetRealMapname(MapName);
 
-    if (MapName ~= "Random")
-    {
-        MapTitle = "Random";
-        MapAuthor = "";
-        IdealPlayerCount = "";
-        Screenshot = None;
-        return;
-    }
-    
-    Screenshot = GetScreenshot(RealMapName);
-
-    if(Left(MapName, 3) == "[X]")
-    {
-        MapTitle = "You can not";
-        MapAuthor = "vote for this map.";
-        IdealPlayerCount = "";
-    }
-    else
-    {
-        L = LevelSummary(DynamicLoadObject(RealMapName $ ".LevelSummary", class'LevelSummary'));
-        if(L != none)
-        {
-            MapTitle = L.Title;
-            MapAuthor = L.Author;
-            IdealPlayerCount = L.IdealPlayerCount;
-        }
-        else
-        {
-            MapTitle = "Download";
-            MapAuthor = "Required";
-            IdealPlayerCount = "";
-        }
-    }
+    ResolveScreenshotAndSummary(RealMapName, MapName);
 }
 
 function string GetRealMapname(string VirtualMap)
@@ -913,8 +888,69 @@ function string GetRealMapname(string VirtualMap)
     return MapName;
 }
 
-function Texture GetScreenshot(string mapName){
-    return Texture(DynamicLoadObject(mapName$".Screenshot", class'Texture'));
+function ResolveScreenshotAndSummary(string realMapName, string virtualMapName){
+	local class<Commandlet> BundleClass;
+	local LevelSummary L;
+	local Commandlet BundleInstance;
+	local string ScreenshotStr;
+	local int index;
+	local string packageName;
+	BundleClass = None;
+
+	MapTitle = "";
+	MapAuthor = "";
+	IdealPlayerCount = "";
+	Screenshot = None;
+
+    if (virtualMapName ~= "Random")
+    {
+        MapTitle = "Random";
+        return;
+    }
+
+	packageName = ClientScreenshotPackage;
+	if (ClientScreenshotPackage != ""){
+		BundleClass = class<Commandlet>(DynamicLoadObject(packageName$".ScreenshotBundle", class'Class'));
+		if (BundleClass != None)
+		{
+			BundleInstance = new BundleClass;
+			index = BundleInstance.Main(realMapName);
+			// iTexture, iTitle, iAuthor, iPlayerCount, iEntryText, iMates, iEnemies
+			ScreenshotStr = packageName$"."$BundleInstance.HelpDesc[0];
+			if (ScreenshotStr != "") {
+				Screenshot = Texture(DynamicLoadObject(ScreenshotStr, class'Texture')); 
+			}
+			MapTitle = BundleInstance.HelpDesc[1]; 
+			MapAuthor = BundleInstance.HelpDesc[2];
+			IdealPlayerCount = BundleInstance.HelpDesc[3];
+		}
+		if (Screenshot == None) {
+			Screenshot = Texture(DynamicLoadObject(realMapName$".Screenshot", class'Texture'));
+		}
+	}
+
+    if(Left(virtualMapName, 3) == "[X]")
+    {
+        MapTitle = "You can not";
+        MapAuthor = "vote for this map.";
+        IdealPlayerCount = "";
+    }
+    else if (MapTitle == "" && MapAuthor == "" && IdealPlayerCount == "")
+    {
+        L = LevelSummary(DynamicLoadObject(realMapName$".LevelSummary", class'LevelSummary'));
+        if(L != none)
+        {
+            MapTitle = L.Title;
+            MapAuthor = L.Author;
+            IdealPlayerCount = L.IdealPlayerCount;
+        }
+        else
+        {
+            MapTitle = "Download";
+            MapAuthor = "Required";
+            IdealPlayerCount = "";
+        }
+    }
 }
 
 function Paint (Canvas C, float MouseX, float MouseY)

@@ -3,7 +3,8 @@
 //================================================================================
 class MapVote expands Mutator config(MVE_Config);
 
-var() config string ClientPackage;		//Load this package
+var() config string ClientPackage;		// Load this package
+var() config string ClientScreenshotPackage; // Load this package
 var() config string ServerInfoURL;
 var() config string MapInfoURL;
 var() config string HTTPMapListLocation; //HTTPMapListPort is needs to be attached here as well
@@ -224,6 +225,7 @@ event PostBeginPlay()
 		bXCGE_DynLoader = true;
 		default.bXCGE_DynLoader = true; //So we get to see if it worked from clients!
 		AddToPackageMap( ClientPackage);
+		if (ClientScreenshotPackage != "") AddToPackageMap( ClientScreenshotPackage);
 	}
 	if ( ExtensionClass != "" )
 		ExtensionC = class<MV_MainExtension>( DynamicLoadObject(ExtensionClass,class'class') );
@@ -1152,6 +1154,8 @@ final function SetupTravelString( string MapString )
 
 	if ( bOverrideServerPackages )
 	{
+    Result.AddPackages(ClientPackage);
+		if (ClientScreenshotPackage != "") Result.AddPackages(ClientScreenshotPackage);
 		Result.AddPackages(CustomGame[Result.GameIndex].Packages);
 		spk = Extension.GenerateSPList(Result.GetPackagesStringList());
 		if ( spk == "" )			
