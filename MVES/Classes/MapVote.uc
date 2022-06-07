@@ -5,6 +5,7 @@ class MapVote expands Mutator config(MVE_Config);
 
 var() config string ClientPackage;		// Load this package
 var() config string ClientScreenshotPackage; // Load this package
+var() config string ClientLogoTexture; // Clients will load and display this texture
 var() config string ServerInfoURL;
 var() config string MapInfoURL;
 var() config string HTTPMapListLocation; //HTTPMapListPort is needs to be attached here as well
@@ -209,8 +210,10 @@ event PostBeginPlay()
 	local Actor A;
 	local class<Actor> ActorClass;
 	local int MapIdx;
+  local string LogoTexturePackage;
 
-	Log("[MVE] PostBeginPlay!");
+	Nfo("PostBeginPlay!");
+  Nfo("ClientScreenshotPackage is `"$ClientScreenshotPackage$"`");
   // Log("[MVE] Debug regen map list");
   // bGenerateMapList = True;
 	if ( bFirstRun )
@@ -224,8 +227,22 @@ event PostBeginPlay()
 	{
 		bXCGE_DynLoader = true;
 		default.bXCGE_DynLoader = true; //So we get to see if it worked from clients!
-		AddToPackageMap( ClientPackage);
-		if (ClientScreenshotPackage != "") AddToPackageMap( ClientScreenshotPackage);
+		AddToPackageMap(ClientPackage);
+		if (ClientScreenshotPackage != "") 
+    {
+      AddToPackageMap(ClientScreenshotPackage);
+    }
+    if (ClientLogoTexture != "")
+    {
+      LogoTexturePackage = GetPackageNameFromString(ClientLogoTexture);
+      if (LogoTexturePackage != "")
+      {
+        AddToPackageMap(LogoTexturePackage);
+      }
+      else {
+        Err("Invalid value for LogoTexturePackage, expected Package.Texture");
+      }
+    }
 	}
 	if ( ExtensionClass != "" )
 		ExtensionC = class<MV_MainExtension>( DynamicLoadObject(ExtensionClass,class'class') );
@@ -1116,7 +1133,7 @@ final function bool CanVote(PlayerPawn Sender)
 //Validity assumed
 final function SetupTravelString( string MapString )
 {
-	local string spk, GameClassName;
+	local string spk, GameClassName, LogoTexturePackage;
 	local int idx, TickRate;
 	local MV_MapOverrides MapOverrides;
 	local MV_MapResult Result;
@@ -1155,10 +1172,29 @@ final function SetupTravelString( string MapString )
 
 	if ( bOverrideServerPackages )
 	{
+    // add client package
     Result.AddPackages(ClientPackage);
-		if (ClientScreenshotPackage != "") Result.AddPackages(ClientScreenshotPackage);
+    // add screenshot package 
+		if (ClientScreenshotPackage != "") 
+    {
+      Result.AddPackages(ClientScreenshotPackage);
+    }
+    // add logo texture package
+    if (ClientLogoTexture != "")
+    {
+      LogoTexturePackage = GetPackageNameFromString(ClientLogoTexture);
+      if (LogoTexturePackage != "")
+      {
+        Result.AddPackages(LogoTexturePackage);
+      }
+      else {
+        Err("Invalid value for LogoTexturePackage, expected Package.Texture");
+      }
+    }
+    // add gametype packages
 		Result.AddPackages(CustomGame[Result.GameIndex].Packages);
-		spk = Extension.GenerateSPList(Result.GetPackagesStringList());
+    // concats main packages
+		spk = Extension.GenerateSPList(Result.GetPackagesStringList()); 
 		if ( spk == "" )			
 		{	
 			spk = MainServerPackages;
@@ -1378,6 +1414,28 @@ function CommonCommands( Actor Sender, String S)
 
 	if ( (S ~= "!v") || (S ~= "!vote") || (S ~= "!mapvote") || (S ~= "!kickvote") )
 		Mutate( "BDBMAPVOTE VOTEMENU", PlayerPawn(Sender) );
+}
+
+/// UTIL
+
+static function string GetPackageNameFromString(string objectReference)
+{
+  local string name, ignore;
+  if (class'MV_Parser'.static.TrySplit(objectReference, ".", name, ignore))
+  {
+    return name;
+  }
+  return "";
+}
+
+static function Err(coerce string message)
+{
+	class'MV_Util'.static.Err(message);
+}
+
+static function Nfo(coerce string message)
+{
+	class'MV_Util'.static.Nfo(message);
 }
 
 defaultproperties

@@ -130,6 +130,10 @@ GetCache:
 			MapListCacheActor.SetPropertyText("bNeedServerMapList","1");
 			MapListCacheActor.SetPropertyText("HTTPMapListLocation","None");
 			MapListCacheActor.SetPropertyText("ClientScreenshotPackage", Mutator.ClientScreenshotPackage );
+			MapListCacheActor.SetPropertyText("ClientLogoTexture", Mutator.ClientLogoTexture );
+			Log("[MVE] Writing ClientScreenshotPackage `"$Mutator.ClientScreenshotPackage$"` to client "$PlayerID);
+			Log("[MVE] Writing ClientLogoTexture `"$Mutator.ClientLogoTexture$"` to client "$PlayerID);
+			Sleep(0.1 * Level.TimeDilation);
 			Mutator.Extension.MLC_Rules( MapListCacheActor);	Sleep(0.2 * Level.TimeDilation);
 			Mutator.Extension.MLC_MapList_1( MapListCacheActor);	Sleep(0.2 * Level.TimeDilation);
 			Mutator.Extension.MLC_MapList_2( MapListCacheActor);	Sleep(0.2 * Level.TimeDilation);

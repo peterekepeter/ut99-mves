@@ -965,8 +965,11 @@ function Paint (Canvas C, float MouseX, float MouseY)
 	local float Y;
 	local float W;
 	local float H;
+	local bool originalNoSmooth;
 
 	Super.Paint(C,MouseX,MouseY);
+	originalNoSmooth = C.bNoSmooth;
+	C.bNoSmooth = false; // make screenshot and background smoother
 	
 	C.DrawColor = class'MapVoteClientConfig'.Default.BackgroundColor;
 	DrawStretchedTexture(C,0.00,0.00,WinWidth,WinHeight,Texture'BackgroundTexture');
@@ -1001,6 +1004,8 @@ function Paint (Canvas C, float MouseX, float MouseY)
 	} else {
 		lblMaptxt3.SetText("");
 	}
+
+	C.bNoSmooth = originalNoSmooth;
 }
 
 function KeyDown (int Key, float X, float Y)
