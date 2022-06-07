@@ -119,6 +119,21 @@ function PlayersToWindow( Info MapVoteWRI)
 		}
 }
 
+function UpdatePlayerVotedInWindows(MVPlayerWatcher Voter)
+{
+	local MVPlayerWatcher W;
+	
+	for ( W = MapVote(Outer).WatcherList ; W != None ; W = W.nextWatcher )
+	{
+		if (W.MapVoteWRIActor == None)
+		{
+			continue;
+		}
+		class'WRI_Statics'.static.UpdatePlayerVoted(
+			W.MapVoteWRIActor, Voter.PlayerID);
+	}
+}
+
 function string WTeamCode( Pawn Other)
 {
 	if ( Other.IsA('Spectator') )		return "9";

@@ -907,6 +907,7 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 		return;
 	}
 	W.PlayerVote = MapString;
+  Extension.UpdatePlayerVotedInWindows(W);
 	BroadcastMessage( Sender.PlayerReplicationInfo.PlayerName $ " voted for " $ Extension.ByDelimiter(MapString,":") @ GameRuleCombo(iU),True);
 	CountMapVotes();
 }
