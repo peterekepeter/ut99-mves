@@ -909,7 +909,10 @@ function ResolveScreenshotAndSummary(string realMapName, string virtualMapName){
     }
 
 	packageName = ClientScreenshotPackage;
-	if (ClientScreenshotPackage != ""){
+	
+	if (packageName != "")
+	{
+		// try to load screenshot and summary from ScreenshotBundle
 		BundleClass = class<Commandlet>(DynamicLoadObject(packageName$".ScreenshotBundle", class'Class'));
 		if (BundleClass != None)
 		{
@@ -924,19 +927,23 @@ function ResolveScreenshotAndSummary(string realMapName, string virtualMapName){
 			MapAuthor = BundleInstance.HelpDesc[2];
 			IdealPlayerCount = BundleInstance.HelpDesc[3];
 		}
-		if (Screenshot == None) {
-			Screenshot = Texture(DynamicLoadObject(realMapName$".Screenshot", class'Texture'));
-		}
+	}
+
+	if (Screenshot == None) {
+		// fallback load screenshot directly from level (only works if level is locally avaiable)
+		Screenshot = Texture(DynamicLoadObject(realMapName$".Screenshot", class'Texture'));
 	}
 
     if(Left(virtualMapName, 3) == "[X]")
     {
+		// map is on cooldown (red)
         MapTitle = "You can not";
         MapAuthor = "vote for this map.";
         IdealPlayerCount = "";
     }
     else if (MapTitle == "" && MapAuthor == "" && IdealPlayerCount == "")
     {
+		// fallback load summary directly from level (only works if level is locally avaiable)
         L = LevelSummary(DynamicLoadObject(realMapName$".LevelSummary", class'LevelSummary'));
         if(L != none)
         {
@@ -946,6 +953,7 @@ function ResolveScreenshotAndSummary(string realMapName, string virtualMapName){
         }
         else
         {
+			// fallback fallback show static strings
             MapTitle = "Download";
             MapAuthor = "Required";
             IdealPlayerCount = "";
