@@ -1440,7 +1440,7 @@ static function Nfo(coerce string message)
 
 defaultproperties
 {
-      ClientPackage="MVE2d"
+      ClientPackage="MVE2e"
       ServerInfoURL=""
       MapInfoURL=""
       HTTPMapListLocation=""
