@@ -49,6 +49,7 @@ var UWindowEditControl txtMessage;
 var UMenuLabelControl lblMode;
 var bool bKickVote;
 var Texture Screenshot;
+var int ScreenshotStyle;
 var string MapTitle;
 var string MapAuthor;
 var string IdealPlayerCount;
@@ -933,6 +934,10 @@ function ResolveScreenshotAndSummary(string realMapName, string virtualMapName){
 		// fallback load screenshot directly from level (only works if level is locally avaiable)
 		Screenshot = Texture(DynamicLoadObject(realMapName$".Screenshot", class'Texture'));
 	}
+	if (Screenshot != None){
+		// make it solid! (STY_Normal)
+		ScreenshotStyle = 1;
+	}
 
     if(Left(virtualMapName, 3) == "[X]")
     {
@@ -973,10 +978,13 @@ function Paint (Canvas C, float MouseX, float MouseY)
 	local float Y;
 	local float W;
 	local float H;
+	local float R;
 	local bool originalNoSmooth;
+	local int originalStyle;
 
 	Super.Paint(C,MouseX,MouseY);
 	originalNoSmooth = C.bNoSmooth;
+	originalStyle = C.Style;
 	C.bNoSmooth = false; // make screenshot and background smoother
 	
 	C.DrawColor = class'MapVoteClientConfig'.Default.BackgroundColor;
@@ -984,7 +992,11 @@ function Paint (Canvas C, float MouseX, float MouseY)
 	
 	if (  !bMapAlreadySet && (LogoTexture != "") && (Screenshot == None) )
 	{
-		Screenshot=Texture(DynamicLoadObject(LogoTexture,Class'Texture'));
+		Screenshot = Texture(DynamicLoadObject(LogoTexture,Class'Texture'));
+		if (Screenshot != None){
+			// make logo transparent!
+			ScreenshotStyle = 3;
+		}
 		bMapAlreadySet=True;
 	}
 	if ( Screenshot != None )
@@ -992,7 +1004,27 @@ function Paint (Canvas C, float MouseX, float MouseY)
 		C.DrawColor.R=255;
 		C.DrawColor.G=255;
 		C.DrawColor.B=255;
-		DrawStretchedTexture(C,30.00 + 2 * MapListwidth,27.00,PlayerListwidth,110.00,Screenshot);
+		W = PlayerListwidth;
+
+		// aspect ratio
+		R = Screenshot.VSize;
+		R /= Screenshot.USize;
+
+		// set height based on aspect ration
+		H = PlayerListwidth * R;
+		if (H > 110.00){
+			// downscale to fit height 110.00
+			W *= 110.00 / H;
+			H = 110.00;
+		}
+
+		// base position + adjustment to keep it centered
+		X = 30.00 + 2 * MapListwidth + (PlayerListwidth - W) / 2;
+		Y = 27.00 + (110.00 - H) / 2;
+		
+		C.Style = ScreenshotStyle;
+		DrawStretchedTexture(C, X, Y, W, H, Screenshot);
+		C.Style = originalStyle;
 	}
 	if ( MapTitle != "" )
 	{
@@ -1311,6 +1343,7 @@ defaultproperties
       lblMode=None
       bKickVote=False
       Screenshot=None
+	  ScreenshotStyle=1
       MapTitle=""
       MapAuthor=""
       IdealPlayerCount=""
