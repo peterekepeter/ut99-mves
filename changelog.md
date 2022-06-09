@@ -1,6 +1,47 @@
+# June 2022
+
+## Green background for players that voted
+
+Players that vote recieve a green background. This was a broken feature. 
+Players did receive the green background but only when mapvote window 
+opens. Now with the fixes applied the player background shouls switch to
+green as soon as they vote.
+
+## Logo Texture 
+
+A logo texture can now be configured and shown. The mapvote will instruct
+all windows to show this texture initially before players select a map.
+
+Example:
+
+```ini
+[MVES.MapVote]
+ClientLogoTexture=Botpack.ASMDAlt_a00
+```
+
+## Populate ServerPackages for Known Properties
+
+When `bOverrideServerPackages` is enabled then mapvote will automatically 
+detect and populate packages from the following properties:
+
+ - ClientLogoTexture
+ - ClientScreenshotPackage
+ - ClientPackage
+
+This means you dont have to manually set these server packages. But currently
+the changes to take place need a new map to be voted through mapvote.
+
+## Screenshot Bundle [EXPERIMENTAL]
+
+In order to have screenshot and level summary for every level in the map,
+there is an experimental feature in place that allows players to load 
+screenshots from a dedicated package which contains all screenshots for 
+the levels.
+
+
 # May 2022
 
-## Map Tags Feature
+## Map Tags Feature [EXPERIMENTAL]
 
 In order to add more flexibility to the way map lists are built, it's now
 possible to tag specific maps. You can assign multiple tags per map.
