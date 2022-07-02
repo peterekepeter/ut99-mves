@@ -49,6 +49,7 @@ var bool bXCGE_DynLoader; //FUCK YEAH
 var() config bool bOverrideServerPackages;
 var() config bool bResetServerPackages;
 var() config string MainServerPackages;
+
 struct GameType
 {
 	var() config bool bEnabled;
@@ -65,6 +66,7 @@ struct GameType
 	var() config string ServerActors;
 	var() config bool bAvoidRandom;
 };
+
 var() config string DefaultSettings;
 var() config int DefaultTickRate;
 var int pos;
@@ -876,15 +878,16 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 {
 	local MVPlayerWatcher W;
 	local int iU;
+  local string prettyMapName;
 
 	if ( bLevelSwitchPending )
 	{
-		Sender.ClientMessage("Server is about to change map, voting isn't allwoed");
+		Sender.ClientMessage("Server is about to change map, voting isn't allowed.");
 		return;
 	}
 	if ( !Sender.bAdmin && !CanVote(Sender) )
 	{
-		Sender.ClientMessage("You're not allowed to vote");
+		Sender.ClientMessage("You're not allowed to vote.");
 		return;
 	}
 	W = GetWatcherFor( Sender);
@@ -896,7 +899,7 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 			MapString = Mid( MapString, 3);
 		else
 		{
-			Sender.ClientMessage("This map is not available");
+			Sender.ClientMessage("This map is not available.");
 			return;
 		}
 	}
@@ -907,25 +910,27 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 		return;
 	}
 
+	iU = int(Extension.ByDelimiter( W.PlayerVote,":",1));
+  prettyMapName = Extension.ByDelimiter(MapString,":") @ GameRuleCombo(iU);
+
 	if (W.PlayerVote == MapString && !Sender.bAdmin)
 	{
-		Sender.ClientMessage("Already voted: "$MapString);
+		Sender.ClientMessage("Already voted: " $ prettyMapName);
 		return;
 	}
 	
 	W.PlayerVote = MapString;
-	iU = int(Extension.ByDelimiter( W.PlayerVote,":",1));
 
 	if ( Sender.bAdmin )
 	{
 		GotoMap(MapString,true);
 		SaveConfig();
-		BroadcastMessage("Server Admin has force a map switch to " $ Extension.ByDelimiter(MapString,":") @ GameRuleCombo(iU),True);
+		BroadcastMessage("Server Admin has force a map switch to " $ prettyMapName, True);
 		return;
 	}
 	W.PlayerVote = MapString;
   Extension.UpdatePlayerVotedInWindows(W);
-	BroadcastMessage( Sender.PlayerReplicationInfo.PlayerName $ " voted for " $ Extension.ByDelimiter(MapString,":") @ GameRuleCombo(iU),True);
+	BroadcastMessage( Sender.PlayerReplicationInfo.PlayerName $ " voted for " $ prettyMapName, True);
 	CountMapVotes();
 }
 

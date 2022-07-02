@@ -19,7 +19,7 @@ Example:
 ClientLogoTexture=Botpack.ASMDAlt_a00
 ```
 
-## Populate ServerPackages for Known Properties
+## Populate ServerPackages for Known Properties [EXPERIMENTAL]
 
 When `bOverrideServerPackages` is enabled then mapvote will automatically 
 detect and populate packages from the following properties:
