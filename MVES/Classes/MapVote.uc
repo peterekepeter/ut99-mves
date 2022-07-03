@@ -214,8 +214,7 @@ event PostBeginPlay()
 	local int MapIdx;
   local string LogoTexturePackage;
 
-	Nfo("PostBeginPlay!");
-  Nfo("ClientScreenshotPackage is `"$ClientScreenshotPackage$"`");
+	Nfo("[MVE] PostBeginPlay!");
   // Log("[MVE] Debug regen map list");
   // bGenerateMapList = True;
 	if ( bFirstRun )

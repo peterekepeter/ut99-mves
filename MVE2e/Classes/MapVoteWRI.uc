@@ -545,10 +545,8 @@ simulated function Timer()
     if (ClientCache.ClientLogoTexture != "")
     {
         CWindow.MapWindow.LogoTexture = ClientCache.ClientLogoTexture;
-        Log("MVE2 setting client logo "$ClientCache.ClientLogoTexture);
     }
     CWindow.MapWindow.ClientScreenshotPackage = ClientCache.ClientScreenshotPackage;
-    Log("MVE2 settings screenshot package "$ClientCache.ClientScreenshotPackage);
     if(ServerInfoURL != "")
     {
         CWindow.InfoWindow.SetInfoServerAddress(ServerInfoURL, MapInfoURL);
