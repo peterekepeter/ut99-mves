@@ -933,6 +933,21 @@ function ResolveScreenshotAndSummary(string realMapName, string virtualMapName){
 	if (Screenshot == None) {
 		// fallback load screenshot directly from level (only works if level is locally avaiable)
 		Screenshot = Texture(DynamicLoadObject(realMapName$".Screenshot", class'Texture'));
+		// if fails, try to load from LevelInfo
+		// https://github.com/OldUnreal/UnrealTournamentPatches/issues/926
+        if (Screenshot == None)
+        {
+            LevelInfo = LevelInfo(DynamicLoadObject(MapName$".LevelInfo0", class'LevelInfo'));
+            if (LevelInfo == None)
+			{
+                LevelInfo = LevelInfo(DynamicLoadObject(MapName$".LevelInfo1", class'LevelInfo'));
+			}
+            if (LevelInfo != None && LevelInfo.Screenshot != None)
+			{
+                Screenshot = LevelInfo.Screenshot;
+			}
+        }
+
 	}
 	if (Screenshot != None){
 		// make it solid! (STY_Normal)
