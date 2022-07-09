@@ -909,16 +909,8 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 		return;
 	}
 
-	iU = int(Extension.ByDelimiter( W.PlayerVote,":",1));
+	iU = int(Extension.ByDelimiter(MapString,":",1));
   prettyMapName = Extension.ByDelimiter(MapString,":") @ GameRuleCombo(iU);
-
-	if (W.PlayerVote == MapString && !Sender.bAdmin)
-	{
-		Sender.ClientMessage("Already voted: " $ prettyMapName);
-		return;
-	}
-	
-	W.PlayerVote = MapString;
 
 	if ( Sender.bAdmin )
 	{
@@ -927,6 +919,14 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 		BroadcastMessage("Server Admin has force a map switch to " $ prettyMapName, True);
 		return;
 	}
+
+	if (W.PlayerVote == MapString)
+	{
+		Sender.ClientMessage("Already voted: " $ prettyMapName);
+		return;
+	}
+	
+  // update player vote and notify others of the vote
 	W.PlayerVote = MapString;
   Extension.UpdatePlayerVotedInWindows(W);
 	BroadcastMessage( Sender.PlayerReplicationInfo.PlayerName $ " voted for " $ prettyMapName, True);
