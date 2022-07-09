@@ -200,6 +200,7 @@ function GlobalLoad()
 		}
 		if ( CurRules != "" )
 		{
+			// add map to maplist
 			ClearMap = RemoveExtension(CurMap);
 			Maps[iMaps++] = ClearMap;
 			MapList[ iMapList ] = ClearMap $ CurRules $ ";";
@@ -207,11 +208,13 @@ function GlobalLoad()
 			iMapList++;
 			MapCount += Len(CurRules) / 3;
 		}
+
+		// get next map from filesystem (to be processed on next loop)
 		CurMap = GetMapName("",FirstMap,iSeek++);
 
 		if (CurMap == FirstMap || CurMap == "" )
 		{
-			Log("[MVE] Scanned "$(iSeek-1)$" maps!");
+			// finished scanning all maps
 			break;
 		}
 	}
@@ -255,7 +258,7 @@ function GlobalLoad()
 		}
 	}
 	
-	Log("[MVE] CHECKING PREMADE LISTS...");
+	Log("[MVE] Checking premade lists...");
 	For ( i=0 ; i<iTmpC ; i++ )
 	{
 		iLen = Len( TmpCodes[i]);
@@ -276,7 +279,43 @@ function GlobalLoad()
 	For ( i=iMapList ; i<4096 ; i++ ){
 		MapList[iMapList] = "";
 	}
-	Log("[MVE] MAP LIST GENERATION ENDED, CHECK THE MV_MapList ACTOR");
+
+	// reload report 
+	Log("[MVE] Matched "$iMaps$" maps to "$iTmpC$" gametypes from "$(iSeek-1)$" scanned maps.");
+	if (iMaps == 0) {
+		Log("[MVE]");
+		Log("[MVE] [ERROR] No maps were loaded!");
+		Log("[MVE]");
+		if (iTmpC <= 0){
+			Log("[MVE] [ERROR] No gametypes were detected!");
+			Log("[MVE]");
+			Log("[MVE] -> enable gametypes with `bEnabled=True`");
+			Log("[MVE] -> make sure the gametype's VotePriority > 0");
+			Log("[MVE] -> the gametype's GameClass, GameName, RuleName must not be empty");
+			Log("[MVE]");
+		}
+		else if (iMaps <= 0) {
+			Log("[MVE] [ERROR] No maps were matched by filters!");
+			Log("[MVE]");
+			Log("[MVE] -> each gametype should have a FilterCode");
+			Log("[MVE] -> FilterCode should have at least 1 MapFilters rule (can have multiple)");
+			Log("[MVE] -> if you use ExcludeFilters make sure it doesn't exclude all maps");
+			Log("[MVE] -> if you're using MapTags you will need 1 MapTags entry for each map");
+			Log("[MVE] -> if you're using premade lists you need 1 MapFilters entry for each map");
+			Log("[MVE]");
+		}
+		// CustomGame[i].bEnabled && (CustomGame[i].GameClass != "") && (CustomGame[i].GameName != "") && (CustomGame[i].RuleName != "") && (CustomGame[i].VotePriority > 0) 
+	}
+	if (iSeek-1 <= 10){
+		Log("[MVE]");
+		Log("[MVE] [WARNING] Unusually low number of maps were found on filesystem!");
+		Log("[MVE]");
+		Log("[MVE] -> make sure you have maps in your map folders");
+		Log("[MVE] -> verify map folders is are added to Paths `Paths=../Maps/*.unr`");
+		Log("[MVE]");
+	}
+
+	Log("[MVE] Map list has been reloaded, check results in the `MVE_MapList.ini`");
 	EnumerateGames();
 	GenerateString();
 	//Mutator.Extension.CloseVoteWindows( Mutator.WatcherList);
