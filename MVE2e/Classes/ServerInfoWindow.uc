@@ -27,7 +27,7 @@ function Created ()
 	local string Core;
 	local string Dev;
 
-	Core="<html><body><center><br><br><h1><font color=\"FFFF00\">Map Vote Extended 2c</font></h1><br><br><b>Core developement: BDB (Bruce Bickar)<br><br>";
+	Core="<html><body><center><br><br><h1><font color=\"FFFF00\">Map Vote Extended 2e</font></h1><br><br><b>Core developement: BDB (Bruce Bickar)<br><br>";
 	Dev="Enhancements by: (Deepu)<br><br>Support: <a href=\"http://forum.ultimateut.tk\">Ultimate UT Forum</a></b></center></body></html>";
 
 	Super.Created();
