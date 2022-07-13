@@ -3,16 +3,17 @@
 //================================================================================
 class MapVote expands Mutator config(MVE_Config);
 
+var() config string TravelString; // Used to load the next map!
+var() config int TravelIdx; // Use to load game settings & mutators for next map
+
 var() config string ClientPackage;		// Load this package
 var() config string ClientScreenshotPackage; // Load this package
 var() config string ClientLogoTexture; // Clients will load and display this texture
 var() config string ServerInfoURL;
 var() config string MapInfoURL;
 var() config string HTTPMapListLocation; //HTTPMapListPort is needs to be attached here as well
-var() config string TravelString; //Used for next map!
 var string CurrentMode; //Clear on restart, if "", take gametype's default game mode
 
-var() config int TravelIdx; //Load this rule set
 var() config int VoteTimeLimit;
 var() config int HTTPMapListPort;
 var() config int DefaultGameTypeIdx; //For crashes
@@ -43,8 +44,9 @@ var() config bool bEnableMapOverrides;
 var() config bool bEnableMapTags;
 var bool bLevelSwitchPending;
 var bool bVotingStage;
+var int VotingStagePreBeginWait;
 var bool bMapChangeIssued;
-var bool bXCGE_DynLoader; //FUCK YEAH
+var bool bXCGE_DynLoader;
 
 var() config bool bOverrideServerPackages;
 var() config bool bResetServerPackages;
@@ -117,10 +119,17 @@ state Voting
 	event BeginState()
 	{
 		bVotingStage = True;
+    VotingStagePreBeginWait = 0;
 		CountMapVotes(); //Call again if mid game, now we do check the maps
 	}
 	PreBegin:
 	Sleep( 5);
+  while (!IsThereAtLeastOneVote() && VotingStagePreBeginWait < VoteTimeLimit){
+    // wait at most VoteTimeLimit seconds for first vote
+    // before starting the countdown (allows players to think and choose next map)
+    Sleep(1);
+    VotingStagePreBeginWait += 1;
+  }
 	Begin:
 	if ( VoteTimeLimit < 5 )
 		goto('Vote_5');
@@ -933,6 +942,20 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 	CountMapVotes();
 }
 
+function bool IsThereAtLeastOneVote()
+{
+	local MVPlayerWatcher W;
+  For ( W=WatcherList ; W!=none ; W=W.nextWatcher )
+  {
+    if ( CanVote(W.Watched) )
+    {
+      if ( W.PlayerVote != "" )
+        return true;
+    }
+  }
+  return false;
+}
+
 function CountMapVotes( optional bool bForceTravel)
 {
 	local MVPlayerWatcher W, UniqueVotes[32];
@@ -1086,10 +1109,20 @@ final function string GetMapFilter( int Idx)
 	return MapFilters[Idx];
 }
 
-final function string MutatorCode( int i)
+final function string MutatorCode(int i)
 {
-	if ( CustomGame[i].bEnabled && (CustomGame[i].GameClass != "") && (CustomGame[i].GameName != "") && (CustomGame[i].RuleName != "") && (CustomGame[i].VotePriority > 0) )
-		return CustomGame[i].FilterCode;
+	if (CustomGame[i].bEnabled && 
+      CustomGame[i].GameClass != "" && 
+      CustomGame[i].GameName != "" && 
+      CustomGame[i].RuleName != "" && 
+      CustomGame[i].VotePriority > 0 )
+  {
+    return CustomGame[i].FilterCode;
+  }
+  else 
+  {
+    return "";
+  }
 }
 
 final function bool HasRandom( int i)
