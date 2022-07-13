@@ -436,7 +436,6 @@ function bool HandleEndGame ()
 
 	if (ShouldHandleEndgame())
 	{
-		HandleAssaultReset();
 		DeathMatchPlus(Level.Game).bDontRestart = True;
 		if ( !bVotingStage )
 			GotoState('Voting','PreBegin');
@@ -478,7 +477,7 @@ function bool IsAssaultAndNeedsToSwitchTeams()
 	return True;
 }
 
-function HandleAssaultReset()
+function ResetAssaultGame()
 {
 	local Assault a;
 	a = Assault(Level.Game);
@@ -1280,6 +1279,7 @@ final function GotoMap( string MapString, optional bool bImmediate)
 	if ( Left(MapString,3) == "[X]" ) //Random sent me here
 		MapString = Mid(MapString,3);
 	SetupTravelString( MapString );
+  ResetCurrentGametypeBeforeTravel();
 	SaveConfig();
 	Extension.CloseVoteWindows( WatcherList);
 	if ( bImmediate )
@@ -1324,6 +1324,14 @@ final function ExecuteTravel()
 	{
 		ConsoleCommand("exit");
 	}
+}
+
+final function ResetCurrentGametypeBeforeTravel(){
+  // put here any code that needs to reset the current gametype settings 
+  // before moving on to the next match
+
+  // assault needs this so next game start with full timer and correct team in correct base
+  ResetAssaultGame();
 }
 
 final function LoadAliases()
