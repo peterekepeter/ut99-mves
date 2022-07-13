@@ -224,7 +224,9 @@ event PostBeginPlay()
 	local int MapIdx;
   local string LogoTexturePackage;
   local string TravelMap;
+  local string CurrentPackages;
   local bool bGotoSuccess;
+  local bool bNeedToRestorePackages, bNeedToRestoreMap;
 
 	Nfo("PostBeginPlay!");
   // Nfo("Debug regen map list");
@@ -289,26 +291,87 @@ event PostBeginPlay()
 			}
 		}
 	}
+
+  bNeedToRestorePackages = false;
+  if (bOverrideServerPackages && !bXCGE_DynLoader){
+    // check that current packages contains all packages specified by mapvote
+    CurrentPackages = ConsoleCommand("Get ini:Engine.Engine.GameEngine ServerPackages");
+    LogoTexturePackage = GetPackageNameFromString(ClientLogoTexture);
+    if (LogoTexturePackage != "" && InStr(CurrentPackages, "\""$LogoTexturePackage$"\"") < 0)
+    {
+      Nfo(LogoTexturePackage$" is missing from ServerPackages");
+      bNeedToRestorePackages = true;
+    }
+    if (ClientScreenshotPackage != "" && InStr(CurrentPackages, "\""$ClientScreenshotPackage$"\"") < 0)
+    {
+      Nfo(ClientScreenshotPackage$" is missing from ServerPackages");
+      bNeedToRestorePackages = true;
+    }
+    if (ClientPackage != "" && InStr(CurrentPackages, "\""$ClientPackage$"\"") < 0)
+    {
+      Nfo(ClientPackage$" is missing from ServerPackages");
+      bNeedToRestorePackages = true;
+    }
+    Cmd = CustomGame[TravelIdx].Packages;
+    if ( InStr( Cmd, "<") >= 0 )
+    {
+      Cmd = ParseAliases( Cmd);
+    }
+    while ( Cmd != "" )
+    {
+      NextParm = Extension.NextParameter( Cmd, ",");
+      if ( NextParm != "" && InStr(CurrentPackages, "\""$ClientPackage$"\"") < 0)
+      {
+        Nfo(NextParm$" is missing from ServerPackages");
+        bNeedToRestorePackages = true;
+      }
+    }
+    if (bNeedToRestorePackages)
+    {
+      Nfo("Mapvote will reload the map to update the required ServerPackages.");
+    }
+    else 
+    {
+      Nfo("ServerPackages are correctly set up!");
+    }
+  }
+
 	Cmd = Extension.ByDelimiter( string(self), ".");
-	Log("[MVE] Command: "$Cmd);
 	TravelMap = Extension.ByDelimiter(TravelString, "?");
-  Log("[MVE] TravelMap: "$TravelMap);
- 
-  if (Cmd != TravelMap && TravelString != "" && TravelMap != "" && RestoreTryCount < 3) {
+
+  if (Cmd != TravelMap && TravelString != "" && TravelMap != "")
+  {
+    bNeedToRestoreMap = true;
+    Nfo("Current map `"$Cmd$"` does not match the travel map `"$TravelMap$"`");
+    Nfo("Will attempt to switch to `"$TravelMap$"`");
+  }
+  else 
+  {
+    bNeedToRestoreMap = false;
+    Nfo("Current map is `"$TravelMap$"`");
+  }
+
+  if ((bNeedToRestorePackages || bNeedToRestoreMap) && RestoreTryCount < 3) {
     RestoreTryCount += 1;
-    Log("[MVE] Restore map from travel string "$TravelMap$":"$TravelIdx);
+    Nfo("Goto `"$TravelMap$":"$TravelIdx$"`` TryCount: `"$RestoreTryCount$"`");
     bGotoSuccess = GotoMap(TravelMap$":"$TravelIdx, true);
     if (bGotoSuccess)
     {
+      Level.NextSwitchCountdown = 0; // makes the switch really fast
       return; // will switch to next map
     } 
     else 
     {
-      Err("Failed to restore map from travel string.");
+      Err("Failed to switch to map from the travel string");
     }
   }
 
-	RestoreTryCount = 0;
+  if (RestoreTryCount != 0)
+  {
+    RestoreTryCount = 0;
+    SaveConfig();
+  }
+
 	CurrentMap = new class'MV_MapResult';
 	CurrentMap.Map = Cmd;
 	CurrentMap.OriginalSong = ""$Level.Song;
