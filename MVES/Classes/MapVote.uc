@@ -5,6 +5,7 @@ class MapVote expands Mutator config(MVE_Config);
 
 var() config string TravelString; // Used to load the next map!
 var() config int TravelIdx; // Use to load game settings & mutators for next map
+var() config int RestoreTryCount;
 
 var() config string ClientPackage;		// Load this package
 var() config string ClientScreenshotPackage; // Load this package
@@ -222,9 +223,11 @@ event PostBeginPlay()
 	local class<Actor> ActorClass;
 	local int MapIdx;
   local string LogoTexturePackage;
+  local string TravelMap;
+  local bool bGotoSuccess;
 
-	Nfo("[MVE] PostBeginPlay!");
-  // Log("[MVE] Debug regen map list");
+	Nfo("PostBeginPlay!");
+  // Nfo("Debug regen map list");
   // bGenerateMapList = True;
 	if ( bFirstRun )
 	{
@@ -288,7 +291,24 @@ event PostBeginPlay()
 	}
 	Cmd = Extension.ByDelimiter( string(self), ".");
 	Log("[MVE] Command: "$Cmd);
-	
+	TravelMap = Extension.ByDelimiter(TravelString, "?");
+  Log("[MVE] TravelMap: "$TravelMap);
+ 
+  if (Cmd != TravelMap && TravelString != "" && TravelMap != "" && RestoreTryCount < 3) {
+    RestoreTryCount += 1;
+    Log("[MVE] Restore map from travel string "$TravelMap$":"$TravelIdx);
+    bGotoSuccess = GotoMap(TravelMap$":"$TravelIdx, true);
+    if (bGotoSuccess)
+    {
+      return; // will switch to next map
+    } 
+    else 
+    {
+      Err("Failed to restore map from travel string.");
+    }
+  }
+
+	RestoreTryCount = 0;
 	CurrentMap = new class'MV_MapResult';
 	CurrentMap.Map = Cmd;
 	CurrentMap.OriginalSong = ""$Level.Song;
@@ -346,7 +366,7 @@ event PostBeginPlay()
 			ActorClass = class<Actor>(DynamicLoadObject(NextParm, class'Class'));	
 			A=Spawn(ActorClass);
 			Level.Game.BaseMutator.AddMutator(Mutator(A));
-			Log("[MVE] ===> "$string(ActorClass));
+			Log("[MVE]  ===> "$string(ActorClass));
 		}
 		if ( bXCGE_DynLoader )
 		{
@@ -1167,21 +1187,23 @@ final function bool CanVote(PlayerPawn Sender)
 }
 
 //Validity assumed
-final function SetupTravelString( string MapString )
+final function bool SetupTravelString( string MapString )
 {
 	local string spk, GameClassName, LogoTexturePackage;
 	local int idx, TickRate;
 	local MV_MapOverrides MapOverrides;
 	local MV_MapResult Result;
+  local LevelInfo info;
 	
-	if ( MapString == "" )
-	{
-		TravelString = "?restart";
-	}
 	Result = new class'MV_MapResult';
 	Result.Map = Extension.NextParameter( MapString, ":");
 	Result.GameIndex = int(MapString);
-	Result.OriginalSong = GetOriginalSongName(Result);
+	info = GetLevelInfo(Result.Map);
+  if (info == None){
+		Err("Bad map string: `"$MapString$"`" );
+    return false;
+  }
+	Result.OriginalSong = ""$info.Song;
 	//RANDOM MAP CHOSEN!
 	if ( Result.Map ~= "Random" )
 	{
@@ -1192,14 +1214,14 @@ final function SetupTravelString( string MapString )
 
 	if ( DynamicLoadObject(ParseAliases(GameClassName),class'Class') == None )
 	{
-		Log("Bad game class: "$GameClassName );
-		return;
+		Err("Bad game class: `"$GameClassName$"`" );
+		return false;
 	}
 
 	TravelString = Result.Map $ "?Game=" $ ParseAliases(GameClassName);
 	TravelIdx = Result.GameIndex;
-	Log("[MVE] -> TravelString: "$TravelString);
-	Log("[MVE] -> GameIdx: "$TravelIdx);
+	Nfo("-> TravelString: `"$TravelString$"`");
+	Nfo("-> GameIdx: `"$TravelIdx$"`");
 		
 	if (bEnableMapOverrides)
 	{
@@ -1239,7 +1261,7 @@ final function SetupTravelString( string MapString )
 		{
 			spk = ParseAliases( spk);
 		}
-		Log("[MVE] -> ServerPackages: "$spk);
+		Nfo("-> ServerPackages: `"$spk$"`");
 		ConsoleCommand( "set ini:Engine.Engine.GameEngine ServerPackages "$spk);
 	}
 	TickRate = DefaultTickRate;
@@ -1247,18 +1269,19 @@ final function SetupTravelString( string MapString )
 		TickRate = CustomGame[idx].TickRate;
 	ConsoleCommand( "set ini:Engine.Engine.NetworkDevice NetServerMaxTickRate "$CustomGame[idx].TickRate);
 	ConsoleCommand( "set ini:Engine.Engine.NetworkDevice LanServerMaxTickRate "$CustomGame[idx].TickRate);
+  Nfo("-> TickRate: `"$TickRate$"`");
+  return true; // SUCCESS!!!
 }
 
-function string GetOriginalSongName(MV_MapResult map)
+function LevelInfo GetLevelInfo(string mapName)
 {
-	local LevelInfo info;
-	info = LevelInfo(DynamicLoadObject(map.Map $"."$"LevelInfo0", class'LevelInfo'));
-	if (info == None)
-	{
-		Log("[MVE] GetOriginalSongName failed for "$map.Map);
-		return "????"; // str should not match anyhing ? not valid in filename nor unreal names
-	}
-	return ""$info.Song;
+  local LevelInfo info;
+  info = LevelInfo(DynamicLoadObject(mapName$".LevelInfo0", class'LevelInfo'));
+	if (info != None) return info;
+  info = LevelInfo(DynamicLoadObject(mapName$".LevelInfo1", class'LevelInfo'));
+	if (info != None) return info;
+  Log("[MVE] [ERROR] GetLevelInfo failed for "$mapName);
+  return None;
 }
 
 function ProcessMapOverrides(MV_MapResult map)
@@ -1274,11 +1297,17 @@ function ProcessMapOverrides(MV_MapResult map)
 	MapOverrides.ApplyOverrides(map);
 }
 
-final function GotoMap( string MapString, optional bool bImmediate)
+final function bool GotoMap( string MapString, optional bool bImmediate)
 {
-	if ( Left(MapString,3) == "[X]" ) //Random sent me here
+	if ( Left(MapString,3) == "[X]" )
+  {
+    //Random sent me here
 		MapString = Mid(MapString,3);
-	SetupTravelString( MapString );
+  }
+	if (!SetupTravelString( MapString )){
+    Err("GotoMap: SetupTravelString has failed!");
+    return false;
+  }
   ResetCurrentGametypeBeforeTravel();
 	SaveConfig();
 	Extension.CloseVoteWindows( WatcherList);
@@ -1289,6 +1318,7 @@ final function GotoMap( string MapString, optional bool bImmediate)
 	}
 	else
 		GotoState('DelayedTravel');
+  return true;
 }
 
 final function RegisterMessageMutator()
@@ -1490,6 +1520,7 @@ defaultproperties
       MapInfoURL=""
       HTTPMapListLocation=""
       TravelString=""
+      RestoreTryCount=0
       CurrentMode=""
       TravelIdx=0
       VoteTimeLimit=60
