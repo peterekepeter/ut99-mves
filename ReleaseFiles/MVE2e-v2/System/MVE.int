@@ -1,0 +1,3 @@
+[Public]
+Object=(Name=MVES.MapVote,Class=Class,MetaClass=Engine.Mutator,Description="Map Vote Extended")
+Preferences=(Caption="Map Vote Extended",Parent="Advanced Options",Class=MVES.MapVote,Immediate=True)
