@@ -157,7 +157,7 @@ function GlobalLoad(bool bFullscan)
 		{
 			if (TestIfMapCanBeLoaded(CurMap) == false)
 			{
-				Log("[MVE] Scan `"$CurMap$"`: failed to load! Skipping maps that fail to load!");
+				Log("[MVE] Scan `"$CurMap$"`: FAILED TO LOAD!!!!!! < check map/packages for errors");
 			}
 			else {
 				Log("[MVE] Scan `"$CurMap$"`: OK!");

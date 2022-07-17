@@ -936,7 +936,10 @@ function OpenWindowFor( PlayerPawn Sender, optional MVPlayerWatcher W)
 	//local MapVoteWRI MVWRI;
 	
 	if ( bLevelSwitchPending )
+	{
+		Sender.ClientMessage("Cannot vote, switching to new map!");
 		return;
+	}
 	if ( ServerCodeName == '' )	
 	{
 		Sender.ClientMessage("Map Vote not setup, load map list using MUTATE BDBMAPVOTE RELOAD");
@@ -950,6 +953,7 @@ function OpenWindowFor( PlayerPawn Sender, optional MVPlayerWatcher W)
 			Sender.ClientMessage("Please wait, Map List Cache not retrieved");
 		else if ( W.MapVoteWRIActor != none )
 		{
+			// already has actor
 		}
 		else
 		{
@@ -958,6 +962,10 @@ function OpenWindowFor( PlayerPawn Sender, optional MVPlayerWatcher W)
 			W.MapVoteWRIActor.SetPropertyText("bKickVote", string(bKickVote) );
 			W.MapVoteWRIActor.SetPropertyText("Mode", CurrentMode);
 		}
+	}
+	else 
+	{
+		Sender.ClientMessage("You cannot vote (not part of voters watchlist)");
 	}
 	//MVWRI.GetServerConfig();
 }
@@ -975,7 +983,7 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 {
 	local MVPlayerWatcher W;
 	local int iU;
-  local string prettyMapName;
+	local string prettyMapName;
 
 	if ( bLevelSwitchPending )
 	{
@@ -1008,7 +1016,7 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 	}
 
 	iU = int(Extension.ByDelimiter(MapString,":",1));
-  prettyMapName = Extension.ByDelimiter(MapString,":") @ GameRuleCombo(iU);
+	prettyMapName = Extension.ByDelimiter(MapString,":") @ GameRuleCombo(iU);
 
 	if ( Sender.bAdmin )
 	{
@@ -1023,10 +1031,10 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 		Sender.ClientMessage("Already voted: " $ prettyMapName);
 		return;
 	}
-	
-  // update player vote and notify others of the vote
+
+	// update player vote and notify others of the vote
 	W.PlayerVote = MapString;
-  Extension.UpdatePlayerVotedInWindows(W);
+	Extension.UpdatePlayerVotedInWindows(W);
 	BroadcastMessage( Sender.PlayerReplicationInfo.PlayerName $ " voted for " $ prettyMapName, True);
 	CountMapVotes();
 }
@@ -1120,26 +1128,16 @@ function CountMapVotes( optional bool bForceTravel)
 	{
 		// very dumb way
 		for (i = 0; i < 1024; i++) {
-			iU = Rand( MapList.iMapList);
+			iU = Rand(MapList.iMapList);
 			iBest = MapList.RandomGame(iU);
 			if (!CustomGame[iBest].bAvoidRandom || i == 1023) {
-				bGotoSuccess = GotoMap( MapList.MapName(iU) $ ":" $ string(iBest), false );
-				if (bGotoSuccess)
-				{
-					BroadcastMessage( "No votes sent, " $ MapList.MapName(iU) @ GameRuleCombo( iBest) @ "has been selected",True);
-					break;
-				}
-				else 
-				{
-					FailedMap(MapList.MapName(iU) $ ":" $ string(iBest));
-				}
+				WinningVote = MapList.MapName(iU) $ ":" $ string(iBest);
+				
+				iU = int(Extension.ByDelimiter(WinningVote, ":", 1));
+				PrettyVote = Extension.ByDelimiter(WinningVote, ":") @ GameRuleCombo(iU);
+
+				WinningVoteMessage = "No votes sent, "$PrettyVote$" has been selected";
 			}
-		}
-		if (!bGotoSuccess)
-		{
-			BroadcastMessage("Choosing random map failed. Restarting voting process, please vote a map.",True);
-			RestartVoting();
-			return;
 		}
 	}
 	else if ( (UniqueCount[iBest] / Total) >= 0.51 ) //Absolute majority
@@ -1312,18 +1310,18 @@ final function bool SetupTravelString( string MapString )
 	Result.Map = Extension.NextParameter( MapString, ":");
 	Result.GameIndex = int(MapString);
 
+	//RANDOM MAP CHOSEN!
+	if ( Result.Map ~= "Random" )
+	{
+		Result.Map = MapList.RandomMap(Result.GameIndex);
+	}
+
 	if (Result.CanMapBeLoaded() == false){
 		Err("Bad map string: `"$Result.Map$"`" );
 		return false;
 	}
 
 	Result.LoadSongInformation();
-
-	//RANDOM MAP CHOSEN!
-	if ( Result.Map ~= "Random" )
-	{
-		Result.Map = MapList.RandomMap(Result.GameIndex);
-	}
 
 	GameClassName = CustomGame[Result.GameIndex].GameClass;
 
