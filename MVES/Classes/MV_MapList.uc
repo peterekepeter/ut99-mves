@@ -3,7 +3,8 @@
 //================================================================================
 class MV_MapList expands Info config(MVE_MapList);
 
-var MapVote Mutator;
+var MapVote Mutator; // required input var
+
 var() config string LastUpdate;
 
 var() config int MapCount;
@@ -152,6 +153,14 @@ function GlobalLoad()
 	Log("[MVE] Scanning all map files, this might take a while");
 	while (true)
 	{
+		if (TestIfMapCanBeLoaded(CurMap) == false)
+		{
+			Log("[MVE] Scan `"$CurMap$"`: failed to load! Skipping maps that fail to load!");
+		}
+		else {
+			Log("[MVE] Scan `"$CurMap$"`: OK!");
+		}
+
 		CurRules = "";
 		For ( i=0 ; i<iTmpC ; i++ ) //Scan what gametypes this map is defined for
 		{
@@ -681,6 +690,10 @@ function MV_MapTags GetMapTagsObject(){
 	MapTags = MapTagsFactory.CreateMapTags(MapTagsConfig);
 
 	return MapTags;
+}
+
+function bool TestIfMapCanBeLoaded(string mapName) {
+	return class'MV_MapResult'.static.Create(mapName).CanMapBeLoaded();
 }
 
 defaultproperties

@@ -5,9 +5,24 @@ var string Map;
 var string Song;
 var int GameIndex;
 
+// private 
+
 var int ServerPackageCount;
 const ServerPackageMaxCount = 1024;
 var string ServerPackages[1024];
+
+var LevelInfo LevelInfo;
+var bool LevelInfoCached;
+var LevelSummary LevelSummary;
+var bool LevelSummaryCached;
+
+static function MV_MapResult Create(optional string map, optional int gameIdx){
+	local MV_MapResult object;
+	object = new class'MV_MapResult';
+	object.Map = map;
+	object.GameIndex = gameIdx;
+	return object;
+}
 
 function bool AddPackages(string packageNameList)
 {
@@ -49,6 +64,65 @@ function string GetPackagesStringList()
 		separator = ",";
 	}
 	return result;
+}
+
+function string GetSongString()
+{
+	LoadSongInformation();
+	return OriginalSong;
+}
+
+function LoadSongInformation(){
+	if (OriginalSong == "")
+	{
+		OriginalSong = ""$GetLevelInfoObject().Song;
+	}
+}
+
+function bool CanMapBeLoaded()
+{
+	if (GetLevelSummaryObject() != None) 
+	{
+		return true;
+	}
+	if (GetLevelInfoObject() != None) 
+	{
+		return true;
+	}
+	// last resort, probably won't help but hey, we tried
+	if (DynamicLoadObject(self.Map$".PlayerStart0", class'PlayerStart') != None) 
+	{
+		return true;
+	}
+	return false;
+}	
+
+function LevelInfo GetLevelInfoObject()
+{
+	if (LevelInfoCached)
+	{
+		return LevelInfo; 
+	}
+	LevelInfoCached = true;
+	// 1st try
+	LevelInfo = LevelInfo(DynamicLoadObject(self.Map$".LevelInfo0", class'LevelInfo'));
+	if (LevelInfo == None) 
+	{
+		// 2nd try
+		LevelInfo = LevelInfo(DynamicLoadObject(self.Map$".LevelInfo1", class'LevelInfo'));
+	}
+	return LevelInfo;
+}
+
+function LevelSummary GetLevelSummaryObject()
+{
+	if (LevelSummaryCached)
+	{
+		return LevelSummary;
+	}
+	LevelSummaryCached = true;
+	LevelSummary = LevelSummary(DynamicLoadObject(self.Map$".LevelSummary", class'LevelSummary'));
+	return LevelSummary;
 }
 
 defaultproperties

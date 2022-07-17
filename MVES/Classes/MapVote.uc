@@ -229,8 +229,8 @@ event PostBeginPlay()
   local bool bNeedToRestorePackages, bNeedToRestoreMap;
 
 	Nfo("PostBeginPlay!");
-  // Nfo("Debug regen map list");
-  // bGenerateMapList = True;
+	// Nfo("Debug regen map list");
+	// bGenerateMapList = True;
 	if ( bFirstRun )
 	{
 		bFirstRun = False;
@@ -372,10 +372,8 @@ event PostBeginPlay()
     SaveConfig();
   }
 
-	CurrentMap = new class'MV_MapResult';
-	CurrentMap.Map = Cmd;
+	CurrentMap = class'MV_MapResult'.static.Create(Cmd, TravelIdx);
 	CurrentMap.OriginalSong = ""$Level.Song;
-	CurrentMap.GameIndex = TravelIdx;
 	
 	if (bEnableMapOverrides)
 	{
@@ -1256,17 +1254,19 @@ final function bool SetupTravelString( string MapString )
 	local int idx, TickRate;
 	local MV_MapOverrides MapOverrides;
 	local MV_MapResult Result;
-  local LevelInfo info;
+	local LevelInfo info;
 	
-	Result = new class'MV_MapResult';
+	Result = class'MV_MapResult'.static.Create();
 	Result.Map = Extension.NextParameter( MapString, ":");
 	Result.GameIndex = int(MapString);
-	info = GetLevelInfo(Result.Map);
-  if (info == None){
+
+	if (Result.CanMapBeLoaded() == false){
 		Err("Bad map string: `"$MapString$"`" );
-    return false;
-  }
-	Result.OriginalSong = ""$info.Song;
+		return false;
+	}
+
+	Result.LoadSongInformation();
+
 	//RANDOM MAP CHOSEN!
 	if ( Result.Map ~= "Random" )
 	{
@@ -1336,16 +1336,7 @@ final function bool SetupTravelString( string MapString )
   return true; // SUCCESS!!!
 }
 
-function LevelInfo GetLevelInfo(string mapName)
-{
-  local LevelInfo info;
-  info = LevelInfo(DynamicLoadObject(mapName$".LevelInfo0", class'LevelInfo'));
-	if (info != None) return info;
-  info = LevelInfo(DynamicLoadObject(mapName$".LevelInfo1", class'LevelInfo'));
-	if (info != None) return info;
-  Log("[MVE] [ERROR] GetLevelInfo failed for "$mapName);
-  return None;
-}
+
 
 function ProcessMapOverrides(MV_MapResult map)
 {
