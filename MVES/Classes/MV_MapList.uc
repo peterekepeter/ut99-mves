@@ -103,7 +103,7 @@ function SetupClientList()
 //We scan all maps, check if they match our filters
 //If no filter exist, go ahead
 //Else add to list and find rules that use it
-function GlobalLoad()
+function GlobalLoad(bool bFullscan)
 {
 	local string FirstMap, CurMap, ClearMap, NewMaps, Maps[16384];
 	local int iSeek;
@@ -153,12 +153,15 @@ function GlobalLoad()
 	Log("[MVE] Scanning all map files, this might take a while");
 	while (true)
 	{
-		if (TestIfMapCanBeLoaded(CurMap) == false)
+		if (bFullscan)
 		{
-			Log("[MVE] Scan `"$CurMap$"`: failed to load! Skipping maps that fail to load!");
-		}
-		else {
-			Log("[MVE] Scan `"$CurMap$"`: OK!");
+			if (TestIfMapCanBeLoaded(CurMap) == false)
+			{
+				Log("[MVE] Scan `"$CurMap$"`: failed to load! Skipping maps that fail to load!");
+			}
+			else {
+				Log("[MVE] Scan `"$CurMap$"`: OK!");
+			}
 		}
 
 		CurRules = "";

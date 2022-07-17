@@ -484,10 +484,19 @@ function Mutate( string MutateString, PlayerPawn Sender)
 {
 	if ( Left(MutateString,10) ~= "BDBMAPVOTE" )
 	{
-		if ( Mid(MutateString,11,6) ~= "RELOAD" )
+		if ( Mid(MutateString,11,8) ~= "FULLSCAN" )
 		{
-			if ( Sender.bAdmin )				MapList.GlobalLoad();
-			else				Sender.ClientMessage("You cannot reload the map list");
+			if ( Sender.bAdmin ) 
+				MapList.GlobalLoad(true);
+			else				
+				Sender.ClientMessage("You cannot reload the map list");
+		}
+		else if ( Mid(MutateString,11,6) ~= "RELOAD" )
+		{
+			if ( Sender.bAdmin ) 
+				MapList.GlobalLoad(false);
+			else				
+				Sender.ClientMessage("You cannot reload the map list");
 		}
 		else if ( Mid(MutateString,11,8) ~= "VOTEMENU" )
 		{
@@ -661,7 +670,7 @@ function GenerateMapList()
 		MapList = Spawn(class'MV_MapList');
 		MapList.Mutator = self;
 	}
-	MapList.GlobalLoad();
+	MapList.GlobalLoad(true);
 }
 
 
