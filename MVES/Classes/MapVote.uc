@@ -222,11 +222,11 @@ event PostBeginPlay()
 	local Actor A;
 	local class<Actor> ActorClass;
 	local int MapIdx;
-  local string LogoTexturePackage;
-  local string TravelMap;
-  local string CurrentPackages;
-  local bool bGotoSuccess;
-  local bool bNeedToRestorePackages, bNeedToRestoreMap;
+	local string LogoTexturePackage;
+	local string TravelMap;
+	local string CurrentPackages;
+	local bool bGotoSuccess;
+	local bool bNeedToRestorePackages, bNeedToRestoreMap;
 
 	Nfo("PostBeginPlay!");
 	// Nfo("Debug regen map list");
@@ -357,13 +357,13 @@ event PostBeginPlay()
     bGotoSuccess = GotoMap(TravelMap$":"$TravelIdx, true);
     if (bGotoSuccess)
     {
-      Level.NextSwitchCountdown = 0; // makes the switch really fast
-      return; // will switch to next map
+		Level.NextSwitchCountdown = 0; // makes the switch really fast
+		return; // will switch to next map
     } 
     else 
     {
-      Err("Failed to switch to map from the travel string");
-    }
+		Err("Failed to switch to map from the travel string");	
+	}
   }
 
   if (RestoreTryCount != 0)
@@ -1042,7 +1042,7 @@ function CountMapVotes( optional bool bForceTravel)
 	local float UniqueCount[32];
 	local int i, iU, iBest, j;
 	local float Total, Current;
-	local bool bTie;
+	local bool bTie, bGotoSuccess;
 
 	if ( !bVotingStage )
 	{
@@ -1111,17 +1111,40 @@ function CountMapVotes( optional bool bForceTravel)
 			iU = Rand( MapList.iMapList);
 			iBest = MapList.RandomGame(iU);
 			if (!CustomGame[iBest].bAvoidRandom || i == 1023) {
-				GotoMap( MapList.MapName(iU) $ ":" $ string(iBest), false );
-				BroadcastMessage( "No votes sent, " $ MapList.MapName(iU) @ GameRuleCombo( iBest) @ "has been selected",True);
-				break;
+				bGotoSuccess = GotoMap( MapList.MapName(iU) $ ":" $ string(iBest), false );
+				if (bGotoSuccess)
+				{
+					BroadcastMessage( "No votes sent, " $ MapList.MapName(iU) @ GameRuleCombo( iBest) @ "has been selected",True);
+					break;
+				}
+				else 
+				{
+					FailedMap(MapList.MapName(iU) $ ":" $ string(iBest));
+				}
 			}
+		}
+		if (!bGotoSuccess)
+		{
+			BroadcastMessage("Choosing random map failed. Restarting voting process, please vote a map.",True);
+			RestartVoting();
+			return;
 		}
 	}
 	else if ( (UniqueCount[iBest] / Total) >= 0.51 ) //Absolute majority
 	{
-		GotoMap( UniqueVotes[iBest].PlayerVote, false);
-		iU = int(Extension.ByDelimiter( UniqueVotes[iBest].PlayerVote,":",1));
-		BroadcastMessage( Extension.ByDelimiter(UniqueVotes[iBest].PlayerVote,":") @ GameRuleCombo( iU) @ "has won by absolute majority.",True);
+		bGotoSuccess = GotoMap( UniqueVotes[iBest].PlayerVote, false);
+		if (bGotoSuccess)
+		{
+			iU = int(Extension.ByDelimiter( UniqueVotes[iBest].PlayerVote,":",1));
+			BroadcastMessage( Extension.ByDelimiter(UniqueVotes[iBest].PlayerVote,":") @ GameRuleCombo( iU) @ "has won by absolute majority.",True);
+		}
+		else 
+		{
+			BroadcastMessage("Failed to load '"$UniqueVotes[iBest].PlayerVote$"'. Restarting voting process, please vote a another map.",True);
+			FailedMap(UniqueVotes[iBest].PlayerVote);
+			RestartVoting();
+			return;
+		}
 	}
 	else if ( bForceTravel && bTie )
 	{
@@ -1135,15 +1158,35 @@ function CountMapVotes( optional bool bForceTravel)
 					iBest = i;
 			}
 		}
-		GotoMap( UniqueVotes[iBest].PlayerVote, false);
-		iU = int(Extension.ByDelimiter( UniqueVotes[iBest].PlayerVote,":",1));
-		BroadcastMessage( CapNumberWord(Current)$"map draw,"@Extension.ByDelimiter(UniqueVotes[iBest].PlayerVote,":") @ GameRuleCombo( iU) @ "selected.",True);
+		bGotoSuccess = GotoMap( UniqueVotes[iBest].PlayerVote, false);
+		if (bGotoSuccess)
+		{
+			iU = int(Extension.ByDelimiter( UniqueVotes[iBest].PlayerVote,":",1));
+			BroadcastMessage( CapNumberWord(Current)$"map draw,"@Extension.ByDelimiter(UniqueVotes[iBest].PlayerVote,":") @ GameRuleCombo( iU) @ "selected.",True);
+		}
+		else 
+		{
+			BroadcastMessage("Failed to load '"$UniqueVotes[iBest].PlayerVote$"'. Restarting voting process, please vote a another map.",True);
+			FailedMap(UniqueVotes[iBest].PlayerVote);
+			RestartVoting();
+			return;
+		}
 	}
 	else if ( bForceTravel )
 	{
-		GotoMap( UniqueVotes[iBest].PlayerVote, false);
-		iU = int(Extension.ByDelimiter( UniqueVotes[iBest].PlayerVote,":",1));
-		BroadcastMessage( Extension.ByDelimiter(UniqueVotes[iBest].PlayerVote,":") @ GameRuleCombo( iU) @ "has won by simple majority.",True);
+		bGotoSuccess = GotoMap( UniqueVotes[iBest].PlayerVote, false);
+		if (bGotoSuccess)
+		{
+			iU = int(Extension.ByDelimiter( UniqueVotes[iBest].PlayerVote,":",1));
+			BroadcastMessage( Extension.ByDelimiter(UniqueVotes[iBest].PlayerVote,":") @ GameRuleCombo( iU) @ "has won by simple majority.",True);
+		}
+		else 
+		{
+			BroadcastMessage("Failed to load '"$UniqueVotes[iBest].PlayerVote$"'. Restarting voting process, please vote a another map.",True);
+			FailedMap(UniqueVotes[iBest].PlayerVote);
+			RestartVoting();
+			return;
+		}
 	}
 
 	if ( !bForceTravel ) //Do not update rankings if we're leaving the map
@@ -1261,7 +1304,7 @@ final function bool SetupTravelString( string MapString )
 	Result.GameIndex = int(MapString);
 
 	if (Result.CanMapBeLoaded() == false){
-		Err("Bad map string: `"$MapString$"`" );
+		Err("Bad map string: `"$Result.Map$"`" );
 		return false;
 	}
 
@@ -1354,15 +1397,15 @@ function ProcessMapOverrides(MV_MapResult map)
 final function bool GotoMap( string MapString, optional bool bImmediate)
 {
 	if ( Left(MapString,3) == "[X]" )
-  {
-    //Random sent me here
+	{
+		//Random sent me here
 		MapString = Mid(MapString,3);
-  }
+	}
 	if (!SetupTravelString( MapString )){
-    Err("GotoMap: SetupTravelString has failed!");
-    return false;
-  }
-  ResetCurrentGametypeBeforeTravel();
+		Err("GotoMap: SetupTravelString has failed!");
+		return false;
+	}
+	ResetCurrentGametypeBeforeTravel();
 	SaveConfig();
 	Extension.CloseVoteWindows( WatcherList);
 	if ( bImmediate )
@@ -1372,7 +1415,23 @@ final function bool GotoMap( string MapString, optional bool bImmediate)
 	}
 	else
 		GotoState('DelayedTravel');
-  return true;
+	return true;
+}
+
+function FailedMap(string voted)
+{
+	Err("Map has failed! "$voted$" check for missing packages, check configuration.");
+}
+
+function RestartVoting()
+{
+	local MVPlayerWatcher W;
+	// clear votes
+	For ( W=WatcherList ; W!=none ; W=W.nextWatcher )
+	{
+		W.PlayerVote = "";
+	}
+	GotoState('Voting','PreBegin');
 }
 
 final function RegisterMessageMutator()
