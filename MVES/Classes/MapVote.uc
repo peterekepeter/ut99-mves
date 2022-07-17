@@ -120,7 +120,7 @@ state Voting
 	event BeginState()
 	{
 		bVotingStage = True;
-    VotingStagePreBeginWait = 0;
+		VotingStagePreBeginWait = 0;
 		CountMapVotes(); //Call again if mid game, now we do check the maps
 	}
 	PreBegin:
@@ -1052,6 +1052,9 @@ function CountMapVotes( optional bool bForceTravel)
 	local int i, iU, iBest, j;
 	local float Total, Current;
 	local bool bTie, bGotoSuccess;
+	local string PrettyVote;
+	local string WinningVote;
+	local string WinningVoteMessage;
 
 	if ( !bVotingStage )
 	{
@@ -1141,19 +1144,13 @@ function CountMapVotes( optional bool bForceTravel)
 	}
 	else if ( (UniqueCount[iBest] / Total) >= 0.51 ) //Absolute majority
 	{
-		bGotoSuccess = GotoMap( UniqueVotes[iBest].PlayerVote, false);
-		if (bGotoSuccess)
-		{
-			iU = int(Extension.ByDelimiter( UniqueVotes[iBest].PlayerVote,":",1));
-			BroadcastMessage( Extension.ByDelimiter(UniqueVotes[iBest].PlayerVote,":") @ GameRuleCombo( iU) @ "has won by absolute majority.",True);
-		}
-		else 
-		{
-			BroadcastMessage("Failed to load '"$UniqueVotes[iBest].PlayerVote$"'. Restarting voting process, please vote a another map.",True);
-			FailedMap(UniqueVotes[iBest].PlayerVote);
-			RestartVoting();
-			return;
-		}
+		bForceTravel = true;
+		WinningVote = UniqueVotes[iBest].PlayerVote;
+
+		iU = int(Extension.ByDelimiter(WinningVote, ":", 1));
+		PrettyVote = Extension.ByDelimiter(WinningVote, ":") @ GameRuleCombo(iU);
+		
+		WinningVoteMessage = PrettyVote$" has won by absolute majority.";
 	}
 	else if ( bForceTravel && bTie )
 	{
@@ -1167,39 +1164,42 @@ function CountMapVotes( optional bool bForceTravel)
 					iBest = i;
 			}
 		}
-		bGotoSuccess = GotoMap( UniqueVotes[iBest].PlayerVote, false);
-		if (bGotoSuccess)
-		{
-			iU = int(Extension.ByDelimiter( UniqueVotes[iBest].PlayerVote,":",1));
-			BroadcastMessage( CapNumberWord(Current)$"map draw,"@Extension.ByDelimiter(UniqueVotes[iBest].PlayerVote,":") @ GameRuleCombo( iU) @ "selected.",True);
-		}
-		else 
-		{
-			BroadcastMessage("Failed to load '"$UniqueVotes[iBest].PlayerVote$"'. Restarting voting process, please vote a another map.",True);
-			FailedMap(UniqueVotes[iBest].PlayerVote);
-			RestartVoting();
-			return;
-		}
+		WinningVote = UniqueVotes[iBest].PlayerVote;
+		
+		iU = int(Extension.ByDelimiter(WinningVote, ":", 1));
+		PrettyVote = Extension.ByDelimiter(WinningVote, ":") @ GameRuleCombo(iU);
+
+		WinningVoteMessage = CapNumberWord(Current)$"map draw,"@PrettyVote@"selected.";
 	}
 	else if ( bForceTravel )
 	{
-		bGotoSuccess = GotoMap( UniqueVotes[iBest].PlayerVote, false);
+		WinningVote = UniqueVotes[iBest].PlayerVote;
+
+		iU = int(Extension.ByDelimiter(WinningVote, ":", 1));
+		PrettyVote = Extension.ByDelimiter(WinningVote, ":") @ GameRuleCombo(iU);
+		
+		WinningVoteMessage = PrettyVote@"has won by simple majority.";
+	}
+
+	if ( bForceTravel )
+	{
+		// travel to winning vote
+		bGotoSuccess = GotoMap(WinningVote, false);
 		if (bGotoSuccess)
 		{
-			iU = int(Extension.ByDelimiter( UniqueVotes[iBest].PlayerVote,":",1));
-			BroadcastMessage( Extension.ByDelimiter(UniqueVotes[iBest].PlayerVote,":") @ GameRuleCombo( iU) @ "has won by simple majority.",True);
+			BroadcastMessage(WinningVoteMessage, True);
 		}
 		else 
 		{
-			BroadcastMessage("Failed to load '"$UniqueVotes[iBest].PlayerVote$"'. Restarting voting process, please vote a another map.",True);
-			FailedMap(UniqueVotes[iBest].PlayerVote);
+			// failed to go to winning vote, restart voting process
+			BroadcastMessage("Failed to load "$PrettyVote$", please vote a another map.",True);
+			FailedMap(WinningVote);
 			RestartVoting();
-			return;
 		}
 	}
-
-	if ( !bForceTravel ) //Do not update rankings if we're leaving the map
+	else 
 	{
+		// Do not update rankings if we're leaving the map
 		i = 1;
 		While ( i<iMapVotes )
 		{
