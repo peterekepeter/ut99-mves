@@ -933,8 +933,6 @@ function UpdateMapListCaches()
 
 function OpenWindowFor( PlayerPawn Sender, optional MVPlayerWatcher W)
 {
-	//local MapVoteWRI MVWRI;
-	
 	if ( bLevelSwitchPending )
 	{
 		Sender.ClientMessage("Cannot vote, switching to new map!");
@@ -946,28 +944,35 @@ function OpenWindowFor( PlayerPawn Sender, optional MVPlayerWatcher W)
 		return;
 	}
 	if ( W == none )
+	{
 		W = GetWatcherFor( Sender);
-	if ( W != none )
-	{
-		if ( W.MapListCacheActor == none )
-			Sender.ClientMessage("Please wait, Map List Cache not retrieved");
-		else if ( W.MapVoteWRIActor != none )
-		{
-			// already has actor
-		}
-		else
-		{
-			W.MapVoteWRIActor = Extension.SpawnVoteWRIActor( Sender);
-			Extension.PlayersToWindow( W.MapVoteWRIActor);
-			W.MapVoteWRIActor.SetPropertyText("bKickVote", string(bKickVote) );
-			W.MapVoteWRIActor.SetPropertyText("Mode", CurrentMode);
-		}
 	}
-	else 
+	if ( W == none )
 	{
-		Sender.ClientMessage("You cannot vote (not part of voters watchlist)");
+		Sender.ClientMessage("Looks like you're not part of the voter list. I'll try to fix that now.");
+		Err("Player '"$Sender.PlayerReplicationInfo.PlayerName$"' was not part of watchlist but requested to vote.");
+		PlayerJoined(Sender);
+		W = GetWatcherFor( Sender);
 	}
-	//MVWRI.GetServerConfig();
+	if ( W == none )
+	{
+		Sender.ClientMessage("Very sorry looks like you're not able to vote!");
+		return;
+	}
+	if ( W.MapListCacheActor == none )
+	{
+		Sender.ClientMessage("Please wait, Map List Cache not retrieved");
+		return;
+	}
+	if ( W.MapVoteWRIActor != none )
+	{
+		return; // already has actor
+	}
+	// finally, do open the window!
+	W.MapVoteWRIActor = Extension.SpawnVoteWRIActor( Sender);
+	Extension.PlayersToWindow( W.MapVoteWRIActor);
+	W.MapVoteWRIActor.SetPropertyText("bKickVote", string(bKickVote) );
+	W.MapVoteWRIActor.SetPropertyText("Mode", CurrentMode);
 }
 
 function OpenAllWindows()
