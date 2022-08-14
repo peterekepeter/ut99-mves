@@ -125,12 +125,12 @@ state Voting
 	}
 	PreBegin:
 	Sleep( 5);
-  while (!IsThereAtLeastOneVote() && VotingStagePreBeginWait < VoteTimeLimit){
+	while (!IsThereAtLeastOneVote() && VotingStagePreBeginWait < VoteTimeLimit){
     // wait at most VoteTimeLimit seconds for first vote
     // before starting the countdown (allows players to think and choose next map)
-    Sleep(1);
-    VotingStagePreBeginWait += 1;
-  }
+		Sleep(1);
+		VotingStagePreBeginWait += 1;
+	}
 	Begin:
 	if ( VoteTimeLimit < 5 )
 		goto('Vote_5');
@@ -244,20 +244,20 @@ event PostBeginPlay()
 		default.bXCGE_DynLoader = true; //So we get to see if it worked from clients!
 		AddToPackageMap(ClientPackage);
 		if (ClientScreenshotPackage != "") 
-    {
-      AddToPackageMap(ClientScreenshotPackage);
-    }
-    if (ClientLogoTexture != "")
-    {
-      LogoTexturePackage = GetPackageNameFromString(ClientLogoTexture);
-      if (LogoTexturePackage != "")
-      {
-        AddToPackageMap(LogoTexturePackage);
-      }
-      else {
-        Err("Invalid value for LogoTexturePackage, expected Package.Texture");
-      }
-    }
+		{
+			AddToPackageMap(ClientScreenshotPackage);
+		}
+		if (ClientLogoTexture != "")
+		{
+			LogoTexturePackage = GetPackageNameFromString(ClientLogoTexture);
+			if (LogoTexturePackage != "")
+			{
+				AddToPackageMap(LogoTexturePackage);
+			}
+			else {
+				Err("Invalid value for LogoTexturePackage, expected Package.Texture");
+			}
+		}
 	}
 	if ( ExtensionClass != "" )
 		ExtensionC = class<MV_MainExtension>( DynamicLoadObject(ExtensionClass,class'class') );
@@ -292,85 +292,85 @@ event PostBeginPlay()
 		}
 	}
 
-  bNeedToRestorePackages = false;
-  if (bOverrideServerPackages && !bXCGE_DynLoader){
-    // check that current packages contains all packages specified by mapvote
-    CurrentPackages = ConsoleCommand("Get ini:Engine.Engine.GameEngine ServerPackages");
-    LogoTexturePackage = GetPackageNameFromString(ClientLogoTexture);
-    if (LogoTexturePackage != "" && InStr(CurrentPackages, "\""$LogoTexturePackage$"\"") < 0)
-    {
-      Nfo(LogoTexturePackage$" is missing from ServerPackages");
-      bNeedToRestorePackages = true;
-    }
-    if (ClientScreenshotPackage != "" && InStr(CurrentPackages, "\""$ClientScreenshotPackage$"\"") < 0)
-    {
-      Nfo(ClientScreenshotPackage$" is missing from ServerPackages");
-      bNeedToRestorePackages = true;
-    }
-    if (ClientPackage != "" && InStr(CurrentPackages, "\""$ClientPackage$"\"") < 0)
-    {
-      Nfo(ClientPackage$" is missing from ServerPackages");
-      bNeedToRestorePackages = true;
-    }
-    Cmd = CustomGame[TravelIdx].Packages;
-    if ( InStr( Cmd, "<") >= 0 )
-    {
-      Cmd = ParseAliases( Cmd);
-    }
-    while ( Cmd != "" )
-    {
-      NextParm = Extension.NextParameter( Cmd, ",");
-      if ( NextParm != "" && InStr(CurrentPackages, "\""$ClientPackage$"\"") < 0)
-      {
-        Nfo(NextParm$" is missing from ServerPackages");
-        bNeedToRestorePackages = true;
-      }
-    }
-    if (bNeedToRestorePackages)
-    {
-      Nfo("Mapvote will reload the map to update the required ServerPackages.");
-    }
-    else 
-    {
-      Nfo("ServerPackages are correctly set up!");
-    }
-  }
+	bNeedToRestorePackages = false;
+	if (bOverrideServerPackages && !bXCGE_DynLoader){
+	// check that current packages contains all packages specified by mapvote
+		CurrentPackages = ConsoleCommand("Get ini:Engine.Engine.GameEngine ServerPackages");
+		LogoTexturePackage = GetPackageNameFromString(ClientLogoTexture);
+		if (LogoTexturePackage != "" && InStr(CurrentPackages, "\""$LogoTexturePackage$"\"") < 0)
+		{
+			Nfo(LogoTexturePackage$" is missing from ServerPackages");
+			bNeedToRestorePackages = true;
+		}
+		if (ClientScreenshotPackage != "" && InStr(CurrentPackages, "\""$ClientScreenshotPackage$"\"") < 0)
+		{
+			Nfo(ClientScreenshotPackage$" is missing from ServerPackages");
+			bNeedToRestorePackages = true;
+		}
+		if (ClientPackage != "" && InStr(CurrentPackages, "\""$ClientPackage$"\"") < 0)
+		{
+			Nfo(ClientPackage$" is missing from ServerPackages");
+			bNeedToRestorePackages = true;
+		}
+		Cmd = CustomGame[TravelIdx].Packages;
+		if ( InStr( Cmd, "<") >= 0 )
+		{
+			Cmd = ParseAliases( Cmd);
+		}
+		while ( Cmd != "" )
+		{
+			NextParm = Extension.NextParameter( Cmd, ",");
+			if ( NextParm != "" && InStr(CurrentPackages, "\""$ClientPackage$"\"") < 0)
+			{
+				Nfo(NextParm$" is missing from ServerPackages");
+				bNeedToRestorePackages = true;
+			}
+		}
+		if (bNeedToRestorePackages)
+		{
+			Nfo("Mapvote will reload the map to update the required ServerPackages.");
+		}
+		else 
+		{
+			Nfo("ServerPackages are correctly set up!");
+		}
+	}
 
 	Cmd = Extension.ByDelimiter( string(self), ".");
 	TravelMap = Extension.ByDelimiter(TravelString, "?");
 
-  if (Cmd != TravelMap && TravelString != "" && TravelMap != "")
-  {
-    bNeedToRestoreMap = true;
-    Nfo("Current map `"$Cmd$"` does not match the travel map `"$TravelMap$"`");
-    Nfo("Will attempt to switch to `"$TravelMap$"`");
-  }
-  else 
-  {
-    bNeedToRestoreMap = false;
-    Nfo("Current map is `"$TravelMap$"`");
-  }
-
-  if ((bNeedToRestorePackages || bNeedToRestoreMap) && RestoreTryCount < 3) {
-    RestoreTryCount += 1;
-    Nfo("Goto `"$TravelMap$":"$TravelIdx$"`` TryCount: `"$RestoreTryCount$"`");
-    bGotoSuccess = GotoMap(TravelMap$":"$TravelIdx, true);
-    if (bGotoSuccess)
-    {
-		Level.NextSwitchCountdown = 0; // makes the switch really fast
-		return; // will switch to next map
-    } 
-    else 
-    {
-		Err("Failed to switch to map from the travel string");	
+	if (Cmd != TravelMap && TravelString != "" && TravelMap != "")
+	{
+		bNeedToRestoreMap = true;
+		Nfo("Current map `"$Cmd$"` does not match the travel map `"$TravelMap$"`");
+		Nfo("Will attempt to switch to `"$TravelMap$"`");
 	}
-  }
+	else 
+	{
+		bNeedToRestoreMap = false;
+		Nfo("Current map is `"$TravelMap$"`");
+	}
 
-  if (RestoreTryCount != 0)
-  {
-    RestoreTryCount = 0;
-    SaveConfig();
-  }
+	if ((bNeedToRestorePackages || bNeedToRestoreMap) && RestoreTryCount < 3) {
+		RestoreTryCount += 1;
+		Nfo("Goto `"$TravelMap$":"$TravelIdx$"`` TryCount: `"$RestoreTryCount$"`");
+		bGotoSuccess = GotoMap(TravelMap$":"$TravelIdx, true);
+		if (bGotoSuccess)
+		{
+			Level.NextSwitchCountdown = 0; // makes the switch really fast
+			return; // will switch to next map
+		} 
+		else 
+		{
+			Err("Failed to switch to map from the travel string");	
+		}
+	}
+
+	if (RestoreTryCount != 0)
+	{
+		RestoreTryCount = 0;
+		SaveConfig();
+	}
 
 	CurrentMap = class'MV_MapResult'.static.Create(Cmd, TravelIdx);
 	CurrentMap.OriginalSong = ""$Level.Song;
@@ -510,9 +510,9 @@ function Mutate( string MutateString, PlayerPawn Sender)
 		else if ( Mid(MutateString,11,5) ~= "KICK " )
 			PlayerKickVote( Sender, Mid(MutateString, 17, 3));
 		else {
-      Sender.ClientMessage("Unknown mapvote command");
+			Sender.ClientMessage("Unknown mapvote command");
 			return;
-    }
+		}
 	}
 
 	if ( NextMutator != none )
@@ -538,7 +538,7 @@ function bool HandleEndGame ()
 function bool ShouldHandleEndgame()
 {
 	return IsMonsterHunt() || // always show mapvote for monsterhunt
-	(!CheckForTie() && !IsAssaultAndNeedsToSwitchTeams());
+		(!CheckForTie() && !IsAssaultAndNeedsToSwitchTeams());
 }
 
 function bool IsMonsterHunt()
@@ -587,11 +587,11 @@ function ResetAssaultGame()
 
 function bool CheckForTie ()
 {
-  local TeamInfo Best;
-  local int i;
-  local Pawn P;
-  local Pawn BestP;
-  local PlayerPawn Player;
+	local TeamInfo Best;
+	local int i;
+	local Pawn P;
+	local Pawn BestP;
+	local PlayerPawn Player;
 
 	if ( Level.Game.IsA('Assault') || Level.Game.IsA('Domination') )
 		return False;
@@ -1047,15 +1047,15 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 function bool IsThereAtLeastOneVote()
 {
 	local MVPlayerWatcher W;
-  For ( W=WatcherList ; W!=none ; W=W.nextWatcher )
-  {
-    if ( CanVote(W.Watched) )
-    {
-      if ( W.PlayerVote != "" )
-        return true;
-    }
-  }
-  return false;
+	For ( W=WatcherList ; W!=none ; W=W.nextWatcher )
+	{
+		if ( CanVote(W.Watched) )
+		{
+			if ( W.PlayerVote != "" )
+				return true;
+		}
+	}
+	return false;
 }
 
 function CountMapVotes( optional bool bForceTravel)
@@ -1247,17 +1247,18 @@ final function string GetMapFilter( int Idx)
 final function string MutatorCode(int i)
 {
 	if (CustomGame[i].bEnabled && 
-      CustomGame[i].GameClass != "" && 
-      CustomGame[i].GameName != "" && 
-      CustomGame[i].RuleName != "" && 
-      CustomGame[i].VotePriority > 0 )
-  {
-    return CustomGame[i].FilterCode;
-  }
-  else 
-  {
-    return "";
-  }
+		CustomGame[i].GameClass != "" && 
+		CustomGame[i].GameName != "" && 
+		CustomGame[i].RuleName != "" && 
+		CustomGame[i].VotePriority > 0 
+	)
+	{
+		return CustomGame[i].FilterCode;
+	}
+	else 
+	{
+		return "";
+	}
 }
 
 final function bool HasRandom( int i)
@@ -1348,28 +1349,28 @@ final function bool SetupTravelString( string MapString )
 
 	if ( bOverrideServerPackages )
 	{
-    // add client package
-    Result.AddPackages(ClientPackage);
-    // add screenshot package 
+		// add client package
+		Result.AddPackages(ClientPackage);
+		// add screenshot package 
 		if (ClientScreenshotPackage != "") 
-    {
-      Result.AddPackages(ClientScreenshotPackage);
-    }
-    // add logo texture package
-    if (ClientLogoTexture != "")
-    {
-      LogoTexturePackage = GetPackageNameFromString(ClientLogoTexture);
-      if (LogoTexturePackage != "")
-      {
-        Result.AddPackages(LogoTexturePackage);
-      }
-      else {
-        Err("Invalid value for LogoTexturePackage, expected Package.Texture");
-      }
-    }
-    // add gametype packages
+		{
+			Result.AddPackages(ClientScreenshotPackage);
+		}
+		// add logo texture package
+		if (ClientLogoTexture != "")
+		{
+			LogoTexturePackage = GetPackageNameFromString(ClientLogoTexture);
+			if (LogoTexturePackage != "")
+			{
+				Result.AddPackages(LogoTexturePackage);
+			}
+			else {
+				Err("Invalid value for LogoTexturePackage, expected Package.Texture");
+			}
+		}
+		// add gametype packages
 		Result.AddPackages(CustomGame[Result.GameIndex].Packages);
-    // concats main packages
+		// concats main packages
 		spk = Extension.GenerateSPList(Result.GetPackagesStringList()); 
 		if ( spk == "" )			
 		{	
@@ -1387,8 +1388,8 @@ final function bool SetupTravelString( string MapString )
 		TickRate = CustomGame[idx].TickRate;
 	ConsoleCommand( "set ini:Engine.Engine.NetworkDevice NetServerMaxTickRate "$CustomGame[idx].TickRate);
 	ConsoleCommand( "set ini:Engine.Engine.NetworkDevice LanServerMaxTickRate "$CustomGame[idx].TickRate);
-  Nfo("-> TickRate: `"$TickRate$"`");
-  return true; // SUCCESS!!!
+	Nfo("-> TickRate: `"$TickRate$"`");
+	return true; // SUCCESS!!!
 }
 
 
@@ -1482,11 +1483,11 @@ final function ExecuteTravel()
 }
 
 final function ResetCurrentGametypeBeforeTravel(){
-  // put here any code that needs to reset the current gametype settings 
-  // before moving on to the next match
+	// put here any code that needs to reset the current gametype settings 
+	// before moving on to the next match
 
-  // assault needs this so next game start with full timer and correct team in correct base
-  ResetAssaultGame();
+	// assault needs this so next game start with full timer and correct team in correct base
+	ResetAssaultGame();
 }
 
 final function LoadAliases()
@@ -1620,12 +1621,12 @@ function CommonCommands( Actor Sender, String S)
 
 static function string GetPackageNameFromString(string objectReference)
 {
-  local string name, ignore;
-  if (class'MV_Parser'.static.TrySplit(objectReference, ".", name, ignore))
-  {
-    return name;
-  }
-  return "";
+	local string name, ignore;
+	if (class'MV_Parser'.static.TrySplit(objectReference, ".", name, ignore))
+	{
+		return name;
+	}
+	return "";
 }
 
 static function Err(coerce string message)
