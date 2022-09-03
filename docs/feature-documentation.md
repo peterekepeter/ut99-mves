@@ -50,7 +50,7 @@ For example `DM-CliffyB4:RA` could mean that the map DM-CliffyB4 is suitable
 for rocket arena and that `CTF-Whatever:LG:SNI` is suitable for lowgrav and
 sniper matches. What the tags are and what they mean are up to the user.
 
-Filters have been extended to support tags. This way maps with speicifc
+Filters have been extended to support tags. This way maps with specific
 tag can be added or removed from map lists using the filters.
 
 To enable this feature you need to set `bEnableMapTags` to true in the
