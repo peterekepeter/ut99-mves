@@ -44,7 +44,7 @@ function bool ShouldJoinMapVote(PlayerPawn PP)
 {
 	if (PP == None ||
 		PP.PlayerReplicationInfo == None ||
-		PP.Player == None || 
+		PP.PlayerReplicationInfo.PlayerName == "" ||
 		MapVote.GetWatcherFor(PP) != None)
 	{
 		return False; 
