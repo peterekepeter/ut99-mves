@@ -32,6 +32,7 @@ enum EIDType
 var() config EIDType PlayerIDType;
 
 var() config bool bFirstRun;
+var() config bool bSaveConfigOnNextRun, bReloadOnNextRun, bFullscanOnNextRun;
 var() config bool bShutdownServerOnTravel;
 var() config bool bWelcomeWindow;
 var() config bool bSpecsAllowed;
@@ -92,7 +93,6 @@ var MV_MainExtension Extension;
 var string ExtensionClass;
 
 
-var(Debug) bool bSaveConfig, bGenerateMapList;
 var string LastMsg;
 
 var string StrMapVotes[32];
@@ -231,11 +231,6 @@ event PostBeginPlay()
 	Nfo("PostBeginPlay!");
 	// Nfo("Debug regen map list");
 	// bGenerateMapList = True;
-	if ( bFirstRun )
-	{
-		bFirstRun = False;
-		SaveConfig();
-	}
 	LoadAliases();
 
 	if ( int(ConsoleCommand("get ini:Engine.Engine.GameEngine XC_Version")) >= 11 ) //Only XC_GameEngine contains this variable
@@ -650,27 +645,30 @@ event Tick( float DeltaTime)
 		if ( bAutoOpen )
 			OpenAllWindows();
 	}
-	if ( bSaveConfig )
+	if ( bReloadOnNextRun || bFullscanOnNextRun )
 	{
-		SaveConfig();
-		bSaveConfig = false;
+		GenerateMapList(bFullscanOnNextRun);
+		bReloadOnNextRun = false;
+		bFullscanOnNextRun = false;
+		bSaveConfigOnNextRun = true;
 	}
-	if ( bGenerateMapList )
+	if ( bSaveConfigOnNextRun || bFirstRun )
 	{
-		GenerateMapList();
-		bGenerateMapList = false;
+		bSaveConfigOnNextRun = false;
+		bFirstRun = false;
+		SaveConfig();
 	}
 	LastMsg = "";
 }
 
-function GenerateMapList()
+function GenerateMapList(bool bFullscan)
 {
 	if ( MapList == none )
 	{
 		MapList = Spawn(class'MV_MapList');
 		MapList.Mutator = self;
 	}
-	MapList.GlobalLoad(true);
+	MapList.GlobalLoad(bFullscan);
 }
 
 
@@ -2941,8 +2939,7 @@ defaultproperties
       MapList=None
       Extension=None
       ExtensionClass="MVES.MV_SubExtension"
-      bSaveConfig=False
-      bGenerateMapList=False
+      bSaveConfigOnNextRun=True
       LastMsg=""
       StrMapVotes(0)=""
       StrMapVotes(1)=""
