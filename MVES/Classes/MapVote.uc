@@ -31,7 +31,8 @@ enum EIDType
 
 var() config EIDType PlayerIDType;
 
-var() config bool bFirstRun;
+//?bDeprecated=True
+var() config bool bFirstRun; 
 var() config bool bSaveConfigOnNextRun, bReloadOnNextRun, bFullscanOnNextRun;
 var() config bool bShutdownServerOnTravel;
 var() config bool bWelcomeWindow;
@@ -654,6 +655,10 @@ event Tick( float DeltaTime)
 	}
 	if ( bSaveConfigOnNextRun || bFirstRun )
 	{
+		if (bFirstRun){
+			Nfo("bFirstRun is deprecated and will be removed"@
+				"use bSaveConfigOnNextRun instead");
+		}
 		bSaveConfigOnNextRun = false;
 		bFirstRun = false;
 		SaveConfig();
