@@ -1655,7 +1655,7 @@ defaultproperties
       VoteTimeLimit=60
       HTTPMapListPort=0
       DefaultGameTypeIdx=0
-      ServerCodeName="None"
+      ServerCodeName="UT-Server"
       MidGameVotePercent=51
       KickPercent=51
       MapCostAddPerLoad=0
