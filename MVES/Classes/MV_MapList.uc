@@ -31,6 +31,7 @@ var(Debug) int EStart[ArrayCount(GameNames)], EEnd[ArrayCount(GameNames)];
 var(Debug) int iTmpC;
 
 var config int iNewMaps[32], iM;
+var config string sNewMaps[32];
 var config string M[16384];
 
 var string MapListString; //Send this over the net!
@@ -265,8 +266,10 @@ function GlobalLoad(bool bFullscan)
 		k = InStr(ClearMap, ":" $ NewMaps $ ":");
 		if (k == -1) {
 			iNewMaps[j] = 0;
+			sNewMaps[j] = "";
 		} else {
 			iNewMaps[j] = int(Mid(ClearMap, k + 2 + Len(NewMaps), 4));
+			sNewMaps[j] = NewMaps;
 		}
 	}
 	
