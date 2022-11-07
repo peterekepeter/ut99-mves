@@ -6,7 +6,6 @@ class MapVote expands Mutator config(MVE_Config);
 var() config string TravelString; // Used to load the next map!
 var() config int TravelIdx; // Use to load game settings & mutators for next map
 var() config int RestoreTryCount;
-var() config int TravelPlayerCount;
 
 var() config string ClientPackage;		// Load this package
 var() config string ClientScreenshotPackage; // Load this package
@@ -694,7 +693,6 @@ function MapChangeIssued()
 		if ( Level.bNextItems )			BroadcastMessage( Extension.ByDelimiter( aStr, ":") $ GameRuleCombo(TravelIdx) @ "has been selected as next map.", true);
 		else			BroadcastMessage( Extension.ByDelimiter( aStr, ":") $ GameRuleCombo(TravelIdx) @ "has been forced.", true);
 		TravelString = Level.NextURL;
-		TravelPlayerCount = GetPlayerCount();
 	}
 	else
 		Log("Map code "$aStr$" not found in map list",'MapVote');
@@ -1030,7 +1028,6 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 
 	if ( Sender.bAdmin )
 	{
-		TravelPlayerCount = GetPlayerCount();
 		GotoMap(MapString,true);
 		SaveConfig();
 		BroadcastMessage("Server Admin has force a map switch to " $ prettyMapName, True);
@@ -1193,7 +1190,6 @@ function CountMapVotes( optional bool bForceTravel)
 	if ( bForceTravel )
 	{
 		// travel to winning vote
-		TravelPlayerCount = GetPlayerCount();
 		bGotoSuccess = GotoMap(WinningVote, false);
 		if (bGotoSuccess)
 		{
@@ -1397,20 +1393,6 @@ final function bool SetupTravelString( string MapString )
 	ConsoleCommand( "set ini:Engine.Engine.NetworkDevice LanServerMaxTickRate "$CustomGame[idx].TickRate);
 	Nfo("-> TickRate: `"$TickRate$"`");
 	return true; // SUCCESS!!!
-}
-
-function int GetPlayerCount(){
-	local int count;
-	local MVPlayerWatcher W;
-	count = 0;
-	For ( W=WatcherList ; W!=none ; W=W.nextWatcher )
-	{
-		if ( CanVote(W.Watched) )
-		{
-			count += 1;
-		}
-	}
-	return count;
 }
 
 function ProcessMapOverrides(MV_MapResult map)
