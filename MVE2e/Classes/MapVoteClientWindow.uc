@@ -892,6 +892,7 @@ function string GetRealMapname(string VirtualMap)
 function ResolveScreenshotAndSummary(string realMapName, string virtualMapName){
 	local class<Commandlet> BundleClass;
 	local LevelSummary L;
+	local LevelInfo LevelInfo;
 	local Commandlet BundleInstance;
 	local string ScreenshotStr;
 	local int index;
@@ -937,10 +938,10 @@ function ResolveScreenshotAndSummary(string realMapName, string virtualMapName){
 		// https://github.com/OldUnreal/UnrealTournamentPatches/issues/926
         if (Screenshot == None)
         {
-            LevelInfo = LevelInfo(DynamicLoadObject(MapName$".LevelInfo0", class'LevelInfo'));
+            LevelInfo = LevelInfo(DynamicLoadObject(realMapName$".LevelInfo0", class'LevelInfo'));
             if (LevelInfo == None)
 			{
-                LevelInfo = LevelInfo(DynamicLoadObject(MapName$".LevelInfo1", class'LevelInfo'));
+                LevelInfo = LevelInfo(DynamicLoadObject(realMapName$".LevelInfo1", class'LevelInfo'));
 			}
             if (LevelInfo != None && LevelInfo.Screenshot != None)
 			{
