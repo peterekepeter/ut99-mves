@@ -4,6 +4,7 @@
 class MV_MapList expands Info config(MVE_MapList);
 
 var MapVote Mutator; // required input var
+const MAX_MAPS = 4096;
 
 var() config string LastUpdate;
 
@@ -113,6 +114,7 @@ function GlobalLoad(bool bFullscan)
 	local string sTest;
 	local bool bAddTag;
 	local MV_MapTags MapTags;
+	local MV_Sort sorter;
 
 	if (Mutator.bEnableMapTags)
 	{
@@ -123,8 +125,6 @@ function GlobalLoad(bool bFullscan)
 	Mutator.CountFilters();
 	if ( Mutator.ServerCodeName == '' )
 		Mutator.SetPropertyText("ServerCodeName",string(rand(MaxInt)) $ string(rand(MaxInt))  );
-	FirstMap = GetMapName("","",0);
-	CurMap = FirstMap;
 	CacheCodes();
 	MapCount = 0;
 	iMapList = 0;
@@ -151,8 +151,12 @@ function GlobalLoad(bool bFullscan)
 		MapCount += Len(CurRules) / 3;
 	}
 	
-	Log("[MVE] Scanning all map files, this might take a while");
-	while (true)
+	FirstMap = GetMapName("","",0);
+	CurMap = FirstMap;
+	sorter = new class'MV_Sort';
+
+	Log("[MVE] Scanning maps from disk paths");
+	while (true) 
 	{
 		if (bFullscan)
 		{
@@ -165,6 +169,31 @@ function GlobalLoad(bool bFullscan)
 			}
 		}
 
+		sorter.AddItem(CurMap);
+            
+		// get next map from filesystem (to be processed on next loop)
+		CurMap = GetMapName("", FirstMap, iSeek++);
+
+		if (sorter.ItemCount >= 4095){
+			Log("[MVE] Map limit reached with `"$CurMap$"`");
+			break;
+		}
+		if (CurMap == FirstMap || CurMap == "" )
+		{
+			// finished scanning all maps
+			break;
+		}
+	}
+      
+	Log("[MVE] Sorting and removing duplicates");
+	sorter.SortAndDeduplicate();
+	
+	Log("[MVE] "$sorter.DuplicatesRemoved$" duplicates were removed");
+
+	Log("[MVE] Matching maps with filters");
+	for (k=0; k<sorter.ItemCount; k+=1)
+	{
+		CurMap = sorter.Items[k];
 		CurRules = "";
 		For ( i=0 ; i<iTmpC ; i++ ) //Scan what gametypes this map is defined for
 		{
@@ -220,15 +249,6 @@ function GlobalLoad(bool bFullscan)
 			ClientMapList[ iMapList ] = MapList[ iMapList ];
 			iMapList++;
 			MapCount += Len(CurRules) / 3;
-		}
-
-		// get next map from filesystem (to be processed on next loop)
-		CurMap = GetMapName("",FirstMap,iSeek++);
-
-		if (CurMap == FirstMap || CurMap == "" )
-		{
-			// finished scanning all maps
-			break;
 		}
 	}
 		
@@ -291,7 +311,7 @@ function GlobalLoad(bool bFullscan)
 		}
 	}
 	iClientMapList = iMapList;
-	For ( i=iMapList ; i<4096 ; i++ ){
+	For ( i=iMapList ; i<MAX_MAPS ; i++ ){
 		MapList[iMapList] = "";
 	}
 
