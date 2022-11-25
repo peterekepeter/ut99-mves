@@ -185,10 +185,16 @@ function GlobalLoad(bool bFullscan)
 		}
 	}
       
-	Log("[MVE] Sorting and removing duplicates");
-	sorter.SortAndDeduplicate();
+	if (Mutator.bSortAndDeduplicateMaps){
+		Log("[MVE] Sorting and removing duplicate maps");
+
+		sorter.SortAndDeduplicate();
+
+		if (sorter.DuplicatesRemoved > 0){
+			Log("[MVE] "$sorter.DuplicatesRemoved$" duplicates found and removed");
+		}
+	}
 	
-	Log("[MVE] "$sorter.DuplicatesRemoved$" duplicates were removed");
 
 	Log("[MVE] Matching maps with filters");
 	for (k=0; k<sorter.ItemCount; k+=1)

@@ -42,6 +42,7 @@ var int ScoreBoardTime;
 var() config int ScoreBoardDelay;
 var float EndGameTime;
 var() config bool bKickVote;
+var() config bool bSortAndDeduplicateMaps;
 var() config bool bEnableHTTPMapList;
 var() config bool bEnableMapOverrides;
 var() config bool bEnableMapTags;
@@ -1642,6 +1643,7 @@ static function Nfo(coerce string message)
 
 defaultproperties
 {
+      bSortAndDeduplicateMaps=false
       ClientPackage="MVE2e"
       ServerInfoURL=""
       MapInfoURL=""
