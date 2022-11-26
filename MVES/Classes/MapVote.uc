@@ -46,6 +46,8 @@ var() config bool bSortAndDeduplicateMaps;
 var() config bool bEnableHTTPMapList;
 var() config bool bEnableMapOverrides;
 var() config bool bEnableMapTags;
+var() config bool bAutoSetGameName;
+
 var bool bLevelSwitchPending;
 var bool bVotingStage;
 var int VotingStagePreBeginWait;
@@ -389,6 +391,9 @@ event PostBeginPlay()
 		if ( MapIdx >= 0 )
 			MapList.History.NewMapPlayed( MapIdx, TravelIdx, MapCostAddPerLoad);
 		CurrentMode = CustomGame[TravelIdx].GameName @ "-" @ CustomGame[TravelIdx].RuleName;
+		if (bAutoSetGameName) {
+			Level.Game.GameName = CustomGame[TravelIdx].RuleName@CustomGame[TravelIdx].GameName;
+		}
 		DEFAULT_MODE:
 		Cmd = CustomGame[TravelIdx].Settings;
 		//Log("[MVE] Loading settings:",'MapVote');
@@ -458,6 +463,9 @@ event PostBeginPlay()
 				Goto NEXT_MATCHING_MAP;
 		}
 		CurrentMode = Level.Game.GameName @ "- Crashed";
+		if (bAutoSetGameName) {
+			Level.Game.GameName = "Crashed"@Level.Game.GameName;
+		}
 		TravelIdx = -1;
 		TravelString = "";
 	}
@@ -1643,7 +1651,8 @@ static function Nfo(coerce string message)
 
 defaultproperties
 {
-      bSortAndDeduplicateMaps=false
+      bAutoSetGameName=True
+      bSortAndDeduplicateMaps=True
       ClientPackage="MVE2e"
       ServerInfoURL=""
       MapInfoURL=""
