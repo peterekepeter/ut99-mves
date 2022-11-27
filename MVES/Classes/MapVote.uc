@@ -232,7 +232,8 @@ event PostBeginPlay()
 	local bool bGotoSuccess;
 	local bool bNeedToRestorePackages, bNeedToRestoreMap;
 
-	Nfo("PostBeginPlay!");
+	Spawn(class'MapVoteDelayedInit').InitializeDelayedInit(self);
+
 	// Nfo("Debug regen map list");
 	// bGenerateMapList = True;
 	LoadAliases();
@@ -481,9 +482,13 @@ event PostBeginPlay()
 	// init player detector
 	PlayerDetector = Spawn(class'MV_PlayerDetector');
 	PlayerDetector.Initialize(self);
+	
+	// propagate MapVote's GameInfo changes to scoreboard
+	Level.Game.InitGameReplicationInfo();
 	// self testing
 	// SetupTravelString("DM-Deck16][:1");
 }
+
 
 function Mutate( string MutateString, PlayerPawn Sender)
 {

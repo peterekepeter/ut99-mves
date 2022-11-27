@@ -18,7 +18,7 @@
         {
             "label": "build and run server",
             "type": "shell",
-            "command": "ucx build MVES && ucx ucc server DM-Fractal?mutator=MVES.MapVote",
+            "command": "ucx build MVES && ucx ucc server",
             "problemMatcher": [
                 {
                     "pattern": [
@@ -78,7 +78,7 @@
         {
             "label": "run server",
             "type": "shell",
-            "command": "ucx ucc server DM-Deck16][?mutator=MVES.MapVote",
+            "command": "ucx ucc server",
             "problemMatcher": [
                 {
                     "pattern": [
@@ -124,7 +124,7 @@
         {
             "label": "run standalone",
             "type": "shell",
-            "command": "ucx ut DM-Deck16][?mutator=MVES.MapVote -log",
+            "command": "ucx ut CityIntro?mutator=MVES.MapVote -log",
             "problemMatcher": [
                 {
                     "pattern": [
