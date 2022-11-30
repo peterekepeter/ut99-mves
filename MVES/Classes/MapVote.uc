@@ -978,7 +978,7 @@ function OpenWindowFor( PlayerPawn Sender, optional MVPlayerWatcher W)
 	}
 	if ( W.MapListCacheActor == none )
 	{
-		Sender.ClientMessage("Please wait, Map List Cache not retrieved");
+		Sender.ClientMessage("Please wait, map list is loading. Try again in 5 seconds.");
 		return;
 	}
 	if ( W.MapVoteWRIActor != none )
