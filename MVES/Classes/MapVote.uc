@@ -73,6 +73,7 @@ struct GameType
 	var() config int TickRate;
 	var() config string ServerActors;
 	var() config bool bAvoidRandom;
+	var() config string Extends;
 };
 
 var() config string DefaultSettings;
@@ -80,6 +81,7 @@ var() config int DefaultTickRate;
 var int pos;
 var() config GameType CustomGame[100];
 var GameType EmptyGame;
+var GameType CurrentGame;
 var int iGames;
 
 
@@ -113,7 +115,7 @@ var string BanList[32];
 var MV_PlayerDetector PlayerDetector;
 var int CurrentID;
 
-var MV_MapResult CurrentMap;
+var MapVoteResult CurrentMap;
 var Music SongOverride;
 
 //XC_GameEngine and Unreal 227 interface
@@ -234,9 +236,10 @@ event PostBeginPlay()
 
 	Spawn(class'MapVoteDelayedInit').InitializeDelayedInit(self);
 
-	// Nfo("Debug regen map list");
-	// bGenerateMapList = True;
+	Nfo("Debug regen map list");
+	bReloadOnNextRun = True;
 	LoadAliases();
+	EvalCustomGame(TravelIdx);
 
 	if ( int(ConsoleCommand("get ini:Engine.Engine.GameEngine XC_Version")) >= 11 ) //Only XC_GameEngine contains this variable
 	{
@@ -312,7 +315,7 @@ event PostBeginPlay()
 			Nfo(ClientPackage$" is missing from ServerPackages");
 			bNeedToRestorePackages = true;
 		}
-		Cmd = CustomGame[TravelIdx].Packages;
+		Cmd = CurrentGame.Packages;
 		if ( InStr( Cmd, "<") >= 0 )
 		{
 			Cmd = ParseAliases( Cmd);
@@ -372,7 +375,7 @@ event PostBeginPlay()
 		SaveConfig();
 	}
 
-	CurrentMap = class'MV_MapResult'.static.Create(Cmd, TravelIdx);
+	CurrentMap = class'MapVoteResult'.static.Create(Cmd, TravelIdx);
 	CurrentMap.OriginalSong = ""$Level.Song;
 	
 	if (bEnableMapOverrides)
@@ -391,12 +394,12 @@ event PostBeginPlay()
 		MapIdx = MapList.FindMapWithGame( Cmd, TravelIdx);
 		if ( MapIdx >= 0 )
 			MapList.History.NewMapPlayed( MapIdx, TravelIdx, MapCostAddPerLoad);
-		CurrentMode = CustomGame[TravelIdx].GameName @ "-" @ CustomGame[TravelIdx].RuleName;
+		CurrentMode = CurrentGame.GameName @ "-" @ CurrentGame.RuleName;
 		if (bAutoSetGameName) {
-			Level.Game.GameName = CustomGame[TravelIdx].RuleName@CustomGame[TravelIdx].GameName;
+			Level.Game.GameName = CurrentGame.RuleName@CurrentGame.GameName;
 		}
 		DEFAULT_MODE:
-		Cmd = CustomGame[TravelIdx].Settings;
+		Cmd = CurrentGame.Settings;
 		//Log("[MVE] Loading settings:",'MapVote');
 		while ( Cmd != "" )
 		{
@@ -406,7 +409,7 @@ event PostBeginPlay()
 				Level.Game.SetPropertyText( Extension.NextParameter(NextParm,"=") , NextParm );
 		}
 		
-		Cmd = ParseAliases(CustomGame[TravelIdx].ServerActors);
+		Cmd = ParseAliases(CurrentGame.ServerActors);
 		if ( Cmd != "" )
 			Log("[MVE] Spawning ServerActors",'MapVote');
 		While ( Cmd != "" )
@@ -419,7 +422,7 @@ event PostBeginPlay()
 			Log("[MVE] ===> "$string(ActorClass));
 		}
 
-		Cmd = ParseAliases(CustomGame[TravelIdx].MutatorList);
+		Cmd = ParseAliases(CurrentGame.MutatorList);
 		if ( Cmd != "" )
 			Log("[MVE] Spawning Mutators",'MapVote');
 		while ( Cmd != "" )
@@ -434,7 +437,7 @@ event PostBeginPlay()
 		}
 		if ( bXCGE_DynLoader )
 		{
-			Cmd = CustomGame[TravelIdx].Packages;
+			Cmd = CurrentGame.Packages;
 			if ( InStr( Cmd, "<") >= 0 )
 				Cmd = ParseAliases( Cmd);
 			while ( Cmd != "" )
@@ -487,6 +490,12 @@ event PostBeginPlay()
 	Level.Game.InitGameReplicationInfo();
 	// self testing
 	// SetupTravelString("DM-Deck16][:1");
+}
+
+function EvalCustomGame(int idx)
+{
+	CurrentGame=CustomGame[idx];
+	Nfo("");
 }
 
 
@@ -1326,10 +1335,10 @@ final function bool SetupTravelString( string MapString )
 	local string spk, GameClassName, LogoTexturePackage;
 	local int idx, TickRate;
 	local MV_MapOverrides MapOverrides;
-	local MV_MapResult Result;
+	local MapVoteResult Result;
 	local LevelInfo info;
 	
-	Result = class'MV_MapResult'.static.Create();
+	Result = class'MapVoteResult'.static.Create();
 	Result.Map = Extension.NextParameter( MapString, ":");
 	Result.GameIndex = int(MapString);
 
@@ -1409,7 +1418,7 @@ final function bool SetupTravelString( string MapString )
 	return true; // SUCCESS!!!
 }
 
-function ProcessMapOverrides(MV_MapResult map)
+function ProcessMapOverrides(MapVoteResult map)
 {
 	local MapOverridesConfig MapOverridesConfig;
 	local MV_MapOverrides MapOverrides;

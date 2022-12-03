@@ -9,7 +9,7 @@ var string SongPackage[1024];
 var string SongName[1024];
 
 
-function MV_MapResult ApplyOverrides(MV_MapResult result)
+function MapVoteResult ApplyOverrides(MapVoteResult result)
 {
 	local int i;
     
@@ -22,7 +22,7 @@ function MV_MapResult ApplyOverrides(MV_MapResult result)
 	}
 }
 
-function private bool RuleMatches(MV_MapResult result, int i)
+function private bool RuleMatches(MapVoteResult result, int i)
 {
 	local string mapCaps;
 	local string filterValue, filterBy, filterByCaps;
@@ -51,7 +51,7 @@ function private bool RuleMatches(MV_MapResult result, int i)
 	return False;
 }
 
-function private RuleApply(MV_MapResult result, int i)
+function private RuleApply(MapVoteResult result, int i)
 {
 	if (SongName[i] != "")
 	{

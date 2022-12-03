@@ -725,7 +725,7 @@ function MV_MapTags GetMapTagsObject(){
 }
 
 function bool TestIfMapCanBeLoaded(string mapName) {
-	return class'MV_MapResult'.static.Create(mapName).CanMapBeLoaded();
+	return class'MapVoteResult'.static.Create(mapName).CanMapBeLoaded();
 }
 
 defaultproperties
