@@ -23,6 +23,14 @@ function TestMain()
 	AssertEquals(s.CanMapBeLoaded(), False, "randomgarbage cannot be loaded");
 	AssertEquals(s.GetSongString(), "None", "song is `None`");
 
+
+	Describe("mutators");
+	s.AddMutators("MVES.MapVote");
+	AssertEquals(s.MutatorCount, 1, "has 1 mutator");
+	s.AddMutators("PackA.MutA,PackB.MutB");
+	AssertEquals(s.MutatorCount, 3, "has 3 mutators");
+	s.AddMutators("MVES.MapVote");
+	AssertEquals(s.MutatorCount, 3, "cannot add the same mutator twice");
 }
 
 function Describe(string subject)
