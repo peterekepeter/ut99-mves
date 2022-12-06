@@ -1329,6 +1329,35 @@ final function bool CanVote(PlayerPawn Sender)
 	return True;
 }
 
+final function MapVoteResult GenerateMapResult(string map, int idx)
+{
+	local MapVoteResult r;
+	r = class'MapVoteResult'.static.Create();
+	r.Map = map;
+	r.GameIndex = idx;
+
+}
+
+// function PopulateResultWithRule(int idx)
+// {
+// 	local string mutator, extends, extendsIdx;
+// 	extends = CustomGame[idx].Extends;
+	
+// 	while (class'MV_Parser'.static.TrySplit(extends, ",", extendsIdx, extends))
+// 	{
+// 		PopulateResultWithRule(int(extendsIdx));
+// 	}
+
+// 	r.SetGameClass(CustomGame[idx].GameClass);
+// 	r.SetGameName(CustomGame[idx].GameName);
+// 	r.SetRuleName(CustomGame[idx].RuleName);
+// 	r.SetFilterCode(CustomGame[idx].FilterCode);
+// 	r.SetTickRate(CustomGame[idx].TickRate);
+// 	r.AddGameSettings(CustomGame[idx].Settings);
+// 	r.AddActors(CustomGame[idx].ServerActors);
+// 	r.AddMutators(CustomGame[idx].MutatorsList);
+// }
+
 //Validity assumed
 final function bool SetupTravelString( string MapString )
 {
@@ -1338,10 +1367,11 @@ final function bool SetupTravelString( string MapString )
 	local MapVoteResult Result;
 	local LevelInfo info;
 	
-	Result = class'MapVoteResult'.static.Create();
-	Result.Map = Extension.NextParameter( MapString, ":");
-	Result.GameIndex = int(MapString);
-
+	Result = GenerateMapResult(
+		Extension.NextParameter( MapString, ":"),
+		int(MapString)
+	);
+	
 	//RANDOM MAP CHOSEN!
 	if ( Result.Map ~= "Random" )
 	{
@@ -1355,7 +1385,7 @@ final function bool SetupTravelString( string MapString )
 
 	Result.LoadSongInformation();
 
-	GameClassName = CustomGame[Result.GameIndex].GameClass;
+	GameClassName = Result.GameClass;
 
 	if ( DynamicLoadObject(ParseAliases(GameClassName),class'Class') == None )
 	{

@@ -5,6 +5,9 @@ var string Map;
 var string Song;
 var int GameIndex;
 
+var int DerivedCount;
+var int DerivedFrom[256];
+
 var string GameName;
 var string RuleName;
 var string GameClass;
@@ -288,4 +291,24 @@ function LevelSummary GetLevelSummaryObject()
 	LevelSummaryCached = True;
 	LevelSummary = LevelSummary(DynamicLoadObject(self.Map$".LevelSummary", class'LevelSummary'));
 	return LevelSummary;
+}
+
+function bool IsDerivedFrom(int idx)
+{
+	local int i;
+
+	for (i = 0; i < DerivedCount; i += 1)
+	{
+		if (DerivedFrom[i] == idx)
+		{
+			return True;
+		}
+	}
+	return False;
+}
+
+function AddDerivedFrom(int idx)
+{
+	DerivedFrom[DerivedCount] = idx;
+	DerivedCount += 1;
 }
