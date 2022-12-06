@@ -5,7 +5,11 @@ var string Map;
 var string Song;
 var int GameIndex;
 
-// private 
+var string GameName;
+var string RuleName;
+var string GameClass;
+var string FilterCode;
+var int TickRate;
 
 const ServerPackageMaxCount = 1024;
 var int ServerPackageCount;
@@ -15,13 +19,23 @@ const MaxMutatorCount = 1024;
 var int MutatorCount;
 var string Mutators[1024];
 
+const MaxActors = 1024;
+var int ActorCount;
+var string Actors[1024];
+
+const MaxSettings = 256;
+var int SettingsCount;
+var string SettingsKey[256];
+var string SettingsValue[256];
+
 var LevelInfo LevelInfo;
 var bool LevelInfoCached;
 
 var LevelSummary LevelSummary;
 var bool LevelSummaryCached;
 
-static function MapVoteResult Create(optional string map, optional int gameIdx){
+static function MapVoteResult Create(optional string map, optional int gameIdx)
+{
 	local MapVoteResult object;
 	object = new class'MapVoteResult';
 	object.Map = map;
@@ -46,7 +60,7 @@ function bool AddPackage(string packageName)
 		Err("Cannot add `"$packageName$"`, max server package count reached!");
 		return False;
 	}
-	for (i=0; i<ServerPackageCount; i++)
+	for (i = 0; i < ServerPackageCount; i ++ )
 	{
 		if (ServerPackages[i] == packageName)
 		{
@@ -54,7 +68,7 @@ function bool AddPackage(string packageName)
 		}
 	}
 	ServerPackages[ServerPackageCount] = packageName;
-	ServerPackageCount++;
+	ServerPackageCount ++ ;
 	return True;
 }
 
@@ -63,7 +77,7 @@ function string GetPackagesStringList()
 	local string separator, result;
 	local int i;
 	separator = "";
-	for (i=0; i<ServerPackageCount; i++)
+	for (i = 0; i < ServerPackageCount; i ++ )
 	{
 		result = result $ separator $ ServerPackages[i];
 		separator = ",";
@@ -89,7 +103,7 @@ function bool AddMutator(string mutator)
 		Err("Cannot add `"$mutator$"`, max mutator count reached!");
 		return False;
 	}
-	for (i=0; i<MutatorCount; i++)
+	for (i = 0; i < MutatorCount; i ++ )
 	{
 		if (Mutators[i] == mutator)
 		{
@@ -97,8 +111,123 @@ function bool AddMutator(string mutator)
 		}
 	}
 	Mutators[MutatorCount] = mutator;
-	MutatorCount++;
+	MutatorCount ++ ;
 	return True;
+}
+
+function bool AddActors(string list)
+{
+	local string actor;
+	
+	while (class'MV_Parser'.static.TrySplit(list, ",", actor, list))
+	{
+		AddActor(actor);
+	}
+}
+
+function bool AddActor(string actor)
+{
+	local int i;
+	if (ActorCount >= MaxActors)
+	{
+		Err("Cannot add `"$actor$"`, max server actor count reached!");
+		return False;
+	}
+	for (i = 0; i < ActorCount; i ++ )
+	{
+		if (Actors[i] == actor)
+		{
+			return False;
+		}
+	}
+	Actors[ActorCount] = actor;
+	ActorCount ++ ;
+	return True;
+}
+
+function bool AddGameSettings(string settingsList)
+{
+	local string keyvalue;
+	local string key;
+	local string value;
+	local bool found;
+	
+	while (class'MV_Parser'.static.TrySplit(settingsList, ",", keyvalue, settingsList))
+	{
+		if (class'MV_Parser'.static.TrySplit(keyvalue, "=", key, value))
+		{
+			UpdateSingleGameSetting(key, value);
+		}
+		else 
+		{
+			Err("Ignoring invalid setting `"$keyvalue$"` from `"$settingsList$"`");
+		}
+	}
+}
+
+function bool UpdateSingleGameSetting(string key, string value)
+{
+	local int i;
+	for (i = 0; i < SettingsCount; i += 1)
+	{
+		if (SettingsKey[i] == key) 
+		{
+			SettingsValue[i] = value;
+			return True;
+		}
+	}
+	if (SettingsCount > MaxSettings)
+	{
+		Err("Cannot set `"$key$"` to `"$value$"`, max settings count reached!");
+		return False;
+	}
+	SettingsKey[SettingsCount] = key;
+	SettingsValue[SettingsCount] = value;
+	SettingsCount ++ ;
+	return True;
+}
+
+function string GetGameSettingByKey(string key)
+{
+	local int i;
+	for (i = 0; i < SettingsCount; i += 1)
+	{
+		if (SettingsKey[i] == key)
+		{
+			return SettingsValue[i];
+		}
+	}
+	return "";
+}
+
+function SetGameName(string s)
+{
+	if (s == "") return;
+	GameName = s;
+}
+
+function SetRuleName(string s)
+{
+	if (s == "") return;
+	RuleName = s;
+}
+
+function SetGameClass(string s)
+{
+	if (s == "") return;
+	GameClass = s;
+}
+
+function SetFilterCode(string s)
+{
+	if (s == "") return;
+	FilterCode = s;
+}
+
+function SetTickRate(int t)
+{
+	if (t <= 0) return;
+	TickRate = t;
 }
 
 function string GetSongString()
@@ -107,7 +236,8 @@ function string GetSongString()
 	return OriginalSong;
 }
 
-function LoadSongInformation(){
+function LoadSongInformation()
+{
 	if (OriginalSong == "")
 	{
 		OriginalSong = ""$GetLevelInfoObject().Song;
@@ -118,18 +248,18 @@ function bool CanMapBeLoaded()
 {
 	if (GetLevelSummaryObject() != None) 
 	{
-		return true;
+		return True;
 	}
 	if (GetLevelInfoObject() != None) 
 	{
-		return true;
+		return True;
 	}
 	// last resort, probably won't help but hey, we tried
 	if (DynamicLoadObject(self.Map$".PlayerStart0", class'PlayerStart') != None) 
 	{
-		return true;
+		return True;
 	}
-	return false;
+	return False;
 }	
 
 function LevelInfo GetLevelInfoObject()
@@ -138,7 +268,7 @@ function LevelInfo GetLevelInfoObject()
 	{
 		return LevelInfo; 
 	}
-	LevelInfoCached = true;
+	LevelInfoCached = True;
 	// 1st try
 	LevelInfo = LevelInfo(DynamicLoadObject(self.Map$".LevelInfo0", class'LevelInfo'));
 	if (LevelInfo == None) 
@@ -155,7 +285,7 @@ function LevelSummary GetLevelSummaryObject()
 	{
 		return LevelSummary;
 	}
-	LevelSummaryCached = true;
+	LevelSummaryCached = True;
 	LevelSummary = LevelSummary(DynamicLoadObject(self.Map$".LevelSummary", class'LevelSummary'));
 	return LevelSummary;
 }
