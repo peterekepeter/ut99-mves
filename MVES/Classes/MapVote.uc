@@ -1342,6 +1342,16 @@ function PopulateResultWithRule(MapVoteResult r, int idx)
 {
 	local string mutator, extends, extendsIdx;
 	extends = CustomGame[idx].Extends;
+
+	if (r.IsDerivedFrom(idx))
+	{
+		PrintCircularExtendsError(r, idx);
+		return;
+	}
+	else 
+	{
+		r.AddDerivedFrom(idx);
+	}
 	
 	while (class'MV_Parser'.static.TrySplit(extends, ",", extendsIdx, extends))
 	{
@@ -1357,6 +1367,20 @@ function PopulateResultWithRule(MapVoteResult r, int idx)
 	r.AddActors(CustomGame[idx].ServerActors);
 	r.AddMutators(CustomGame[idx].MutatorList);
 	r.AddPackages(CustomGame[idx].Packages);
+}
+
+function PrintCircularExtendsError(MapVoteResult r, int idx){
+
+	local string list;
+	local int i, parentIdx;
+	list = "";
+	for (i=0; i<r.DerivedCount; i+=1)
+	{
+		parentIdx = r.DerivedFrom[i];
+		list = list$" -> "$parentIdx;
+	}
+	list = list$" -> "$idx;
+	Err("Detected circular extends: "$list);
 }
 
 //Validity assumed

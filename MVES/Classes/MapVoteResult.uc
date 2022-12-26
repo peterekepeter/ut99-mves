@@ -6,7 +6,7 @@ var string Song;
 var int GameIndex;
 
 var int DerivedCount;
-var int DerivedFrom[256];
+var int DerivedFrom[32];
 
 var string GameName;
 var string RuleName;
