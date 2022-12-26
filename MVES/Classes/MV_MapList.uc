@@ -154,8 +154,8 @@ function GlobalLoad(bool bFullscan)
 	FirstMap = GetMapName("","",0);
 	CurMap = FirstMap;
 	sorter = new class'MV_Sort';
-
-	Log("[MVE] Scanning maps from disk paths");
+;
+	Log("[MVE] Reloading map list, this may take a while!");
 	while (true) 
 	{
 		if (bFullscan)

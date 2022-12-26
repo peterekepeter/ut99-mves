@@ -236,8 +236,6 @@ event PostBeginPlay()
 
 	Spawn(class'MapVoteDelayedInit').InitializeDelayedInit(self);
 
-	Nfo("Debug regen map list");
-	bReloadOnNextRun = True;
 	LoadAliases();
 	EvalCustomGame(TravelIdx);
 
@@ -1429,13 +1427,13 @@ final function bool SetupTravelString( string mapStringWithIdx )
 
 	if ( bOverrideServerPackages )
 	{
-		// add client package
-		Result.AddPackages(ClientPackage);
 		// add screenshot package 
 		if (ClientScreenshotPackage != "") 
 		{
 			Result.AddPackages(ClientScreenshotPackage);
 		}
+		// add client package
+		Result.AddPackages(ClientPackage);
 		// add logo texture package
 		if (ClientLogoTexture != "")
 		{
