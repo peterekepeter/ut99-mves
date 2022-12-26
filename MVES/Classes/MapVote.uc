@@ -488,8 +488,6 @@ event PostBeginPlay()
 	
 	// propagate MapVote's GameInfo changes to scoreboard
 	Level.Game.InitGameReplicationInfo();
-	// self testing
-	// SetupTravelString("DM-Deck16][:1");
 }
 
 function EvalCustomGame(int idx)
@@ -1335,43 +1333,45 @@ final function MapVoteResult GenerateMapResult(string map, int idx)
 	r = class'MapVoteResult'.static.Create();
 	r.Map = map;
 	r.GameIndex = idx;
+	PopulateResultWithRule(r, idx);
 
+	return r;
 }
 
-// function PopulateResultWithRule(int idx)
-// {
-// 	local string mutator, extends, extendsIdx;
-// 	extends = CustomGame[idx].Extends;
+function PopulateResultWithRule(MapVoteResult r, int idx)
+{
+	local string mutator, extends, extendsIdx;
+	extends = CustomGame[idx].Extends;
 	
-// 	while (class'MV_Parser'.static.TrySplit(extends, ",", extendsIdx, extends))
-// 	{
-// 		PopulateResultWithRule(int(extendsIdx));
-// 	}
+	while (class'MV_Parser'.static.TrySplit(extends, ",", extendsIdx, extends))
+	{
+		PopulateResultWithRule(r, int(extendsIdx));
+	}
 
-// 	r.SetGameClass(CustomGame[idx].GameClass);
-// 	r.SetGameName(CustomGame[idx].GameName);
-// 	r.SetRuleName(CustomGame[idx].RuleName);
-// 	r.SetFilterCode(CustomGame[idx].FilterCode);
-// 	r.SetTickRate(CustomGame[idx].TickRate);
-// 	r.AddGameSettings(CustomGame[idx].Settings);
-// 	r.AddActors(CustomGame[idx].ServerActors);
-// 	r.AddMutators(CustomGame[idx].MutatorsList);
-// }
+	r.SetGameClass(CustomGame[idx].GameClass);
+	r.SetGameName(CustomGame[idx].GameName);
+	r.SetRuleName(CustomGame[idx].RuleName);
+	r.SetFilterCode(CustomGame[idx].FilterCode);
+	r.SetTickRate(CustomGame[idx].TickRate);
+	r.AddGameSettings(CustomGame[idx].Settings);
+	r.AddActors(CustomGame[idx].ServerActors);
+	r.AddMutators(CustomGame[idx].MutatorList);
+	r.AddPackages(CustomGame[idx].Packages);
+}
 
 //Validity assumed
-final function bool SetupTravelString( string MapString )
+final function bool SetupTravelString( string mapStringWithIdx )
 {
-	local string spk, GameClassName, LogoTexturePackage;
+	local string spk, GameClassName, LogoTexturePackage, mapFileName, idxString;
 	local int idx, TickRate;
 	local MV_MapOverrides MapOverrides;
 	local MapVoteResult Result;
 	local LevelInfo info;
+
+	class'MV_Parser'.static.TrySplit(mapStringWithIdx, ":", mapFileName, idxString);
 	
-	Result = GenerateMapResult(
-		Extension.NextParameter( MapString, ":"),
-		int(MapString)
-	);
-	
+	Result = GenerateMapResult(mapFileName, int(idxString));
+
 	//RANDOM MAP CHOSEN!
 	if ( Result.Map ~= "Random" )
 	{
@@ -1379,7 +1379,7 @@ final function bool SetupTravelString( string MapString )
 	}
 
 	if (Result.CanMapBeLoaded() == false){
-		Err("Bad map string: `"$Result.Map$"`" );
+		Err("Map cannot be loaded: `"$Result.Map$"`" );
 		return false;
 	}
 
@@ -1389,7 +1389,7 @@ final function bool SetupTravelString( string MapString )
 
 	if ( DynamicLoadObject(ParseAliases(GameClassName),class'Class') == None )
 	{
-		Err("Bad game class: `"$GameClassName$"`" );
+		Err("Game class cannot be loaded: `"$GameClassName$"`" );
 		return false;
 	}
 
