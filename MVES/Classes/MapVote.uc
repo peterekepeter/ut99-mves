@@ -3,17 +3,12 @@
 //================================================================================
 class MapVote expands Mutator config(MVE_Config);
 
-var() config string TravelString; // Used to load the next map!
-var() config int TravelIdx; // Use to load game settings & mutators for next map
-var() config int RestoreTryCount;
-
 var() config string ClientPackage;		// Load this package
 var() config string ClientScreenshotPackage; // Load this package
 var() config string ClientLogoTexture; // Clients will load and display this texture
 var() config string ServerInfoURL;
 var() config string MapInfoURL;
 var() config string HTTPMapListLocation; //HTTPMapListPort is needs to be attached here as well
-var string CurrentMode; //Clear on restart, if "", take gametype's default game mode
 
 var() config int VoteTimeLimit;
 var() config int HTTPMapListPort;
@@ -38,9 +33,7 @@ var() config bool bShutdownServerOnTravel;
 var() config bool bWelcomeWindow;
 var() config bool bSpecsAllowed;
 var() config bool bAutoOpen;
-var int ScoreBoardTime;
 var() config int ScoreBoardDelay;
-var float EndGameTime;
 var() config bool bKickVote;
 var() config bool bSortAndDeduplicateMaps;
 var() config bool bEnableHTTPMapList;
@@ -48,15 +41,20 @@ var() config bool bEnableMapOverrides;
 var() config bool bEnableMapTags;
 var() config bool bAutoSetGameName;
 
+var() config bool bOverrideServerPackages;
+var() config bool bResetServerPackages;
+var() config string MainServerPackages;
+
+var int ScoreBoardTime;
+var float EndGameTime;
+
+var string CurrentMode; //Clear on restart, if "", take gametype's default game mode
+
 var bool bLevelSwitchPending;
 var bool bVotingStage;
 var int VotingStagePreBeginWait;
 var bool bMapChangeIssued;
 var bool bXCGE_DynLoader;
-
-var() config bool bOverrideServerPackages;
-var() config bool bResetServerPackages;
-var() config string MainServerPackages;
 
 struct GameType
 {
@@ -112,6 +110,7 @@ var int iKickVotes;
 
 var string BanList[32];
 
+var MV_TravelInfo TravelInfo;
 var MV_PlayerDetector PlayerDetector;
 var int CurrentID;
 
@@ -234,10 +233,11 @@ event PostBeginPlay()
 	local bool bGotoSuccess;
 	local bool bNeedToRestorePackages, bNeedToRestoreMap;
 
+	TravelInfo = Spawn(class'MV_TravelInfo');
 	Spawn(class'MapVoteDelayedInit').InitializeDelayedInit(self);
 
 	LoadAliases();
-	EvalCustomGame(TravelIdx);
+	EvalCustomGame(TravelInfo.TravelIdx);
 
 	if ( int(ConsoleCommand("get ini:Engine.Engine.GameEngine XC_Version")) >= 11 ) //Only XC_GameEngine contains this variable
 	{
@@ -338,9 +338,9 @@ event PostBeginPlay()
 	}
 
 	Cmd = Extension.ByDelimiter( string(self), ".");
-	TravelMap = Extension.ByDelimiter(TravelString, "?");
+	TravelMap = Extension.ByDelimiter(TravelInfo.TravelString, "?");
 
-	if (Cmd != TravelMap && TravelString != "" && TravelMap != "")
+	if (Cmd != TravelMap && TravelInfo.TravelString != "" && TravelMap != "")
 	{
 		bNeedToRestoreMap = true;
 		Nfo("Current map `"$Cmd$"` does not match the travel map `"$TravelMap$"`");
@@ -352,10 +352,10 @@ event PostBeginPlay()
 		Nfo("Current map is `"$TravelMap$"`");
 	}
 
-	if ((bNeedToRestorePackages || bNeedToRestoreMap) && RestoreTryCount < 3) {
-		RestoreTryCount += 1;
-		Nfo("Goto `"$TravelMap$":"$TravelIdx$"`` TryCount: `"$RestoreTryCount$"`");
-		bGotoSuccess = GotoMap(TravelMap$":"$TravelIdx, true);
+	if ((bNeedToRestorePackages || bNeedToRestoreMap) && TravelInfo.RestoreTryCount < 3) {
+		TravelInfo.RestoreTryCount += 1;
+		Nfo("Goto `"$TravelMap$":"$TravelInfo.TravelIdx$"`` TryCount: `"$TravelInfo.RestoreTryCount$"`");
+		bGotoSuccess = GotoMap(TravelMap$":"$TravelInfo.TravelIdx, true);
 		if (bGotoSuccess)
 		{
 			Level.NextSwitchCountdown = 0; // makes the switch really fast
@@ -367,13 +367,13 @@ event PostBeginPlay()
 		}
 	}
 
-	if (RestoreTryCount != 0)
+	if (TravelInfo.RestoreTryCount != 0)
 	{
-		RestoreTryCount = 0;
-		SaveConfig();
+		TravelInfo.RestoreTryCount = 0;
+		TravelInfo.SaveConfig();
 	}
 
-	CurrentMap = class'MapVoteResult'.static.Create(Cmd, TravelIdx);
+	CurrentMap = class'MapVoteResult'.static.Create(Cmd, TravelInfo.TravelIdx);
 	CurrentMap.OriginalSong = ""$Level.Song;
 	
 	if (bEnableMapOverrides)
@@ -387,11 +387,11 @@ event PostBeginPlay()
 		}
 	}
 
-	if ( Cmd ~= Left(TravelString, Len(Cmd) ) )  //CRASH DIDN'T HAPPEN, SETUP GAME
+	if ( Cmd ~= Left(TravelInfo.TravelString, Len(Cmd) ) )  //CRASH DIDN'T HAPPEN, SETUP GAME
 	{
-		MapIdx = MapList.FindMapWithGame( Cmd, TravelIdx);
+		MapIdx = MapList.FindMapWithGame( Cmd, TravelInfo.TravelIdx);
 		if ( MapIdx >= 0 )
-			MapList.History.NewMapPlayed( MapIdx, TravelIdx, MapCostAddPerLoad);
+			MapList.History.NewMapPlayed( MapIdx, TravelInfo.TravelIdx, MapCostAddPerLoad);
 		CurrentMode = CurrentGame.GameName @ "-" @ CurrentGame.RuleName;
 		if (bAutoSetGameName) {
 			Level.Game.GameName = CurrentGame.RuleName@CurrentGame.GameName;
@@ -454,7 +454,7 @@ event PostBeginPlay()
 			NextParm = MapList.MapGames( MapIdx);
 		if ( (string(Level.Game.Class) ~= ParseAliases(CustomGame[DefaultGameTypeIdx].GameClass)) && (InStr(NextParm, MapList.TwoDigits(DefaultGameTypeIdx)) >= 0) ) //Map is in default game mode list and matches gametype
 		{
-			TravelIdx = DefaultGameTypeIdx;
+			TravelInfo.TravelIdx = DefaultGameTypeIdx;
 			Goto DEFAULT_MODE;
 		}
 //		Log( Level.Game.Class @ CustomGame[DefaultGameTypeIdx].GameClass @ MapIdx @ NextParm @ MapList.TwoDigits(DefaultGameTypeIdx));
@@ -468,8 +468,8 @@ event PostBeginPlay()
 		if (bAutoSetGameName) {
 			Level.Game.GameName = "Crashed"@Level.Game.GameName;
 		}
-		TravelIdx = -1;
-		TravelString = "";
+		TravelInfo.TravelIdx = -1;
+		TravelInfo.TravelString = "";
 	}
 	MapList.SetupClientList();
 	if ( MapList.MapListString == "" && MapList.MapCount > 0 )
@@ -478,7 +478,7 @@ event PostBeginPlay()
 	{
 		MainServerPackages = ConsoleCommand("Get ini:Engine.Engine.GameEngine ServerPackages");
 		bResetServerPackages = false;
-		SaveConfig();
+		SaveConfig(); // initially populates updates MVE_Config with MainServerPackages
 	}
 	// init player detector
 	PlayerDetector = Spawn(class'MV_PlayerDetector');
@@ -680,7 +680,7 @@ event Tick( float DeltaTime)
 		}
 		bSaveConfigOnNextRun = false;
 		bFirstRun = false;
-		SaveConfig();
+		SaveConfig(); // generates properties for configuration
 	}
 	LastMsg = "";
 }
@@ -704,18 +704,18 @@ function MapChangeIssued()
 	bMapChangeIssued = true;
 	Log("Map change issued with URL: "$ Level.NextURL,'MapVote');
 	aStr = Extension.ByDelimiter( Level.NextURL, "?");
-	aStr = Extension.ByDelimiter( aStr, "#" )  $ ":" $ string(TravelIdx) ; //Map name plus current IDX
+	aStr = Extension.ByDelimiter( aStr, "#" )  $ ":" $ string(TravelInfo.TravelIdx) ; //Map name plus current IDX
 	while ( InStr( aStr, " ") == 0 )
 		aStr = Mid( aStr, 1);
 	if ( MapList.ValidMap( aStr) )
 	{
-		if ( Level.bNextItems )			BroadcastMessage( Extension.ByDelimiter( aStr, ":") $ GameRuleCombo(TravelIdx) @ "has been selected as next map.", true);
-		else			BroadcastMessage( Extension.ByDelimiter( aStr, ":") $ GameRuleCombo(TravelIdx) @ "has been forced.", true);
-		TravelString = Level.NextURL;
+		if ( Level.bNextItems )			BroadcastMessage( Extension.ByDelimiter( aStr, ":") $ GameRuleCombo(TravelInfo.TravelIdx) @ "has been selected as next map.", true);
+		else			BroadcastMessage( Extension.ByDelimiter( aStr, ":") $ GameRuleCombo(TravelInfo.TravelIdx) @ "has been forced.", true);
+		TravelInfo.TravelString = Level.NextURL;
 	}
 	else
 		Log("Map code "$aStr$" not found in map list",'MapVote');
-	SaveConfig();
+	TravelInfo.SaveConfig();
 }
 
 function PlayerJoined( PlayerPawn P)
@@ -1415,10 +1415,10 @@ final function bool SetupTravelString( string mapStringWithIdx )
 		return false;
 	}
 
-	TravelString = Result.Map $ "?Game=" $ ParseAliases(GameClassName);
-	TravelIdx = Result.GameIndex;
-	Nfo("-> TravelString: `"$TravelString$"`");
-	Nfo("-> GameIdx: `"$TravelIdx$"`");
+	TravelInfo.TravelString = Result.Map $ "?Game=" $ ParseAliases(GameClassName);
+	TravelInfo.TravelIdx = Result.GameIndex;
+	Nfo("-> TravelString: `"$TravelInfo.TravelString$"`");
+	Nfo("-> GameIdx: `"$TravelInfo.TravelIdx$"`");
 		
 	if (bEnableMapOverrides)
 	{
@@ -1495,7 +1495,7 @@ final function bool GotoMap( string MapString, optional bool bImmediate)
 		return false;
 	}
 	ResetCurrentGametypeBeforeTravel();
-	SaveConfig();
+	TravelInfo.SaveConfig();
 	Extension.CloseVoteWindows( WatcherList);
 	if ( bImmediate )
 	{
@@ -1551,7 +1551,7 @@ final function string CapNumberWord( int Number)
 
 final function ExecuteTravel()
 {
-	Level.ServerTravel( TravelString,False);
+	Level.ServerTravel( TravelInfo.TravelString,False);
 	if (bShutdownServerOnTravel)
 	{
 		ConsoleCommand("exit");
@@ -1723,10 +1723,7 @@ defaultproperties
       ServerInfoURL=""
       MapInfoURL=""
       HTTPMapListLocation=""
-      TravelString=""
-      RestoreTryCount=0
       CurrentMode=""
-      TravelIdx=0
       VoteTimeLimit=60
       HTTPMapListPort=0
       DefaultGameTypeIdx=0
