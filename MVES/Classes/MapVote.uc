@@ -28,7 +28,7 @@ var() config EIDType PlayerIDType;
 
 //?bDeprecated=True
 var() config bool bFirstRun; 
-var() config bool bSaveConfigOnNextRun, bReloadOnNextRun, bFullscanOnNextRun;
+var() config bool bSaveConfigOnNextRun, bReloadOnNextRun, bReloadOnEveryRun, bFullscanOnNextRun;
 var() config bool bShutdownServerOnTravel;
 var() config bool bWelcomeWindow;
 var() config bool bSpecsAllowed;
@@ -235,6 +235,11 @@ event PostBeginPlay()
 
 	TravelInfo = Spawn(class'MV_TravelInfo');
 	Spawn(class'MapVoteDelayedInit').InitializeDelayedInit(self);
+
+	if (bReloadOnEveryRun)
+	{
+		bReloadOnNextRun = True;
+	}
 
 	LoadAliases();
 	EvalCustomGame(TravelInfo.TravelIdx);
