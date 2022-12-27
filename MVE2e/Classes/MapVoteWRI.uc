@@ -193,29 +193,29 @@ simulated function bool OpenWindow ()
 
 simulated function bool SetupWindow()
 {
-    local int i;
+	local int i;
 
-    if(!bSetupWindowDelayDone)
-    {
-        SetTimer(0.50, false);
-        return false;
-    }
-    if(ClientConf.bUseMsgTimeout)
-    {
-        class'SayMessagePlus'.default.Lifetime = int(ClientConf.MsgTimeOut);
-        class'CriticalStringPlus'.default.Lifetime = int(ClientConf.MsgTimeOut);
-        class'RedSayMessagePlus'.default.Lifetime = int(ClientConf.MsgTimeOut);
-        class'TeamSayMessagePlus'.default.Lifetime = int(ClientConf.MsgTimeOut);
-        class'StringMessagePlus'.default.Lifetime = int(ClientConf.MsgTimeOut);
-        class'DeathMessagePlus'.default.Lifetime = int(ClientConf.MsgTimeOut);
-    }
+	if(!bSetupWindowDelayDone)
+	{
+		SetTimer(0.50, false);
+		return false;
+	}
+	if(ClientConf.bUseMsgTimeout)
+	{
+		class'SayMessagePlus'.default.Lifetime = int(ClientConf.MsgTimeOut);
+		class'CriticalStringPlus'.default.Lifetime = int(ClientConf.MsgTimeOut);
+		class'RedSayMessagePlus'.default.Lifetime = int(ClientConf.MsgTimeOut);
+		class'TeamSayMessagePlus'.default.Lifetime = int(ClientConf.MsgTimeOut);
+		class'StringMessagePlus'.default.Lifetime = int(ClientConf.MsgTimeOut);
+		class'DeathMessagePlus'.default.Lifetime = int(ClientConf.MsgTimeOut);
+	}
 	
-    DebugLog("MapVoteWRI: SetupWindow()");
+	DebugLog("MapVoteWRI: SetupWindow()");
 
-    if(super.SetupWindow())
-    {
-        SetTimer(Level.TimeDilation,False);
-        CWindow = MapVoteTabWindow(MapVoteFramedWindow(TheWindow).ClientArea);
+	if(super.SetupWindow())
+	{
+		SetTimer(Level.TimeDilation,False);
+		CWindow = MapVoteTabWindow(MapVoteFramedWindow(TheWindow).ClientArea);
 	} else {
 		Log("Super.SetupWindow() = false");
 	}
@@ -223,155 +223,149 @@ simulated function bool SetupWindow()
 
 simulated function SetVoteList()
 {
-    local int i;
-    local string temp;
-    local int iTemp, iGameMode, Count, iNewMap;
-    local string RuleStr, MapName, SList, sNewMaps[ArrayCount(iNewMaps)];
+	local int i;
+	local string temp;
+	local int iTemp, iGameMode, Count, iNewMap;
+	local string RuleStr, MapName, SList, PrevSList, sNewMaps[ArrayCount(iNewMaps)];
+	Log("!!!!!!!!!!!!!!!!! SetVoteList was called!!!!!!!!!!!!!");
 
-    i = 0;
-    J0x07:
-	if ( i < 4096 )
+	for ( i = 0;  i < 4096; ++i )
 	{
 		if ( i < 256 )
 		{
 			temp=MapList1[i % 256];
-		}else
-			if ( i < 512 )
-			{
-				temp=MapList2[i % 256];
-			}else
-				if ( i < 768 )
-				{
-					temp=MapList3[i % 256];
-				}else
-					if ( i < 1024 )
-					{
-						temp=MapList4[i % 256];
-					}else
-						if ( i < 1280 )
-						{
-							temp=MapList5[i % 256];
-						}else
-							if ( i < 1536 )
-							{
-								temp=MapList6[i % 256];
-							}else
-								if ( i < 1792 )
-								{
-									temp=MapList7[i % 256];
-								}else
-
-								if ( i < 2048 )
-								{
-									temp=MapList8[i % 256];
-								}else
-
-								if ( i < 2304 )
-								{
-									temp=MapList9[i % 256];
-								}else
-
-								if ( i < 2560 )
-								{
-									temp=MapList10[i % 256];
-								}else
-
-								if ( i < 2816 )
-								{
-									temp=MapList11[i % 256];
-								}else
-
-								if ( i < 3072 )
-								{
-									temp=MapList12[i % 256];
-								}else
-
-								if ( i < 3328 )
-								{
-									temp=MapList13[i % 256];
-								}else
-
-								if ( i < 3584 )
-								{
-									temp=MapList14[i % 256];
-								}else
-
-								if ( i < 3840 )
-								{
-									temp=MapList15[i % 256];
-								}else
-
-								if ( i < 4096 )
-								{
-									temp=MapList16[i % 256];
-								}
+		}
+		else if ( i < 512 )
+		{
+			temp=MapList2[i % 256];
+		}
+		else if ( i < 768 )
+		{
+			temp=MapList3[i % 256];
+		}
+		else if ( i < 1024 )
+		{
+			temp=MapList4[i % 256];
+		}
+		else if ( i < 1280 )
+		{
+			temp=MapList5[i % 256];
+		}
+		else if ( i < 1536 )
+		{
+			temp=MapList6[i % 256];
+		}
+		else if ( i < 1792 )
+		{
+			temp=MapList7[i % 256];
+		}
+		else if ( i < 2048 )
+		{
+			temp=MapList8[i % 256];
+		}
+		else if ( i < 2304 )
+		{
+			temp=MapList9[i % 256];
+		}
+		else if ( i < 2560 )
+		{
+			temp=MapList10[i % 256];
+		}
+		else if ( i < 2816 )
+		{
+			temp=MapList11[i % 256];
+		}
+		else if ( i < 3072 )
+		{
+			temp=MapList12[i % 256];
+		}
+		else if ( i < 3328 )
+		{
+			temp=MapList13[i % 256];
+		}
+		else if ( i < 3584 )
+		{
+			temp=MapList14[i % 256];
+		}
+		else if ( i < 3840 )
+		{
+			temp=MapList15[i % 256];
+		}
+		else if ( i < 4096 )
+		{
+			temp=MapList16[i % 256];
+		}
         // End:0x2F2
-        if(temp == "")
-        {
-            // [Explicit Continue]
-            goto J0x3D1;
-        }
-        for (iNewMap = 0; iNewMap < ArrayCount(iNewMaps); iNewMap++)
-	    	if (i != 0 && iNewMaps[iNewMap] == i)
-	    		break;
-        MapList[i] = temp;
-        MapName = MapList[i];
-        SList = MapList[i];
-        MapName = Left(MapName, InStr(MapName, ":"));
-        SList = Mid(SList, InStr(SList, ":"));
-        MapList[i] = MapName;       
-        if (iNewMap != ArrayCount(iNewMaps))
-        	 sNewMaps[iNewMap] = SList;
-        J0x364:
-        // End:0x3D1 [Loop If]
-        if(InStr(SList, ":") != -1)
-        {
-            iTemp = int(Mid(SList, InStr(SList, ":") + 1, 2));
-            CWindow.AddMapName(iTemp, MapList[i]);            
-            SList = Mid(SList, InStr(SList, ":") + 1);
-            J0x3D1:
-            // [Loop Continue]
-            goto J0x364;
-        }
-        ++ i;
-        goto J0x07;
-    }
-    for (i = 0; i < ArrayCount(iNewMaps); i++)
-    	for (SList = sNewMaps[i]; InStr(SList, ":") != -1; SList = Mid(SList, InStr(SList, ":") + 1)) {
-    		CWindow.AddMapName(-int(Mid(SList, InStr(SList, ":") + 1, 2)), MapList[iNewMaps[i]]);
-            break; // only shows each map once
-    	}
-    i = 0;
-    J0x3E2:
-    // End:0x4F9 [Loop If]
-    if(i < ArrayCount(RuleList))
-    {
-        temp = RuleList[i];
-        CWindow.MapWindow.GetMapListBox(i).VotePriority = VotePriority[i];
-        // End:0x440
-        if(temp == "")
-        {
-            // [Explicit Continue]
-            goto J0x4EF;
-        }
-        iGameMode = int(Mid(temp, InStr(temp, ":") + 1, 2));
-        CWindow.AddGameMode(iGameMode, GameModeName[iGameMode]);
-        J0x47C:
-        // End:0x4EF [Loop If]
-        if(InStr(temp, ":") != -1)
-        {
-            iTemp = int(Mid(temp, InStr(temp, ":") + 1, 2));
-            temp = Mid(temp, InStr(temp, ":") + 3);
-            CWindow.AddGameRule(iGameMode, RuleName[iTemp], iTemp);
-            J0x4EF:
-            // [Loop Continue]
-            goto J0x47C;
-        }
-        ++ i;
-        // [Loop Continue]
-        goto J0x3E2;
-    }
-    bSetVoteList = true;
+		if(temp == "")
+		{
+			continue;
+		}
+		for (iNewMap = 0; iNewMap < ArrayCount(iNewMaps); iNewMap++)
+			if (i != 0 && iNewMaps[iNewMap] == i)
+				break;
+
+		MapList[i] = temp;
+		MapName = MapList[i];
+		SList = MapList[i];
+		if (InStr(SList, ":") != -1)
+		{
+			MapName = Left(MapName, InStr(MapName, ":"));
+			SList = Mid(SList, InStr(SList, ":"));
+			PrevSList = SList;
+		}
+		else 
+		{
+			MapName = Left(MapName, Len(MapName) - 1);
+			SList = PrevSList;
+		}
+		Log("MapName "$MapName$" SList "$SList);
+		MapList[i] = MapName;       
+		if (iNewMap != ArrayCount(iNewMaps))
+			sNewMaps[iNewMap] = SList;
+      
+		while (InStr(SList, ":") != -1)
+		{
+			iTemp = int(Mid(SList, InStr(SList, ":") + 1, 2));
+			CWindow.AddMapName(iTemp, MapList[i]);            
+			SList = Mid(SList, InStr(SList, ":") + 1);
+		}
+	}
+	for (i = 0; i < ArrayCount(iNewMaps); i++)
+		for (SList = sNewMaps[i]; InStr(SList, ":") != -1; SList = Mid(SList, InStr(SList, ":") + 1)) {
+			CWindow.AddMapName(-int(Mid(SList, InStr(SList, ":") + 1, 2)), MapList[iNewMaps[i]]);
+			break; // only shows each map once
+		}
+	i = 0;
+	J0x3E2:
+	// End:0x4F9 [Loop If]
+	if(i < ArrayCount(RuleList))
+	{
+		temp = RuleList[i];
+		CWindow.MapWindow.GetMapListBox(i).VotePriority = VotePriority[i];
+		// End:0x440
+		if(temp == "")
+		{
+				// [Explicit Continue]
+			goto J0x4EF;
+		}
+		iGameMode = int(Mid(temp, InStr(temp, ":") + 1, 2));
+		CWindow.AddGameMode(iGameMode, GameModeName[iGameMode]);
+		J0x47C:
+		// End:0x4EF [Loop If]
+		if(InStr(temp, ":") != -1)
+		{
+			iTemp = int(Mid(temp, InStr(temp, ":") + 1, 2));
+			temp = Mid(temp, InStr(temp, ":") + 3);
+			CWindow.AddGameRule(iGameMode, RuleName[iTemp], iTemp);
+			J0x4EF:
+			// [Loop Continue]
+			goto J0x47C;
+		}
+		++ i;
+		// [Loop Continue]
+		goto J0x3E2;
+	}
+	bSetVoteList = true;
 }
 
 simulated function bool SetAdminWindow()

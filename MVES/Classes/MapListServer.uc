@@ -30,7 +30,7 @@ event Query(WebRequest Request, WebResponse Response)
 			return;
 		}
 	}
-	if ( MapList.MapCount == 0 || MapList.Mutator.ServerCodeName == '' )
+	if ( MapList.iMapList == 0 || MapList.Mutator.ServerCodeName == '' )
 	{
 		Error501(Response);
 		return;

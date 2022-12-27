@@ -118,7 +118,7 @@ GetCache:
 		MapListCacheActor.SetPropertyText("bClientLoadEnd","1");
 		MapListCacheActor.SetPropertyText("HTTPMapListLocation","None");
 		MapListCacheActor.SetPropertyText("bChaceCheck","1");
-		MapListCacheActor.SetPropertyText("LoadMapCount", string(Mutator.MapList.MapCount) );
+		MapListCacheActor.SetPropertyText("LoadMapCount", string(Mutator.MapList.iMapList) );
 		MapListCacheActor.SetPropertyText("LoadRuleCount", string(Mutator.MapList.GameCount) );
 		MapListCacheActor.SetPropertyText("LoadPercentage", "100" );
 	}

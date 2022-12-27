@@ -181,7 +181,7 @@ function MLC_Rules( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 
 	MapListCacheActor.SetPropertyText("RuleCount", string(MapList.GameCount));
-	MapListCacheActor.SetPropertyText("MapCount", string(MapList.MapCount));
+	MapListCacheActor.SetPropertyText("MapCount", string(MapList.iMapList));
 	MapListCacheActor.SetPropertyText("RuleListCount", string(MapList.iRules));
 }
 

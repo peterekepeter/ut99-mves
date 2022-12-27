@@ -8,7 +8,6 @@ const MAX_MAPS = 4096;
 
 var() config string LastUpdate;
 
-var() config int MapCount;
 var() config int iMapList;
 var() config string MapList[4096];
 var(Debug) string ClientMapList[4096]; //This is what we send
@@ -107,10 +106,10 @@ function SetupClientList()
 //Else add to list and find rules that use it
 function GlobalLoad(bool bFullscan)
 {
-	local string FirstMap, CurMap, ClearMap, NewMaps, Maps[16384];
+	local string FirstMap, CurMap, CurMapWithoutExtension, ClearMap, NewMaps, Maps[16384];
 	local int iSeek;
-	local string CurFP, CurRules;
-	local int i, j, k, iLen, iMaps;
+	local string CurFP, CurRules, PrevRules;
+	local int i, j, k, iLen, iMaps, firstHas;
 	local string sTest;
 	local bool bAddTag;
 	local MV_MapTags MapTags;
@@ -126,11 +125,11 @@ function GlobalLoad(bool bFullscan)
 	if ( Mutator.ServerCodeName == '' )
 		Mutator.SetPropertyText("ServerCodeName",string(rand(MaxInt)) $ string(rand(MaxInt))  );
 	CacheCodes();
-	MapCount = 0;
 	iMapList = 0;
 	iSeek = 1;
 
 	// collect game names that have random enabled into CurRules string
+      
 	For ( i=0 ; i<ArrayCount(GameNames) ; i++ )
 	{
 		if ( Mutator.MutatorCode( i) == "" )
@@ -148,13 +147,13 @@ function GlobalLoad(bool bFullscan)
 		MapList[iMapList] = "Random" $ CurRules $ ";";
 		ClientMapList[ iMapList ] = MapList[ iMapList ];
 		iMapList++;
-		MapCount += Len(CurRules) / 3;
+		PrevRules = CurRules;
 	}
 	
 	FirstMap = GetMapName("","",0);
 	CurMap = FirstMap;
 	sorter = new class'MV_Sort';
-;
+
 	Log("[MVE] Reloading map list, this may take a while!");
 	while (true) 
 	{
@@ -200,6 +199,8 @@ function GlobalLoad(bool bFullscan)
 	for (k=0; k<sorter.ItemCount; k+=1)
 	{
 		CurMap = sorter.Items[k];
+            // Log("[MVE] processing map "$CurMap);
+		CurMapWithoutExtension = RemoveExtension(CurMap);
 		CurRules = "";
 		For ( i=0 ; i<iTmpC ; i++ ) //Scan what gametypes this map is defined for
 		{
@@ -213,9 +214,9 @@ function GlobalLoad(bool bFullscan)
 					continue;
 				sTest = Mid( Mutator.GetMapFilter(j), iLen);
 				if ( Mutator.bEnableMapTags && InStr(sTest, ":") == 0 ) //Tag match
-					bAddTag = MapTags.TestTagMatch(RemoveExtension(CurMap), sTest);
+					bAddTag = MapTags.TestTagMatch(CurMapWithoutExtension, sTest);
 				else if ( InStr(sTest,"*") < 0 ) //Exact match for map name
-					bAddTag = (sTest ~= RemoveExtension(CurMap));
+					bAddTag = (sTest ~= CurMapWithoutExtension);
 				else
 				{
 					sTest = Left( sTest, Len(sTest)-1);
@@ -230,9 +231,9 @@ function GlobalLoad(bool bFullscan)
 				{
 					sTest = Mid( Mutator.ExcludeFilters[j], iLen);
 					if ( Mutator.bEnableMapTags && InStr(sTest, ":") == 0 ) //Tag match
-						bAddTag = !MapTags.TestTagMatch(RemoveExtension(CurMap), sTest);
+						bAddTag = !MapTags.TestTagMatch(CurMapWithoutExtension, sTest);
 					else if ( InStr(sTest,"*") < 0 ) //Exact match for map name
-						bAddTag = !(sTest ~= RemoveExtension(CurMap));
+						bAddTag = !(sTest ~= CurMapWithoutExtension);
 					else
 					{
 						sTest = Left( sTest, Len(sTest)-1);
@@ -249,12 +250,19 @@ function GlobalLoad(bool bFullscan)
 		if ( CurRules != "" )
 		{
 			// add map to maplist
-			ClearMap = RemoveExtension(CurMap);
-			Maps[iMaps++] = ClearMap;
-			MapList[ iMapList ] = ClearMap $ CurRules $ ";";
+			ClearMap = CurMapWithoutExtension;
+			Maps[ iMaps++ ] = ClearMap;
+			if (CurRules == PrevRules)
+			{
+				MapList[ iMapList ] = ClearMap $ ";";
+			}
+			else 
+			{
+				MapList[ iMapList ] = ClearMap $ CurRules $ ";";
+			}
 			ClientMapList[ iMapList ] = MapList[ iMapList ];
 			iMapList++;
-			MapCount += Len(CurRules) / 3;
+			PrevRules = CurRules;
 		}
 	}
 		
@@ -311,14 +319,17 @@ function GlobalLoad(bool bFullscan)
 					continue;
 				MapList[iMapList] = Mid( Mutator.GetMapFilter(j), iLen) $ GameTags[i] $ ";";
 				ClientMapList[ iMapList ] = MapList[ iMapList ];
+				// Log("[MVE] processing premade "$MapList[iMapList]);
 				iMapList++;
-				MapCount += Len(GameTags[i]) / 3;
 			}
 		}
 	}
+
+      // clear the rest
 	iClientMapList = iMapList;
 	For ( i=iMapList ; i<MAX_MAPS ; i++ ){
-		MapList[iMapList] = "";
+		MapList[i] = "";
+		ClientMapList[i] = "";
 	}
 
 	// reload report 
@@ -564,7 +575,7 @@ function GenerateString()
 		MapListString = MapListString $ "MapList[" $ string(i) $ "]=" $ ClientMapList[i] $ chr(13);
 
 	MapListString = MapListString 
-		$ "MapCount=" $ string(MapCount) $ chr(13)
+		$ "MapCount=" $ string(iMapList) $ chr(13)
 		$ "RuleListCount=" $ string(iRules) $ chr(13)
 		$ "RuleCount=" $ string(GameCount) $ chr(13);
 
@@ -732,7 +743,6 @@ defaultproperties
 {
       Mutator=None
       LastUpdate=""
-      MapCount=0
       iMapList=0
       MapList(0)=""
       MapList(1)=""
