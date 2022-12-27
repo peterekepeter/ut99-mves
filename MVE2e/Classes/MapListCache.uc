@@ -33,11 +33,12 @@ var int MapCount;
 var int iNewMaps[32];
 var bool bInitialized;
 var bool bClientLoadEnd;
+var bool bRulesAreLoaded;
 var bool bChaceCheck;
 var bool bNeedServerMapList;
 var int LoadMapCount;
 var int LoadRuleCount;
-var float LoadPercentage;
+var int LoadPercentage;
 var MapVoteCache MVC;
 var bool bDebugMode;
 var string HTTPMapListLocation;
@@ -629,9 +630,12 @@ final simulated function MapListCheck ()
 
 	LoadMapCount = NECount;
 	LoadRuleCount = RCount;
-	LoadPercentage = (NECount + RLCount + RCount) / (MapCount + RuleListCount + RuleCount);
-	LoadPercentage *= 100;
-	Log("loaded "$LoadPercentage$"%");
+	LoadPercentage = (NECount + RLCount + RCount) * 100 / (MapCount + RuleListCount + RuleCount);
+
+	if ((RLCount == RuleListCount) && (RCount == RuleCount))
+	{
+		bRulesAreLoaded = true;
+	}
 
 	if ( (NECount == MapCount) && (RLCount == RuleListCount) && (RCount == RuleCount) )
 	{

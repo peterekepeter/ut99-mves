@@ -108,7 +108,7 @@ PostID:
 	PlayerID = class'MV_MainExtension'.static.PreFill( PlayerID, "0", 3);
 	Mutator.Extension.AddPlayerToWindows( self);
 GetCache:
-	Sleep( 1.5 + FRand() * 5 );
+	Sleep( 1.0 + FRand() * 1.0 );
 	if ( !GetCacheActor() )
 		Stop;
 	TicksLeft = 15;
@@ -131,29 +131,28 @@ GetCache:
 			MapListCacheActor.SetPropertyText("HTTPMapListLocation","None");
 			MapListCacheActor.SetPropertyText("ClientScreenshotPackage", Mutator.ClientScreenshotPackage );
 			MapListCacheActor.SetPropertyText("ClientLogoTexture", Mutator.ClientLogoTexture );
-			Sleep(0.1 * Level.TimeDilation);
-			Mutator.Extension.MLC_Rules( MapListCacheActor);	Sleep(0.2 * Level.TimeDilation);
-			Mutator.Extension.MLC_MapList_1( MapListCacheActor);	Sleep(0.4 * Level.TimeDilation);
-			Mutator.Extension.MLC_MapList_2( MapListCacheActor);	Sleep(0.4 * Level.TimeDilation);
-			Mutator.Extension.MLC_MapList_3( MapListCacheActor);	Sleep(0.4 * Level.TimeDilation);
-			Mutator.Extension.MLC_MapList_4( MapListCacheActor);	Sleep(0.4 * Level.TimeDilation);
-			Mutator.Extension.MLC_MapList_5( MapListCacheActor);	Sleep(0.4 * Level.TimeDilation);
-			Mutator.Extension.MLC_MapList_6( MapListCacheActor);	Sleep(0.4 * Level.TimeDilation);
-			Mutator.Extension.MLC_MapList_7( MapListCacheActor);	Sleep(0.4 * Level.TimeDilation);
-			Mutator.Extension.MLC_MapList_8( MapListCacheActor);	Sleep(0.4 * Level.TimeDilation);
-			Mutator.Extension.MLC_MapList_9( MapListCacheActor);	Sleep(0.4 * Level.TimeDilation);
-			Mutator.Extension.MLC_MapList_10( MapListCacheActor);	Sleep(0.4 * Level.TimeDilation);
-			Mutator.Extension.MLC_MapList_11( MapListCacheActor);	Sleep(0.4 * Level.TimeDilation);
-			Mutator.Extension.MLC_MapList_12( MapListCacheActor);	Sleep(0.4 * Level.TimeDilation);
-			Mutator.Extension.MLC_MapList_13( MapListCacheActor);	Sleep(0.4 * Level.TimeDilation);
-			Mutator.Extension.MLC_MapList_14( MapListCacheActor);	Sleep(0.4 * Level.TimeDilation);
-			Mutator.Extension.MLC_MapList_15( MapListCacheActor);	Sleep(0.4 * Level.TimeDilation);
+			Mutator.Extension.MLC_Rules( MapListCacheActor); 	Sleep(0.5);
+			Mutator.Extension.MLC_MapList_1( MapListCacheActor); 	Sleep(0.5);
+			Mutator.Extension.MLC_MapList_2( MapListCacheActor);	Sleep(0.5);
+			Mutator.Extension.MLC_MapList_3( MapListCacheActor);	Sleep(0.5);
+			Mutator.Extension.MLC_MapList_4( MapListCacheActor);	Sleep(0.5);
+			Mutator.Extension.MLC_MapList_5( MapListCacheActor);	Sleep(0.5);
+			Mutator.Extension.MLC_MapList_6( MapListCacheActor);	Sleep(0.5);
+			Mutator.Extension.MLC_MapList_7( MapListCacheActor);	Sleep(0.5);
+			Mutator.Extension.MLC_MapList_8( MapListCacheActor);	Sleep(0.5);
+			Mutator.Extension.MLC_MapList_9( MapListCacheActor);	Sleep(0.5);
+			Mutator.Extension.MLC_MapList_10( MapListCacheActor);	Sleep(0.5);
+			Mutator.Extension.MLC_MapList_11( MapListCacheActor);	Sleep(0.5);
+			Mutator.Extension.MLC_MapList_12( MapListCacheActor);	Sleep(0.5);
+			Mutator.Extension.MLC_MapList_13( MapListCacheActor);	Sleep(0.5);
+			Mutator.Extension.MLC_MapList_14( MapListCacheActor);	Sleep(0.5);
+			Mutator.Extension.MLC_MapList_15( MapListCacheActor);	Sleep(0.5);
 			Mutator.Extension.MLC_MapList_16( MapListCacheActor);
 			Stop;
 		}
-		Sleep(0.33 * Level.TimeDilation); //Total: 5 secs
+		Sleep(0.5); // Total: 8-10 seconds
 	}
-	if ( bHTTPLoading ) //Started but not ended
+	if ( bHTTPLoading ) // Started but not ended
 		Goto('FullCache');
 }
 

@@ -30,6 +30,7 @@ var string MapList16[256];
 var int MapCount;
 var int iNewMaps[32];
 var bool bSetVoteList;
+var bool bSetRuleList;
 var bool bSetAdminWindow;
 var string PlayerName[32];
 var bool bKickVote;
@@ -75,9 +76,11 @@ var bool bOpenWindowDispatched;
 var bool bSetupWindowDelayDone;
 var MapListCache ClientCache;
 var bool bMapListLoad;
+var bool bRulesListLoaded;
 var MapVoteClientConfig ClientConf;
 var MapVoteTabWindow CWindow;
 var Class<MapListCacheHelper> Helper;
+var int TimerCallCount;
 
 replication
 {
@@ -105,79 +108,86 @@ simulated function PostBeginPlay()
 
 simulated function GetMapList()
 {
-    local int i;
-    local MapListCache Cache;
+	local int i;
+	local MapListCache Cache;
 
-    // End:0x0E
-    if(bMapListLoad == true)
-    {
-        return;
-    }
-    // End:0x1B
-    if(Owner == none)
-    {
-        return;
-    }
-    // End:0x38
-    foreach Owner.ChildActors(class'MapListCache', ClientCache)
-    {
-        // End:0x38
-        break;        
-    }    
-    // End:0x46
-    if(ClientCache == none)
-    {
-        return;
-    }
+	// End:0x0E
+	if(bMapListLoad == true)
+	{
+		return;
+	}
+	// End:0x1B
+	if(Owner == none)
+	{
+		return;
+	}
+	// End:0x38
+	foreach Owner.ChildActors(class'MapListCache', ClientCache)
+	{
+		// End:0x38
+		break;        
+	}    
+	// End:0x46
+	if(ClientCache == none)
+	{
+		return;
+	}
+	if (ClientCache.bRulesAreLoaded)
+	{
+		bRulesListLoaded = true;
+	}
     // End:0x5D
-    if(ClientCache.bClientLoadEnd == false)
-    {
-        return;
-    }
-    MapCount = ClientCache.MapCount;
-    i = 0;
-    J0x78:
-    // End:0x10E [Loop If]
-    if(i < ArrayCount(RuleList))
-    {
-        RuleList[i] = ClientCache.RuleList[i];
-        GameModeName[i] = ClientCache.GameModeName[i];
-        RuleName[i] = ClientCache.RuleName[i];
-        VotePriority[i] = ClientCache.GetVotePriority(i);
-        ++ i;
-        // [Loop Continue]
-        goto J0x78;
-    }
-    RuleListCount = ClientCache.RuleListCount;
-    RuleCount = ClientCache.RuleCount;
-    i = 0;
-    J0x13D:
-    // End:0x356 [Loop If]
-    if(i < 256)
-    {
-        MapList1[i] = ClientCache.MapList1[i];
-        MapList2[i] = ClientCache.MapList2[i];
-        MapList3[i] = ClientCache.MapList3[i];
-        MapList4[i] = ClientCache.MapList4[i];
-        MapList5[i] = ClientCache.MapList5[i];
-        MapList6[i] = ClientCache.MapList6[i];
-        MapList7[i] = ClientCache.MapList7[i];
-        MapList8[i] = ClientCache.MapList8[i];
-        MapList9[i] = ClientCache.MapList9[i];
-        MapList10[i] = ClientCache.MapList10[i];
-        MapList11[i] = ClientCache.MapList11[i];
-        MapList12[i] = ClientCache.MapList12[i];
-        MapList13[i] = ClientCache.MapList13[i];
-        MapList14[i] = ClientCache.MapList14[i];
-        MapList15[i] = ClientCache.MapList15[i];
-        MapList16[i] = ClientCache.MapList16[i];
-        ++ i;
-        // [Loop Continue]
-        goto J0x13D;
-    }
-    for (i = 0; i < ArrayCount(iNewMaps); i++)
-    	iNewMaps[i] = ClientCache.iNewMaps[i];
-    bMapListLoad = true;
+	if(ClientCache.bClientLoadEnd == false)
+	{
+		return;
+	}
+	MapCount = ClientCache.MapCount;
+	i = 0;
+	J0x78:
+	// End:0x10E [Loop If]
+	if(i < ArrayCount(RuleList))
+	{
+		RuleList[i] = ClientCache.RuleList[i];
+		GameModeName[i] = ClientCache.GameModeName[i];
+		RuleName[i] = ClientCache.RuleName[i];
+		VotePriority[i] = ClientCache.GetVotePriority(i);
+		++ i;
+		// [Loop Continue]
+		goto J0x78;
+	}
+	RuleListCount = ClientCache.RuleListCount;
+	RuleCount = ClientCache.RuleCount;
+	i = 0;
+	J0x13D:
+	// End:0x356 [Loop If]
+	if(i < 256)
+	{
+		MapList1[i] = ClientCache.MapList1[i];
+		MapList2[i] = ClientCache.MapList2[i];
+		MapList3[i] = ClientCache.MapList3[i];
+		MapList4[i] = ClientCache.MapList4[i];
+		MapList5[i] = ClientCache.MapList5[i];
+		MapList6[i] = ClientCache.MapList6[i];
+		MapList7[i] = ClientCache.MapList7[i];
+		MapList8[i] = ClientCache.MapList8[i];
+		MapList9[i] = ClientCache.MapList9[i];
+		MapList10[i] = ClientCache.MapList10[i];
+		MapList11[i] = ClientCache.MapList11[i];
+		MapList12[i] = ClientCache.MapList12[i];
+		MapList13[i] = ClientCache.MapList13[i];
+		MapList14[i] = ClientCache.MapList14[i];
+		MapList15[i] = ClientCache.MapList15[i];
+		MapList16[i] = ClientCache.MapList16[i];
+		++ i;
+		// [Loop Continue]
+		goto J0x13D;
+	}
+	for (i = 0; i < ArrayCount(iNewMaps); i++)
+	{
+		iNewMaps[i] = ClientCache.iNewMaps[i];
+	}
+	bMapListLoad = true;
+	bRulesListLoaded = true; // just in case
 }
 
 simulated function bool OpenWindow ()
@@ -227,7 +237,12 @@ simulated function SetVoteList()
 	local string temp;
 	local int iTemp, iGameMode, Count, iNewMap;
 	local string RuleStr, MapName, SList, PrevSList, sNewMaps[ArrayCount(iNewMaps)];
-	Log("!!!!!!!!!!!!!!!!! SetVoteList was called!!!!!!!!!!!!!");
+
+	if (bSetVoteList) 
+	{
+		return;
+	}
+
 
 	for ( i = 0;  i < 4096; ++i )
 	{
@@ -318,7 +333,7 @@ simulated function SetVoteList()
 			MapName = Left(MapName, Len(MapName) - 1);
 			SList = PrevSList;
 		}
-		Log("MapName "$MapName$" SList "$SList);
+		
 		MapList[i] = MapName;       
 		if (iNewMap != ArrayCount(iNewMaps))
 			sNewMaps[iNewMap] = SList;
@@ -330,42 +345,47 @@ simulated function SetVoteList()
 			SList = Mid(SList, InStr(SList, ":") + 1);
 		}
 	}
+
 	for (i = 0; i < ArrayCount(iNewMaps); i++)
+	{
 		for (SList = sNewMaps[i]; InStr(SList, ":") != -1; SList = Mid(SList, InStr(SList, ":") + 1)) {
 			CWindow.AddMapName(-int(Mid(SList, InStr(SList, ":") + 1, 2)), MapList[iNewMaps[i]]);
 			break; // only shows each map once
 		}
-	i = 0;
-	J0x3E2:
-	// End:0x4F9 [Loop If]
-	if(i < ArrayCount(RuleList))
+	}
+	bSetVoteList = true;
+}
+
+simulated function SetRuleList()
+{	
+	local string temp;
+	local int i, iTemp, iGameMode;
+
+	if (bSetRuleList) 
+	{
+		return;
+	}
+
+	for (i = 0; i < ArrayCount(RuleList); ++ i)
 	{
 		temp = RuleList[i];
 		CWindow.MapWindow.GetMapListBox(i).VotePriority = VotePriority[i];
 		// End:0x440
 		if(temp == "")
 		{
-				// [Explicit Continue]
-			goto J0x4EF;
+			continue;
 		}
 		iGameMode = int(Mid(temp, InStr(temp, ":") + 1, 2));
 		CWindow.AddGameMode(iGameMode, GameModeName[iGameMode]);
-		J0x47C:
 		// End:0x4EF [Loop If]
-		if(InStr(temp, ":") != -1)
+		while (InStr(temp, ":") != -1)
 		{
 			iTemp = int(Mid(temp, InStr(temp, ":") + 1, 2));
 			temp = Mid(temp, InStr(temp, ":") + 3);
 			CWindow.AddGameRule(iGameMode, RuleName[iTemp], iTemp);
-			J0x4EF:
-			// [Loop Continue]
-			goto J0x47C;
 		}
-		++ i;
-		// [Loop Continue]
-		goto J0x3E2;
 	}
-	bSetVoteList = true;
+	bSetRuleList = true;
 }
 
 simulated function bool SetAdminWindow()
@@ -450,133 +470,158 @@ simulated function bool SetAdminWindow()
 
 simulated function Timer()
 {
-    local int i, MyPlayerCount;
-    local bool bHasVoted;
-    local int repPlayerCount;
-    local string TitleTemp;
+	local int i, MyPlayerCount;
+	local bool bHasVoted;
+	local int repPlayerCount;
+	local string TitleTemp;
 
-    GetMapList();
-    if(!bOpenWindowDispatched)
-    {
-        OpenWindow();
-        return;
-    }
-    if(!bSetupWindowDelayDone)
-    {
-        bSetupWindowDelayDone = true;
-        SetupWindow();
-    }
-    DebugLog("timer()");
-    bUpdated = false;
-    if(bMapListLoad && !bSetVoteList)
-    {
-        SetVoteList();
-    }
-    if(!bSetAdminWindow)
-    {
-        bUpdated = SetAdminWindow();
-    }
-    if(bKickVote || PlayerPawn(Owner).PlayerReplicationInfo.bAdmin)
-    {
-        CWindow.EnableKickWindow();
-    }
-    i = 0;
-    J0xBE:
-    if((i < 32) && PlayerName[i] != "")
-    {
-        repPlayerCount = i + 1;
-        ++ i;
-        goto J0xBE;
-    }
-    if(repPlayerCount != gPlayerCount)
-    {
-        i = gPlayerCount;
-        J0x110:
-        if(i < repPlayerCount)
-        {
-            if(Right(PlayerName[i], 5) == "&?&!&")
-            {
-                PlayerName[i] = Mid(PlayerName[i], 0, Len(PlayerName[i]) - 5);
-                bHasVoted = true;
-            }
-            else
-            {
-                bHasVoted = false;
-            }
-            CWindow.AddPlayerName(PlayerName[i], bHasVoted);
-            ++ i;
-            goto J0x110;
-        }
-        gPlayerCount = repPlayerCount;
-        bUpdated = true;
-    }
-    i = 0;
-    J0x1BC:
-    if((MapVoteResults[i] != "") && i < 31)
-    {
-        UpdateMapVoteResults(MapVoteResults[i], i);
-        ++ i;
-        goto J0x1BC;
-    }
-    i = 0;
-    J0x203:
-    if((KickVoteResults[i] != "") && i < 31)
-    {
-        UpdateKickVoteResults(KickVoteResults[i], i);
-        ++ i;
-        goto J0x203;
-    }
-	  if ( ClientCache != None )
-	  {
+	TimerCallCount += 1;
+
+	GetMapList();
+	if(!bOpenWindowDispatched)
+	{
+		OpenWindow();
+		return;
+	}
+	if(!bSetupWindowDelayDone)
+	{
+		bSetupWindowDelayDone = true;
+		SetupWindow();
+	}
+	bUpdated = false;
+	if (!bSetRuleList && bRulesListLoaded)
+	{
+		SetRuleList();
+	}
+	if(bMapListLoad && !bSetVoteList)
+	{
+		SetVoteList();
+	}
+	if(!bSetAdminWindow)
+	{
+		bUpdated = SetAdminWindow();
+	}
+	if(bKickVote || PlayerPawn(Owner).PlayerReplicationInfo.bAdmin)
+	{
+		CWindow.EnableKickWindow();
+	}
+	i = 0;
+	J0xBE:
+	if((i < 32) && PlayerName[i] != "")
+	{
+		repPlayerCount = i + 1;
+		++ i;
+		goto J0xBE;
+	}
+	if(repPlayerCount != gPlayerCount)
+	{
+		i = gPlayerCount;
+		J0x110:
+		if(i < repPlayerCount)
+		{
+			if(Right(PlayerName[i], 5) == "&?&!&")
+			{
+				PlayerName[i] = Mid(PlayerName[i], 0, Len(PlayerName[i]) - 5);
+				bHasVoted = true;
+			}
+			else
+			{
+				bHasVoted = false;
+			}
+			CWindow.AddPlayerName(PlayerName[i], bHasVoted);
+			++ i;
+			goto J0x110;
+		}
+		gPlayerCount = repPlayerCount;
+		bUpdated = true;
+	}
+	i = 0;
+	J0x1BC:
+	if((MapVoteResults[i] != "") && i < 31)
+	{
+		UpdateMapVoteResults(MapVoteResults[i], i);
+		++ i;
+		goto J0x1BC;
+	}
+	i = 0;
+	J0x203:
+	if((KickVoteResults[i] != "") && i < 31)
+	{
+		UpdateKickVoteResults(KickVoteResults[i], i);
+		++ i;
+		goto J0x203;
+	}
+
+	// set window title
+	if ( ClientCache == None )
+	{
+		// indeterminate loading bar
+		TitleTemp = MapVoteFramedWindow(TheWindow).TitleStr;
+		TitleTemp = TitleTemp $ "    loading ";
+		for (i = 0; i < TimerCallCount; i += 1)
+		{
+			TitleTemp = TitleTemp $ ".";
+		}
+	}
+	else if (ClientCache.LoadPercentage < 100)
+	{
+		// determinate loading bar
+		TitleTemp = MapVoteFramedWindow(TheWindow).TitleStr;
+		TitleTemp = TitleTemp $ "    loading "$ClientCache.LoadPercentage$"% complete";
+	}
+	else 
+	{
+		// loaded, show proper title
 		TitleTemp = MapVoteFramedWindow(TheWindow).TitleStr;
 		TitleTemp = TitleTemp $ "    " $ string(ClientCache.LoadRuleCount) $ "/" $ string(ClientCache.RuleCount) @ "Game Rule loaded";
 		TitleTemp = TitleTemp $ "    " $ string(ClientCache.LoadMapCount) $ "/" $ string(ClientCache.MapCount) @ "Maps loaded";
 		TitleTemp = TitleTemp $ "     Mode:" @ Mode;
-		MapVoteFramedWindow(TheWindow).WindowTitle = TitleTemp;
-	  }
-    CWindow.MapWindow.lblTitle.SetText(MapVoteTitle);
-    CWindow.MapWindow.LogoTexture = LogoTexture;
-    if (ClientCache.ClientLogoTexture != "")
-    {
-        CWindow.MapWindow.LogoTexture = ClientCache.ClientLogoTexture;
-    }
-    CWindow.MapWindow.ClientScreenshotPackage = ClientCache.ClientScreenshotPackage;
-    if(ServerInfoURL != "")
-    {
-        CWindow.InfoWindow.SetInfoServerAddress(ServerInfoURL, MapInfoURL);
-        if(CWindow.AdminWindow != none)
-        {
-            AdminWindow(CWindow.AdminWindow.ClientArea).txtServerInfoURL.SetValue(ServerInfoURL);
-        }
-    }
-    else
-    {
-        MapVoteNavBar(CWindow.InfoWindow.VSplitter.BottomClientWindow).ServerInfoButton.bDisabled = true;
-    }
-    MapVoteNavBar(CWindow.InfoWindow.VSplitter.BottomClientWindow).ReportButton1.bDisabled = false;
-    MapVoteNavBar(CWindow.InfoWindow.VSplitter.BottomClientWindow).ReportButton2.bDisabled = false;
-    CWindow.MapWindow.PrefixDictionary = PrefixDictionary;
-    if(!bMapListLoad)
-    {
-        SetTimer(0.50, false);
-        return;
-    }
-    if(!bUpdated && blastCheck)
-    {
-        if(CWindow.AdminWindow != none)
-        {
-            AdminWindow(CWindow.AdminWindow.ClientArea).RemoteSaveButton.bDisabled = false;
-        }
-        return;
-    }
-    if(!bUpdated)
-    {
-        blastCheck = true;
-        SetTimer(Level.TimeDilation,False);
-        return;
-    }
-    blastCheck = false;
-    SetTimer(0.50, false);
+	}
+	MapVoteFramedWindow(TheWindow).WindowTitle = TitleTemp;
+
+	CWindow.MapWindow.lblTitle.SetText(MapVoteTitle);
+	CWindow.MapWindow.LogoTexture = LogoTexture;
+	if (ClientCache.ClientLogoTexture != "")
+	{
+		CWindow.MapWindow.LogoTexture = ClientCache.ClientLogoTexture;
+	}
+	CWindow.MapWindow.ClientScreenshotPackage = ClientCache.ClientScreenshotPackage;
+	if(ServerInfoURL != "")
+	{
+		CWindow.InfoWindow.SetInfoServerAddress(ServerInfoURL, MapInfoURL);
+		if(CWindow.AdminWindow != none)
+		{
+			AdminWindow(CWindow.AdminWindow.ClientArea).txtServerInfoURL.SetValue(ServerInfoURL);
+		}
+	}
+	else
+	{
+		MapVoteNavBar(CWindow.InfoWindow.VSplitter.BottomClientWindow).ServerInfoButton.bDisabled = true;
+	}
+	MapVoteNavBar(CWindow.InfoWindow.VSplitter.BottomClientWindow).ReportButton1.bDisabled = false;
+	MapVoteNavBar(CWindow.InfoWindow.VSplitter.BottomClientWindow).ReportButton2.bDisabled = false;
+	CWindow.MapWindow.PrefixDictionary = PrefixDictionary;
+	if(!bMapListLoad)
+	{
+		SetTimer(0.50, false);
+		return;
+	}
+	if(!bUpdated && blastCheck)
+	{
+		if(CWindow.AdminWindow != none)
+		{
+			AdminWindow(CWindow.AdminWindow.ClientArea).RemoteSaveButton.bDisabled = false;
+		}
+		return;
+	}
+	if(!bUpdated)
+	{
+		blastCheck = true;
+		SetTimer(Level.TimeDilation,False);
+		return;
+	}
+	blastCheck = false;
+	SetTimer(0.50, false);
 }
 
 simulated function AddNewPlayer (string NewPlayerName, bool bHasVoted)

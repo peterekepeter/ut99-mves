@@ -520,10 +520,11 @@ function Mutate( string MutateString, PlayerPawn Sender)
 		}
 		else if ( Mid(MutateString,11,8) ~= "VOTEMENU" )
 		{
-			if ( (Level.TimeSeconds > 15) || (Level.NetMode == 0) || Sender.bAdmin )
-				OpenWindowFor( Sender);
-			else
-				Sender.ClientMessage("Please wait a few seconds to vote");
+			OpenWindowFor(Sender);
+			// if ( (Level.TimeSeconds > 15) || (Level.NetMode == 0) || Sender.bAdmin )
+			// 	OpenWindowFor( Sender);
+			// else
+			// 	Sender.ClientMessage("Please wait a few seconds to vote");
 		}
 		else if ( Mid(MutateString,11,3) ~= "MAP" )
 			PlayerVoted( Sender, Mid(MutateString,15) );
@@ -986,11 +987,11 @@ function OpenWindowFor( PlayerPawn Sender, optional MVPlayerWatcher W)
 		Sender.ClientMessage("Very sorry looks like you're not able to vote!");
 		return;
 	}
-	if ( W.MapListCacheActor == none )
-	{
-		Sender.ClientMessage("Please wait, map list is loading. Try again in 5 seconds.");
-		return;
-	}
+	// if ( W.MapListCacheActor == none )
+	// {
+	// 	Sender.ClientMessage("Please wait, map list is loading. Try again in 5 seconds.");
+	// 	return;
+	// }
 	if ( W.MapVoteWRIActor != none )
 	{
 		return; // already has actor
