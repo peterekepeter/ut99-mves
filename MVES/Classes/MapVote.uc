@@ -1725,7 +1725,7 @@ defaultproperties
 {
       bAutoSetGameName=True
       bSortAndDeduplicateMaps=True
-      ClientPackage="MVE2e"
+      ClientPackage="MVE2f"
       ServerInfoURL=""
       MapInfoURL=""
       HTTPMapListLocation=""
