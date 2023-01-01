@@ -716,7 +716,7 @@ function MapChangeIssued()
 	{
 		aStr = Mid( aStr, 1);
 	}
-	if ( MapList.ValidMap( aStr, notValidReason ) )	
+	if ( MapList.IsValidMap( aStr, notValidReason ) )	
 	{
 		if ( Level.bNextItems )
 		{
@@ -1054,7 +1054,7 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 		}
 	}
 	W.bOverflow = true;
-	if ( !MapList.ValidMap(MapString, notValidReason) ) //String is normalized, safe to cast equals
+	if ( !MapList.IsValidMap(MapString, notValidReason) ) //String is normalized, safe to cast equals
 	{
 		Sender.ClientMessage("Cannot vote, bad map code: "$notValidReason$" in "$MapString);
 		return;

@@ -491,10 +491,10 @@ function EnumerateGames()
 	}
 }
 
-function bool ValidMap( out string MapString, out string reason )
+function bool IsValidMap( out string MapString, out string reason )
 {
-	local string MapName, GameIdx;
-	local int i, iLen;
+	local string MapName, GameIdx, targetIdxList;
+	local int i, iLen, colonAt;
 	local bool bMapFound;
 	
 	reason = "";
@@ -520,10 +520,18 @@ function bool ValidMap( out string MapString, out string reason )
 	bMapFound = false;
 	For ( i=0 ; i<iMapList ; i++ )
 	{
-		if ( Left(MapList[i], iLen) ~= MapName )
+		// use the gametype list of previous list item where it is defined
+		colonAt = InStr(MapList[i], ":");
+		if ( colonAt != -1 ) 
+		{
+			targetIdxList = Mid(MapList[i], colonAt);
+		}
+		
+		// TODO ensure map name match is exact (map name that starts with another might match)
+		if ( Left(MapList[i], iLen) ~= MapName)
 		{
 			bMapFound = true;
-			if ( InStr( Mid(MapList[i],iLen), GameIdx) > 0 )
+			if ( InStr( targetIdxList, GameIdx ) > 0 )
 			{
 				// found!
 				// normalize string for voting stage
