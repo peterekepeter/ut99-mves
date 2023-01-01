@@ -74,47 +74,39 @@ replication
 		bClientLoadEnd;
 }
 
-final simulated function AddCache()
+final simulated function SaveToMapVoteCache()
 {
 	local int i;
 
-	// End:0x2B
-	if(!(Role != ROLE_Authority) || Level.NetMode == NM_Standalone)
+	if( Role == ROLE_Authority || Level.NetMode == NM_Standalone )
 	{
 		return;
 	}
-	// End:0x47
-	if((ServerCode == "") || LastUpdate == "")
+	if(ServerCode == "" || LastUpdate == "")
 	{
 		return;
 	}
+
 	class'MapListCacheHelper'.static.ConvertServerCode(self);
 	MVC.bCached = true;
-	// End:0xAC
+
 	if(PlayerPawn(Owner).GameReplicationInfo != none)
 	{
 		MVC.ServerName = PlayerPawn(Owner).GameReplicationInfo.ServerName;
 	}
 	MVC.LastUpdate = LastUpdate;
-	i = 0;
-	J0xC7:
-	// End:0x15D [Loop If]
-	if(i < ArrayCount(RuleList))
+	
+	for ( i = 0; i < ArrayCount(RuleList); ++i )
 	{
 		MVC.RuleList[i] = RuleList[i];
 		MVC.GameModeName[i] = GameModeName[i];
 		MVC.RuleName[i] = RuleName[i];
 		MVC.SetVotePriority(i, VotePriority[i]);
-		++ i;
-		// [Loop Continue]
-		goto J0xC7;
 	}
 	MVC.RuleListCount = RuleListCount;
 	MVC.RuleCount = RuleCount;
-	i = 0;
-	J0x18C:
-	// End:0x3A5 [Loop If]
-	if(i < 256)
+
+	for ( i = 0; i < 256; ++ i)
 	{
 		MVC.MapList1[i] = MapList1[i];
 		MVC.MapList2[i] = MapList2[i];
@@ -132,20 +124,21 @@ final simulated function AddCache()
 		MVC.MapList14[i] = MapList14[i];
 		MVC.MapList15[i] = MapList15[i];
 		MVC.MapList16[i] = MapList16[i];
-		++ i;
-		// [Loop Continue]
-		goto J0x18C;
 	}
 	MVC.MapCount = MapCount;
+
 	for (i = 0; i < ArrayCount(iNewMaps); i++)
+	{
 		MVC.iNewMaps[i] = iNewMaps[i];
+	}
+
 	MVC.SaveConfig();
 	dlog("client: Save!");
 }
 
 simulated function Tick (float F)
 {
-	if (  !bInitialized )
+	if ( !bInitialized )
 	{
 		Initialized();
 	} else {
@@ -459,12 +452,11 @@ final simulated function ChaceCheck()
 {
 	local int i;
 
-	// End:0x2B
 	if(!(Role != ROLE_Authority) || Level.NetMode == NM_Standalone)
 	{
 		return;
 	}
-	// End:0x55
+
 	if(((HTTPMapListLocation == "") || ServerCode == "") || LastUpdate == "")
 	{
 		return;
@@ -473,18 +465,17 @@ final simulated function ChaceCheck()
 	MVC = new (class'MapVoteCache', class'MapListCacheHelper'.default.ServerCodeN) class'MapVoteCache';
 	bChaceCheck = true;
 	dlog("client: ChaceCheckEnd!");
-	// End:0x16B
+
 	if(!MVC.bCached || MVC.LastUpdate != LastUpdate)
 	{
 		bNeedServerMapList = true;
-		// End:0x12B
+
 		if(HTTPMapListLocation ~= "None")
 		{
 			dlog("client: NeedServerMapList!");
 			MVC.CacheClear();
 			NeedServerMapList();
 		}
-		// End:0x169
 		else
 		{
 			dlog("client: NeedServerMapList! (HTTP)");
@@ -493,25 +484,20 @@ final simulated function ChaceCheck()
 		}
 		return;
 	}
-	i = 0;
-	J0x172:
-	// End:0x208 [Loop If]
-	if(i < ArrayCount(RuleList))
+
+	// no need to transfer, load from ini
+
+	for (i = 0; i < ArrayCount(RuleList); ++i)
 	{
 		RuleList[i] = MVC.RuleList[i];
 		GameModeName[i] = MVC.GameModeName[i];
 		RuleName[i] = MVC.RuleName[i];
 		VotePriority[i] = MVC.GetVotePriority(i);
-		++ i;
-		// [Loop Continue]
-		goto J0x172;
 	}
 	RuleListCount = MVC.RuleListCount;
 	RuleCount = MVC.RuleCount;
-	i = 0;
-	J0x237:
-	// End:0x450 [Loop If]
-	if(i < 256)
+
+	for (i = 0; i < 256; ++i)
 	{
 		MapList1[i] = MVC.MapList1[i];
 		MapList2[i] = MVC.MapList2[i];
@@ -529,9 +515,7 @@ final simulated function ChaceCheck()
 		MapList14[i] = MVC.MapList14[i];
 		MapList15[i] = MVC.MapList15[i];
 		MapList16[i] = MVC.MapList16[i];
-		++ i;
-		// [Loop Continue]
-		goto J0x237;
+	
 	}
 	MapCount = MVC.MapCount;
 }
@@ -539,12 +523,12 @@ final simulated function ChaceCheck()
 final function NeedServerMapList()
 {
 	//local string S;
+	Log("NeedServerMapList() was called call, Role:"$Role);
 
 	if(Role != ROLE_Authority)
 	{
 		return;
 	}
-	dlog("NeedServerMapList() call");
 	HTTPMapListLocation = "None";
 	bNeedServerMapList = true;
 /*     S = Left(string(default.Class), InStr(string(default.Class), "."));
@@ -565,7 +549,7 @@ simulated function Timer ()
 		SetTimer(0.0,False);
 		return;
 	}
-	if (  !bChaceCheck )
+	if ( !bChaceCheck )
 	{
 		ChaceCheck();
 	}
@@ -643,7 +627,7 @@ final simulated function MapListCheck ()
 		dlog("client: ClientLoadEnd!");
 		if ( bNeedServerMapList )
 		{
-			AddCache();
+			SaveToMapVoteCache();
 		}
 	}
 }
@@ -658,11 +642,11 @@ final simulated function int MapCounter (string S)
 
 final function dlog (string S)
 {
-  if (  !bDebugMode )
-  {
-	return;
-  }
-  Log(S,Class.Name);
+	if ( !bDebugMode )
+	{
+		return;
+	}
+	Log(S,Class.Name);
 }
 
 final simulated function float GetVotePriority( int Idx)
