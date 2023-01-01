@@ -476,7 +476,7 @@ event PostBeginPlay()
 		TravelInfo.TravelIdx = -1;
 		TravelInfo.TravelString = "";
 	}
-	MapList.SetupClientList();
+      
 	if ( MapList.MapListString == "" && MapList.iMapList > 0 )
 		MapList.GenerateString();
 	if ( bResetServerPackages && bOverrideServerPackages )

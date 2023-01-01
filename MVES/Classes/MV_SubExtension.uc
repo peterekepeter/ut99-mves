@@ -79,7 +79,7 @@ function MLC_MapList_1( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 	MLC = MapListCache(MapListCacheActor);
 	l = 0;
-	k = MapList.iClientMapList - l;
+	k = MapList.GetMapListCount() - l;
 	if ( k > 256 ) k = 256;
 	For ( i=0 ; i<k ; i++ )		MLC.MapList1[ i ] = MapList.GetMapList( i + l );
 	// For ( i=0 ; i<k ; i++ )		Log("copy MLC.MapList1["$i$"] "$MLC.MapList1[ i ]);
@@ -90,7 +90,7 @@ function MLC_MapList_2( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 	MLC = MapListCache(MapListCacheActor);
 	l = 256;
-	k = MapList.iClientMapList - l;
+	k = MapList.GetMapListCount() - l;
 	if ( k > 256 ) k = 256;
 	For ( i=0 ; i<k ; i++ )		MLC.MapList2[ i ] = MapList.GetMapList( i + l );
 	// For ( i=0 ; i<k ; i++ )		Log("copy MLC.MapList2["$i$"] "$MLC.MapList2[ i ]);
@@ -101,7 +101,7 @@ function MLC_MapList_3( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 	MLC = MapListCache(MapListCacheActor);
 	l = 512;
-	k = MapList.iClientMapList - l;
+	k = MapList.GetMapListCount() - l;
 	if ( k > 256 ) k = 256;
 	For ( i=0 ; i<k ; i++ )		MLC.MapList3[ i ] = MapList.GetMapList( i + l );
 	// For ( i=0 ; i<k ; i++ )		Log("copy MLC.MapList3["$i$"] "$MLC.MapList3[ i ]);
@@ -112,7 +112,7 @@ function MLC_MapList_4( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 	MLC = MapListCache(MapListCacheActor);
 	l = 768;
-	k = MapList.iClientMapList - l;
+	k = MapList.GetMapListCount() - l;
 	if ( k > 256 ) k = 256;
 	For ( i=0 ; i<k ; i++ )		MLC.MapList4[ i ] = MapList.GetMapList( i + l );
 	// For ( i=0 ; i<k ; i++ )		Log("copy MLC.MapList4["$i$"] "$MLC.MapList4[ i ]);
@@ -123,7 +123,7 @@ function MLC_MapList_5( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 	MLC = MapListCache(MapListCacheActor);
 	l = 1024;
-	k = MapList.iClientMapList - l;
+	k = MapList.GetMapListCount() - l;
 	if ( k > 256 ) k = 256;
 	For ( i=0 ; i<k ; i++ )		MLC.MapList5[ i ] = MapList.GetMapList( i + l );
 	// For ( i=0 ; i<k ; i++ )		Log("copy MLC.MapList5["$i$"] "$MLC.MapList5[ i ]);
@@ -134,7 +134,7 @@ function MLC_MapList_6( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 	MLC = MapListCache(MapListCacheActor);
 	l = 1280;
-	k = MapList.iClientMapList - l;
+	k = MapList.GetMapListCount() - l;
 	if ( k > 256 ) k = 256;
 	For ( i=0 ; i<k ; i++ )		MLC.MapList6[ i ] = MapList.GetMapList( i + l );
 	// For ( i=0 ; i<k ; i++ )		Log("copy MLC.MapList6["$i$"] "$MLC.MapList6[ i ]);
@@ -145,7 +145,7 @@ function MLC_MapList_7( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 	MLC = MapListCache(MapListCacheActor);
 	l = 1536;
-	k = MapList.iClientMapList - l;
+	k = MapList.GetMapListCount() - l;
 	if ( k > 256 ) k = 256;
 	For ( i=0 ; i<k ; i++ )		MLC.MapList7[ i ] = MapList.GetMapList( i + l );
 	// For ( i=0 ; i<k ; i++ )		Log("copy MLC.MapList7["$i$"] "$MLC.MapList7[ i ]);
@@ -156,7 +156,7 @@ function MLC_MapList_8( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 	MLC = MapListCache(MapListCacheActor);
 	l = 1792;
-	k = MapList.iClientMapList - l;
+	k = MapList.GetMapListCount() - l;
 	if ( k > 256 ) k = 256;
 	For ( i=0 ; i<k ; i++ )		MLC.MapList8[ i ] = MapList.GetMapList( i + l );
 	// For ( i=0 ; i<k ; i++ )		Log("copy MLC.MapList8["$i$"] "$MLC.MapList8[ i ]);
@@ -167,7 +167,7 @@ function MLC_MapList_9( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 	MLC = MapListCache(MapListCacheActor);
 	l = 2048;
-	k = MapList.iClientMapList - l;
+	k = MapList.GetMapListCount() - l;
 	if ( k > 256 ) k = 256;
 	For ( i=0 ; i<k ; i++ )		MLC.MapList9[ i ] = MapList.GetMapList( i + l );
 	// For ( i=0 ; i<k ; i++ )		Log("copy MLC.MapList9["$i$"] "$MLC.MapList9[ i ]);
@@ -178,7 +178,7 @@ function MLC_MapList_10( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 	MLC = MapListCache(MapListCacheActor);
 	l = 2304;
-	k = MapList.iClientMapList - l;
+	k = MapList.GetMapListCount() - l;
 	if ( k > 256 ) k = 256;
 	For ( i=0 ; i<k ; i++ )		MLC.MapList10[ i ] = MapList.GetMapList( i + l );
 	// For ( i=0 ; i<k ; i++ )		Log("copy MLC.MapList10["$i$"] "$MLC.MapList10[ i ]);
@@ -189,7 +189,7 @@ function MLC_MapList_11( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 	MLC = MapListCache(MapListCacheActor);
 	l = 2560;
-	k = MapList.iClientMapList - l;
+	k = MapList.GetMapListCount() - l;
 	if ( k > 256 ) k = 256;
 	For ( i=0 ; i<k ; i++ )		MLC.MapList11[ i ] = MapList.GetMapList( i + l );
 	// For ( i=0 ; i<k ; i++ )		Log("copy MLC.MapList11["$i$"] "$MLC.MapList11[ i ]);
@@ -200,7 +200,7 @@ function MLC_MapList_12( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 	MLC = MapListCache(MapListCacheActor);
 	l = 2816;
-	k = MapList.iClientMapList - l;
+	k = MapList.GetMapListCount() - l;
 	if ( k > 256 ) k = 256;
 	For ( i=0 ; i<k ; i++ )		MLC.MapList12[ i ] = MapList.GetMapList( i + l );
 	// For ( i=0 ; i<k ; i++ )		Log("copy MLC.MapList12["$i$"] "$MLC.MapList12[ i ]);
@@ -211,7 +211,7 @@ function MLC_MapList_13( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 	MLC = MapListCache(MapListCacheActor);
 	l = 3072;
-	k = MapList.iClientMapList - l;
+	k = MapList.GetMapListCount() - l;
 	if ( k > 256 ) k = 256;
 	For ( i=0 ; i<k ; i++ )		MLC.MapList13[ i ] = MapList.GetMapList( i + l );
 	// For ( i=0 ; i<k ; i++ )		Log("copy MLC.MapList13["$i$"] "$MLC.MapList13[ i ]);
@@ -222,7 +222,7 @@ function MLC_MapList_14( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 	MLC = MapListCache(MapListCacheActor);
 	l = 3328;
-	k = MapList.iClientMapList - l;
+	k = MapList.GetMapListCount() - l;
 	if ( k > 256 ) k = 256;
 	For ( i=0 ; i<k ; i++ )		MLC.MapList14[ i ] = MapList.GetMapList( i + l );
 	// For ( i=0 ; i<k ; i++ )		Log("copy MLC.MapList14["$i$"] "$MLC.MapList14[ i ]);
@@ -233,7 +233,7 @@ function MLC_MapList_15( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 	MLC = MapListCache(MapListCacheActor);
 	l = 3584;
-	k = MapList.iClientMapList - l;
+	k = MapList.GetMapListCount() - l;
 	if ( k > 256 ) k = 256;
 	For ( i=0 ; i<k ; i++ )		MLC.MapList15[ i ] = MapList.GetMapList( i + l );
 	// For ( i=0 ; i<k ; i++ )		Log("copy MLC.MapList15["$i$"] "$MLC.MapList15[ i ]);
@@ -244,7 +244,7 @@ function MLC_MapList_16( Info MapListCacheActor)
 	MapList = MapVote(Outer).MapList;
 	MLC = MapListCache(MapListCacheActor);
 	l = 3840;
-	k = MapList.iClientMapList - l;
+	k = MapList.GetMapListCount() - l;
 	if ( k > 256 ) k = 256;
 	For ( i=0 ; i<k ; i++ )		MLC.MapList16[ i ] = MapList.GetMapList( i + l );
 	// For ( i=0 ; i<k ; i++ )		Log("copy MLC.MapList16["$i$"] "$MLC.MapList16[ i ]);
