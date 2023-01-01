@@ -706,21 +706,32 @@ function GenerateMapList(bool bFullscan)
 function MapChangeIssued()
 {
 	local string aStr;
+	local string notValidReason;
 
 	bMapChangeIssued = true;
-	Log("Map change issued with URL: "$ Level.NextURL,'MapVote');
+	Log("[MVE] Map change issued with URL: "$ Level.NextURL, 'MapVote');
 	aStr = Extension.ByDelimiter( Level.NextURL, "?");
 	aStr = Extension.ByDelimiter( aStr, "#" )  $ ":" $ string(TravelInfo.TravelIdx) ; //Map name plus current IDX
 	while ( InStr( aStr, " ") == 0 )
-		aStr = Mid( aStr, 1);
-	if ( MapList.ValidMap( aStr) )
 	{
-		if ( Level.bNextItems )			BroadcastMessage( Extension.ByDelimiter( aStr, ":") $ GameRuleCombo(TravelInfo.TravelIdx) @ "has been selected as next map.", true);
-		else			BroadcastMessage( Extension.ByDelimiter( aStr, ":") $ GameRuleCombo(TravelInfo.TravelIdx) @ "has been forced.", true);
+		aStr = Mid( aStr, 1);
+	}
+	if ( MapList.ValidMap( aStr, notValidReason ) )	
+	{
+		if ( Level.bNextItems )
+		{
+			BroadcastMessage( Extension.ByDelimiter( aStr, ":") $ GameRuleCombo(TravelInfo.TravelIdx) @ "has been selected as next map.", true);
+		}
+		else 
+		{			
+			BroadcastMessage( Extension.ByDelimiter( aStr, ":") $ GameRuleCombo(TravelInfo.TravelIdx) @ "has been forced.", true);
+		}
 		TravelInfo.TravelString = Level.NextURL;
 	}
 	else
-		Log("Map code "$aStr$" not found in map list",'MapVote');
+	{
+		Log("[MVE] Map code "$aStr$" not found in map list: "$notValidReason, 'MapVote');
+	}
 	TravelInfo.SaveConfig();
 }
 
@@ -1017,6 +1028,7 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 	local MVPlayerWatcher W;
 	local int iU;
 	local string prettyMapName;
+	local string notValidReason;
 
 	if ( bLevelSwitchPending )
 	{
@@ -1042,9 +1054,9 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 		}
 	}
 	W.bOverflow = true;
-	if ( !MapList.ValidMap(MapString) ) //String is normalized, safe to cast equals
+	if ( !MapList.ValidMap(MapString, notValidReason) ) //String is normalized, safe to cast equals
 	{
-		Sender.ClientMessage("Cannot vote, bad map code: "$MapString);
+		Sender.ClientMessage("Cannot vote, bad map code: "$notValidReason$" in "$MapString);
 		return;
 	}
 

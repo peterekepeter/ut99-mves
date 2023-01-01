@@ -491,29 +491,63 @@ function EnumerateGames()
 	}
 }
 
-function bool ValidMap( out string MapString)
+function bool ValidMap( out string MapString, out string reason )
 {
 	local string MapName, GameIdx;
 	local int i, iLen;
+	local bool bMapFound;
 	
+	reason = "";
 	iLen = InStr( MapString, ":");
 	if ( iLen <= 0 )
+	{
+		reason = "missing gametype code";
 		return false;
+	}
 	GameIdx = Mid( MapString, iLen+1);
 	if ( (GameIdx == "") || (Len(GameIdx) > 2) || (String(int(GameIdx)) != GameIdx) )
-		return false; //Make sure it's a valid number
+	{
+		reason = "gametype code not a number";
+		return false;
+	}
 	if ( Len(GameIdx) == 1 )
+	{
 		GameIdx = "0"$GameIdx;
+	}
 	MapName = Left( MapString, iLen);
+
+	// find map in list 
+	bMapFound = false;
 	For ( i=0 ; i<iMapList ; i++ )
+	{
 		if ( Left(MapList[i], iLen) ~= MapName )
 		{
+			bMapFound = true;
 			if ( InStr( Mid(MapList[i],iLen), GameIdx) > 0 )
 			{
-				MapString = Left(MapList[i], iLen) $ ":" $ GameIdx; //Normalize string for voting stage
+				// found!
+				// normalize string for voting stage
+				MapString = Left(MapList[i], iLen) $ ":" $ GameIdx; 
+				// TODO check if map on coldown
+				// TODO check if map in crashed state
 				return true;
 			}
-		}   //REMOVED BREAK, NOW SAME MAP CAN BE IN LIST MULTIPLE TIMES
+			//REMOVED BREAK, NOW SAME MAP CAN BE IN LIST MULTIPLE TIMES
+			// TODO code can be simplified if we can ensure that each map is only listed once
+		}   
+	}
+
+	// map string not valid but return a relevant reason
+	if (bMapFound)
+	{
+		reason = "map found but it did not have the requested gametype";
+		return false;
+	}
+	else 
+	{
+		reason = "map not found";
+		return false;
+	}
 }
 
 function int FindMap( string MapString, optional int StartingIdx)
