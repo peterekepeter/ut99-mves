@@ -16,24 +16,14 @@ var UWindowLabelControl lblMLT1, lblMLT2, lblMLT3, lblMLT4, lblMLT5, lblMLT6, lb
 var UWindowLabelControl lblBXT, lblBG, lblHMT, lblHMT2, lblMS, lblMsgTimeOut;
 var bool bSliderInited;
 var UWindowCheckbox cbUseMsgTimeout;
-//var UWindowCheckbox bStartupLogo;
 
-var Localized String ColorCol[11];
-var Color WhiteColor, BlackColor;
-var Color RedColor;
-var Color PurpleColor;
-var Color LightBlueColor;
-var Color TurquoiseColor;
-var Color GreenColor;
-var Color OrangeColor;
-var Color YellowColor;
-var Color PinkColor;
-var Color DeepBlueColor;
+var MapVoteClientConfig Config;
+//var UWindowCheckbox bStartupLogo;
 
 function Paint (Canvas C, float MouseX, float MouseY)
 {
 	Super.Paint(C,MouseX,MouseY);
-	C.DrawColor = Class'MapVoteClientConfig'.Default.BackgroundColor;
+	C.DrawColor = Config.BackgroundColor;
 	DrawStretchedTexture(C,0.0,0.0,WinWidth,WinHeight,Texture'BackgroundTexture');
 	C.DrawColor.R = 0;
 	C.DrawColor.G = 255;
@@ -43,7 +33,7 @@ function Paint (Canvas C, float MouseX, float MouseY)
 	DrawStretchedTexture(C,10.0,240.0,635.0,2.0,Texture'ListsBoxBackground');
 	//DrawStretchedTexture(C,10.0,300.0,635.0,2.0,Texture'ListsBoxBackground');
 	DrawStretchedTexture(C,10.0,420.0,635.0,2.0,Texture'ListsBoxBackground');
-	C.DrawColor = Class'MapVoteClientConfig'.Default.BoxesColor;
+	C.DrawColor = Config.BoxesColor;
 	DrawStretchedTexture(C,468.5,170.661,100.0,20.0,Texture'ListsBoxBackground');
 }
 
@@ -53,166 +43,15 @@ function Created()
 
 	Super.Created();
 
-	if(Class'MapVoteClientConfig'.default.BoxesTextColor == 0)
-		BXTC = RedColor;
-	else if(Class'MapVoteClientConfig'.default.BoxesTextColor == 1)
-		BXTC = PurpleColor;
-	else if(Class'MapVoteClientConfig'.default.BoxesTextColor == 2)
-		BXTC = LightBlueColor;
-	else if(Class'MapVoteClientConfig'.default.BoxesTextColor == 3)
-		BXTC = TurquoiseColor;
-	else if(Class'MapVoteClientConfig'.default.BoxesTextColor == 4)
-		BXTC = GreenColor;
-	else if(Class'MapVoteClientConfig'.default.BoxesTextColor == 5)
-		BXTC = OrangeColor;
-	else if(Class'MapVoteClientConfig'.default.BoxesTextColor == 6)
-		BXTC = YellowColor;
-	else if(Class'MapVoteClientConfig'.default.BoxesTextColor == 7)
-		BXTC = PinkColor;
-	else if(Class'MapVoteClientConfig'.default.BoxesTextColor == 8)
-		BXTC = WhiteColor;
-	else if(Class'MapVoteClientConfig'.default.BoxesTextColor == 9)
-		BXTC = DeepBlueColor;
-	else if(Class'MapVoteClientConfig'.default.BoxesTextColor == 10)
-		BXTC = BlackColor;
+	Config = class'MapVoteClientConfig'.static.GetInstance();
 
-	if(Class'MapVoteClientConfig'.default.GameModTitleColor == 0)
-		TitleColor1 = RedColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 1)
-		TitleColor1 = PurpleColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 2)
-		TitleColor1 = LightBlueColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 3)
-		TitleColor1 = TurquoiseColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 4)
-		TitleColor1 = GreenColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 5)
-		TitleColor1 = OrangeColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 6)
-		TitleColor1 = YellowColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 7)
-		TitleColor1 = PinkColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 8)
-		TitleColor1 = WhiteColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 9)
-		TitleColor1 = DeepBlueColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 10)
-		TitleColor1 = BlackColor;
-
-	if(Class'MapVoteClientConfig'.default.RuleTitleColor == 0)
-		TitleColor2 = RedColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 1)
-		TitleColor2 = PurpleColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 2)
-		TitleColor2 = LightBlueColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 3)
-		TitleColor2 = TurquoiseColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 4)
-		TitleColor2 = GreenColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 5)
-		TitleColor2 = OrangeColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 6)
-		TitleColor2 = YellowColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 7)
-		TitleColor2 = PinkColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 8)
-		TitleColor2 = WhiteColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 9)
-		TitleColor2 = DeepBlueColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 10)
-		TitleColor2 = BlackColor;
-
-	if(Class'MapVoteClientConfig'.default.MapTitleColor == 0)
-		TitleColor3 = RedColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 1)
-		TitleColor3 = PurpleColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 2)
-		TitleColor3 = LightBlueColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 3)
-		TitleColor3 = TurquoiseColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 4)
-		TitleColor3 = GreenColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 5)
-		TitleColor3 = OrangeColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 6)
-		TitleColor3 = YellowColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 7)
-		TitleColor3 = PinkColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 8)
-		TitleColor3 = WhiteColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 9)
-		TitleColor3 = DeepBlueColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 10)
-		TitleColor3 = BlackColor;
-
-	if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 0)
-		TitleColor4 = RedColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 1)
-		TitleColor4 = PurpleColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 2)
-		TitleColor4 = LightBlueColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 3)
-		TitleColor4 = TurquoiseColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 4)
-		TitleColor4 = GreenColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 5)
-		TitleColor4 = OrangeColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 6)
-		TitleColor4 = YellowColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 7)
-		TitleColor4 = PinkColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 8)
-		TitleColor4 = WhiteColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 9)
-		TitleColor4 = DeepBlueColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 10)
-		TitleColor4 = BlackColor;
-
-	if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 0)
-		TitleColor5 = RedColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 1)
-		TitleColor5 = PurpleColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 2)
-		TitleColor5 = LightBlueColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 3)
-		TitleColor5 = TurquoiseColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 4)
-		TitleColor5 = GreenColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 5)
-		TitleColor5 = OrangeColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 6)
-		TitleColor5 = YellowColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 7)
-		TitleColor5 = PinkColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 8)
-		TitleColor5 = WhiteColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 9)
-		TitleColor5 = DeepBlueColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 10)
-		TitleColor5 = BlackColor;
-
-	if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 0)
-		TitleColor6 = RedColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 1)
-		TitleColor6 = PurpleColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 2)
-		TitleColor6 = LightBlueColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 3)
-		TitleColor6 = TurquoiseColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 4)
-		TitleColor6 = GreenColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 5)
-		TitleColor6 = OrangeColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 6)
-		TitleColor6 = YellowColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 7)
-		TitleColor6 = PinkColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 8)
-		TitleColor6 = WhiteColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 9)
-		TitleColor6 = DeepBlueColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 10)
-		TitleColor6 = BlackColor;
+	BXTC = Config.GetColorOfBoxesTextColor();
+	TitleColor1 = Config.GetColorOfGameModTitleColor();
+	TitleColor2 = Config.GetColorOfRuleTitleColor();
+	TitleColor3 = Config.GetColorOfMapTitleColor();
+	TitleColor4 = Config.GetColorOfKickVoteTitleColor();
+	TitleColor5 = Config.GetColorOfPlayerTitleColor();
+	TitleColor6 = Config.GetColorOfMapVoteTitleColor();
 
 	C.R=171;
 	C.G=171;
@@ -243,7 +82,7 @@ function Created()
 	RSlider.SetText("Red Color");
 	RSlider.SetRange(1,255,1);
 	RSlider.bAcceptsFocus=False;
-	RSlider.SetValue(Class'MapVoteClientConfig'.default.BackgroundColor.R);
+	RSlider.SetValue(Config.BackgroundColor.R);
 	RSlider.SetHelpText("Configure Red Color");
 	RSlider.SetFont(F_Normal);
 	RSlider.MinValue=1;
@@ -256,7 +95,7 @@ function Created()
 	GSlider.SetText("Green Color");
 	GSlider.SetRange(1,255,1);
 	GSlider.bAcceptsFocus=False;
-	GSlider.SetValue(Class'MapVoteClientConfig'.default.BackgroundColor.G);
+	GSlider.SetValue(Config.BackgroundColor.G);
 	GSlider.SetHelpText("Configure Green Color");
 	GSlider.SetFont(F_Normal);
 	GSlider.MinValue=1;
@@ -269,7 +108,7 @@ function Created()
 	BSlider.SetText("Blue Color");
 	BSlider.SetRange(1,255,1);
 	BSlider.bAcceptsFocus=False;
-	BSlider.SetValue(Class'MapVoteClientConfig'.default.BackgroundColor.B);
+	BSlider.SetValue(Config.BackgroundColor.B);
 	BSlider.SetHelpText("Configure Blue Color");
 	BSlider.SetFont(F_Normal);
 	BSlider.MinValue=1;
@@ -288,7 +127,7 @@ function Created()
 	RBSlider.SetText("Red Color");
 	RBSlider.SetRange(1,255,1);
 	RBSlider.bAcceptsFocus=False;
-	RBSlider.SetValue(Class'MapVoteClientConfig'.default.BoxesColor.R);
+	RBSlider.SetValue(Config.BoxesColor.R);
 	RBSlider.SetHelpText("Configure Red Color");
 	RBSlider.SetFont(F_Normal);
 	RBSlider.MinValue=1;
@@ -301,7 +140,7 @@ function Created()
 	GBSlider.SetText("Green Color");
 	GBSlider.SetRange(1,255,1);
 	GBSlider.bAcceptsFocus=False;
-	GBSlider.SetValue(Class'MapVoteClientConfig'.default.BoxesColor.G);
+	GBSlider.SetValue(Config.BoxesColor.G);
 	GBSlider.SetHelpText("Configure Green Color");
 	GBSlider.SetFont(F_Normal);
 	GBSlider.MinValue=1;
@@ -314,7 +153,7 @@ function Created()
 	BBSlider.SetText("Blue Color");
 	BBSlider.SetRange(1,255,1);
 	BBSlider.bAcceptsFocus=False;
-	BBSlider.SetValue(Class'MapVoteClientConfig'.default.BoxesColor.B);
+	BBSlider.SetValue(Config.BoxesColor.B);
 	BBSlider.SetHelpText("Configure Blue Color");
 	BBSlider.SetFont(F_Normal);
 	BBSlider.MinValue=1;
@@ -327,14 +166,14 @@ function Created()
 	BXT.SetText("Boxes Text Color");
 	BXT.SetRange(0,10,1);
 	BXT.bAcceptsFocus=False;
-	BXT.SetValue(Class'MapVoteClientConfig'.default.BoxesTextColor);
+	BXT.SetValue(Config.BoxesTextColor);
 	BXT.SetFont(F_Normal);
 	BXT.Align = TA_Left;
 	BXT.SetTextColor(C);
 
 	BXTL = UWindowLabelControl(CreateControl(Class'UWindowLabelControl',360.0,195.0,WinWidth - 0,0.0));
 	BXTL.Align = TA_Left;
-	BXTL.SetText(ColorCol[int(BXT.value)]);
+	BXTL.SetText(Config.GetNameOfBoxesTextColor());
 	BXTL.SetTextColor(C);
 
 	lblBXT = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',438.0,175.5,WinWidth - 500,200.0));
@@ -356,14 +195,14 @@ function Created()
 	Title1.SetText("Game Mod Title Color");
 	Title1.SetRange(0,10,1);
 	Title1.bAcceptsFocus=False;
-	Title1.SetValue(Class'MapVoteClientConfig'.default.GameModTitleColor);
+	Title1.SetValue(Config.GameModTitleColor);
 	Title1.SetFont(F_Normal);
 	Title1.Align = TA_Left;
 	Title1.SetTextColor(C);
 
 	TitleText1 = UWindowLabelControl(CreateControl(Class'UWindowLabelControl',360.0,255.0,WinWidth - 0,0.0));
 	TitleText1.Align = TA_Left;
-	TitleText1.SetText(ColorCol[int(Title1.value)]);
+	TitleText1.SetText(Config.GetNameOfGameModTitleColor());
 	TitleText1.SetTextColor(C);
 
 	lblMLT1 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',469.0,255.0,WinWidth - 500,200.0));
@@ -378,14 +217,14 @@ function Created()
 	Title2.SetText("Rule Title Color");
 	Title2.SetRange(0,10,1);
 	Title2.bAcceptsFocus=False;
-	Title2.SetValue(Class'MapVoteClientConfig'.default.RuleTitleColor);
+	Title2.SetValue(Config.RuleTitleColor);
 	Title2.SetFont(F_Normal);
 	Title2.Align = TA_Left;
 	Title2.SetTextColor(C);
 
 	TitleText2 = UWindowLabelControl(CreateControl(Class'UWindowLabelControl',360.0,279.0,WinWidth - 0,0.0));
 	TitleText2.Align = TA_Left;
-	TitleText2.SetText(ColorCol[int(Title2.value)]);
+	TitleText2.SetText(Config.GetNameOfRuleTitleColor());
 	TitleText2.SetTextColor(C);
 
 	lblMLT2 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',469.0,279.0,WinWidth - 500,200.0));
@@ -400,14 +239,14 @@ function Created()
 	Title3.SetText("Map Title Color");
 	Title3.SetRange(0,10,1);
 	Title3.bAcceptsFocus=False;
-	Title3.SetValue(Class'MapVoteClientConfig'.default.MapTitleColor);
+	Title3.SetValue(Config.MapTitleColor);
 	Title3.SetFont(F_Normal);
 	Title3.Align = TA_Left;
 	Title3.SetTextColor(C);
 
 	TitleText3 = UWindowLabelControl(CreateControl(Class'UWindowLabelControl',360.0,303.0,WinWidth - 0,0.0));
 	TitleText3.Align = TA_Left;
-	TitleText3.SetText(ColorCol[int(Title3.value)]);
+	TitleText3.SetText(Config.GetNameOfMapTitleColor());
 	TitleText3.SetTextColor(C);
 
 	lblMLT3 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',469.0,303.0,WinWidth - 500,200.0));
@@ -422,14 +261,14 @@ function Created()
 	Title4.SetText("Kick Vote Title Color");
 	Title4.SetRange(0,10,1);
 	Title4.bAcceptsFocus=False;
-	Title4.SetValue(Class'MapVoteClientConfig'.default.KickVoteTitleColor);
+	Title4.SetValue(Config.KickVoteTitleColor);
 	Title4.SetFont(F_Normal);
 	Title4.Align = TA_Left;
 	Title4.SetTextColor(C);
 
 	TitleText4 = UWindowLabelControl(CreateControl(Class'UWindowLabelControl',360.0,327.0,WinWidth - 0,0.0));
 	TitleText4.Align = TA_Left;
-	TitleText4.SetText(ColorCol[int(Title4.value)]);
+	TitleText4.SetText(Config.GetNameOfKickVoteTitleColor());
 	TitleText4.SetTextColor(C);
 
 	lblMLT4 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',469.0,327.0,WinWidth - 500,200.0));
@@ -444,14 +283,14 @@ function Created()
 	Title5.SetText("Player Title Color");
 	Title5.SetRange(0,10,1);
 	Title5.bAcceptsFocus=False;
-	Title5.SetValue(Class'MapVoteClientConfig'.default.PlayerTitleColor);
+	Title5.SetValue(Config.PlayerTitleColor);
 	Title5.SetFont(F_Normal);
 	Title5.Align = TA_Left;
 	Title5.SetTextColor(C);
 
 	TitleText5 = UWindowLabelControl(CreateControl(Class'UWindowLabelControl',360.0,351.0,WinWidth - 0,0.0));
 	TitleText5.Align = TA_Left;
-	TitleText5.SetText(ColorCol[int(Title5.value)]);
+	TitleText5.SetText(Config.GetNameOfPlayerTitleColor());
 	TitleText5.SetTextColor(C);
 
 	lblMLT5 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',469.0,351.0,WinWidth - 500,200.0));
@@ -466,14 +305,14 @@ function Created()
 	Title6.SetText("Map Vote Title Color");
 	Title6.SetRange(0,10,1);
 	Title6.bAcceptsFocus=False;
-	Title6.SetValue(Class'MapVoteClientConfig'.default.MapVoteTitleColor);
+	Title6.SetValue(Config.MapVoteTitleColor);
 	Title6.SetFont(F_Normal);
 	Title6.Align = TA_Left;
 	Title6.SetTextColor(C);
 
 	TitleText6 = UWindowLabelControl(CreateControl(Class'UWindowLabelControl',360.0,375.0,WinWidth - 0,0.0));
 	TitleText6.Align = TA_Left;
-	TitleText6.SetText(ColorCol[int(Title6.value)]);
+	TitleText6.SetText(Config.GetNameOfMapVoteTitleColor());
 	TitleText6.SetTextColor(C);
 
 	lblMLT6 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',469.0,375.0,WinWidth - 500,200.0));
@@ -497,7 +336,7 @@ function Created()
 	sldMsgTimeOut.SetRange(3,60,1);
 	sldMsgTimeOut.SetText("Adjust Message Expiration Time");
 	sldMsgTimeOut.SetTextColor(C);
-	sldMsgTimeOut.SetValue(Class'MapVoteClientConfig'.Default.MsgTimeOut);
+	sldMsgTimeOut.SetValue(Config.MsgTimeOut);
 
 	lblMsgTimeOut = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',360.0,457.0,WinWidth - 0,0.0));
 	lblMsgTimeOut.SetText(string(int(sldMsgTimeOut.Value)) $ " sec");
@@ -510,7 +349,7 @@ function Created()
 	cbUseMsgTimeout.SetFont(0);
 	cbUseMsgTimeout.Align=TA_Right;
 	cbUseMsgTimeout.SetSize(170.00,1.00);
-	cbUseMsgTimeout.bChecked=Class'MapVoteClientConfig'.Default.bUseMsgTimeout;
+	cbUseMsgTimeout.bChecked=Config.bUseMsgTimeout;
 
 /*
 	bStartupLogo = UWindowCheckbox(CreateControl(Class'UWindowCheckbox',689.00,600,110.00,20.00));
@@ -519,7 +358,7 @@ function Created()
 	bStartupLogo.SetTextColor(C);
 	bStartupLogo.SetFont(0);
 	bStartupLogo.Align=TA_Right;
-	bStartupLogo.bChecked=Class'MapVoteClientConfig'.default.bStartupLogo;
+	bStartupLogo.bChecked=Config.bStartupLogo;
 */
 	CloseButton = UWindowSmallButton(CreateControl(Class'UWindowSmallButton',570.0,480.0,80.0,10.0));
 	CloseButton.Text="Close";
@@ -557,265 +396,118 @@ function Notify(UWindowDialogControl C, byte E)
 				case RSlider:
 					if(RSlider != None)
 					{
-						Class'MapVoteClientConfig'.default.BackgroundColor.R = RSlider.GetValue();
-						Class'MapVoteClientConfig'.static.StaticSaveConfig();
+						Config.BackgroundColor.R = RSlider.GetValue();
+						Config.SaveConfig();
 					}
 					break;
 
 				case GSlider:
 					if(GSlider != None)
 					{
-						Class'MapVoteClientConfig'.default.BackgroundColor.G = GSlider.GetValue();
-						Class'MapVoteClientConfig'.static.StaticSaveConfig();
+						Config.BackgroundColor.G = GSlider.GetValue();
+						Config.SaveConfig();
 					}
 					break;
 
 				case BSlider:
 					if(BSlider != None)
 					{
-						Class'MapVoteClientConfig'.default.BackgroundColor.B = BSlider.GetValue();
-						Class'MapVoteClientConfig'.static.StaticSaveConfig();
+						Config.BackgroundColor.B = BSlider.GetValue();
+						Config.SaveConfig();
 					}
 					break;
 
 				case RBSlider:
 					if(RBSlider != None)
 					{
-						Class'MapVoteClientConfig'.default.BoxesColor.R = RBSlider.GetValue();
-						Class'MapVoteClientConfig'.static.StaticSaveConfig();
+						Config.BoxesColor.R = RBSlider.GetValue();
+						Config.SaveConfig();
 					}
 					break;
 
 				case GBSlider:
 					if(GBSlider != None)
 					{
-						Class'MapVoteClientConfig'.default.BoxesColor.G = GBSlider.GetValue();
-						Class'MapVoteClientConfig'.static.StaticSaveConfig();
+						Config.BoxesColor.G = GBSlider.GetValue();
+						Config.SaveConfig();
 					}
 					break;
 
 				case BBSlider:
 					if(BBSlider != None)
 					{
-						Class'MapVoteClientConfig'.default.BoxesColor.B = BBSlider.GetValue();
-						Class'MapVoteClientConfig'.static.StaticSaveConfig();
+						Config.BoxesColor.B = BBSlider.GetValue();
+						Config.SaveConfig();
 					}
 					break;
 
 				case BXT:
 					if(BXT != None && BXTL != None && lblBXT != None)
 					{
-						BXTL.SetText(ColorCol[int(BXT.value)]);
-						if(BXT.Value == 0)
-							lblBXT.SetTextColor(RedColor);
-						else if(BXT.Value == 1)
-							lblBXT.SetTextColor(PurpleColor);
-						else if(BXT.Value == 2)
-							lblBXT.SetTextColor(LightBlueColor);
-						else if(BXT.Value == 3)
-							lblBXT.SetTextColor(TurquoiseColor);
-						else if(BXT.Value == 4)
-							lblBXT.SetTextColor(GreenColor);
-						else if(BXT.Value == 5)
-							lblBXT.SetTextColor(OrangeColor);
-						else if(BXT.Value == 6)
-							lblBXT.SetTextColor(YellowColor);
-						else if(BXT.Value == 7)
-							lblBXT.SetTextColor(PinkColor);
-						else if(BXT.Value == 8)
-							lblBXT.SetTextColor(WhiteColor);
-						else if(BXT.Value == 9)
-							lblBXT.SetTextColor(DeepBlueColor);
-						else if(BXT.Value == 10)
-							lblBXT.SetTextColor(BlackColor);
-						Class'MapVoteClientConfig'.default.BoxesTextColor = int(BXT.GetValue());
-						Class'MapVoteClientConfig'.static.StaticSaveConfig();
+						Config.BoxesTextColor = int(BXT.GetValue());
+						Config.SaveConfig();
+						BXTL.SetText(Config.GetNameOfBoxesTextColor());
+						lblBXT.SetTextColor(Config.GetColorOfBoxesTextColor());
 					}
 					break;
 
 				case Title1:
 					if(Title1 != None && TitleText1 != None && lblMLT1 != None)
 					{
-						TitleText1.SetText(ColorCol[int(Title1.value)]);
-						if(Title1.Value == 0)
-							lblMLT1.SetTextColor(RedColor);
-						else if(Title1.Value == 1)
-							lblMLT1.SetTextColor(PurpleColor);
-						else if(Title1.Value == 2)
-							lblMLT1.SetTextColor(LightBlueColor);
-						else if(Title1.Value == 3)
-							lblMLT1.SetTextColor(TurquoiseColor);
-						else if(Title1.Value == 4)
-							lblMLT1.SetTextColor(GreenColor);
-						else if(Title1.Value == 5)
-							lblMLT1.SetTextColor(OrangeColor);
-						else if(Title1.Value == 6)
-							lblMLT1.SetTextColor(YellowColor);
-						else if(Title1.Value == 7)
-							lblMLT1.SetTextColor(PinkColor);
-						else if(Title1.Value == 8)
-							lblMLT1.SetTextColor(WhiteColor);
-						else if(Title1.Value == 9)
-							lblMLT1.SetTextColor(DeepBlueColor);
-						else if(Title1.Value == 10)
-							lblMLT1.SetTextColor(BlackColor);
-						Class'MapVoteClientConfig'.default.GameModTitleColor = int(Title1.GetValue());
-						Class'MapVoteClientConfig'.static.StaticSaveConfig();						
+						Config.GameModTitleColor = int(Title1.GetValue());
+						Config.SaveConfig();				
+						TitleText1.SetText(Config.GetNameOfGameModTitleColor());
+						lblMLT1.SetTextColor(Config.GetColorOfGameModTitleColor());
 					}
 					break;
 
 				case Title2:
 					if(Title2 != None && TitleText2 != None && lblMLT2 != None)
 					{
-						TitleText2.SetText(ColorCol[int(Title2.value)]);
-						if(Title2.Value == 0)
-							lblMLT2.SetTextColor(RedColor);
-						else if(Title2.Value == 1)
-							lblMLT2.SetTextColor(PurpleColor);
-						else if(Title2.Value == 2)
-							lblMLT2.SetTextColor(LightBlueColor);
-						else if(Title2.Value == 3)
-							lblMLT2.SetTextColor(TurquoiseColor);
-						else if(Title2.Value == 4)
-							lblMLT2.SetTextColor(GreenColor);
-						else if(Title2.Value == 5)
-							lblMLT2.SetTextColor(OrangeColor);
-						else if(Title2.Value == 6)
-							lblMLT2.SetTextColor(YellowColor);
-						else if(Title2.Value == 7)
-							lblMLT2.SetTextColor(PinkColor);
-						else if(Title2.Value == 8)
-							lblMLT2.SetTextColor(WhiteColor);
-						else if(Title2.Value == 9)
-							lblMLT2.SetTextColor(DeepBlueColor);
-						else if(Title2.Value == 10)
-							lblMLT2.SetTextColor(BlackColor);
-						Class'MapVoteClientConfig'.default.RuleTitleColor = int(Title2.GetValue());
-						Class'MapVoteClientConfig'.static.StaticSaveConfig();						
+						Config.RuleTitleColor = int(Title2.GetValue());
+						Config.SaveConfig();				
+						TitleText2.SetText(Config.GetNameOfRuleTitleColor());
+						lblMLT2.SetTextColor(Config.GetColorOfRuleTitleColor());
 					}
 					break;
 
 				case Title3:
 					if(Title3 != None && TitleText3 != None && lblMLT3 != None)
 					{
-						TitleText3.SetText(ColorCol[int(Title3.value)]);
-						if(Title3.Value == 0)
-							lblMLT3.SetTextColor(RedColor);
-						else if(Title3.Value == 1)
-							lblMLT3.SetTextColor(PurpleColor);
-						else if(Title3.Value == 2)
-							lblMLT3.SetTextColor(LightBlueColor);
-						else if(Title3.Value == 3)
-							lblMLT3.SetTextColor(TurquoiseColor);
-						else if(Title3.Value == 4)
-							lblMLT3.SetTextColor(GreenColor);
-						else if(Title3.Value == 5)
-							lblMLT3.SetTextColor(OrangeColor);
-						else if(Title3.Value == 6)
-							lblMLT3.SetTextColor(YellowColor);
-						else if(Title3.Value == 7)
-							lblMLT3.SetTextColor(PinkColor);
-						else if(Title3.Value == 8)
-							lblMLT3.SetTextColor(WhiteColor);
-						else if(Title3.Value == 9)
-							lblMLT3.SetTextColor(DeepBlueColor);
-						else if(Title3.Value == 10)
-							lblMLT3.SetTextColor(BlackColor);
-						Class'MapVoteClientConfig'.default.MapTitleColor = int(Title3.GetValue());
-						Class'MapVoteClientConfig'.static.StaticSaveConfig();						
+						Config.MapTitleColor = int(Title3.GetValue());
+						Config.SaveConfig();					
+						TitleText3.SetText(Config.GetNameOfMapTitleColor());
+						lblMLT3.SetTextColor(Config.GetColorOfMapTitleColor());	
 					}
 					break;
 
 				case Title4:
 					if(Title4 != None && TitleText4 != None && lblMLT4 != None)
 					{
-						TitleText4.SetText(ColorCol[int(Title4.value)]);
-						if(Title4.Value == 0)
-							lblMLT4.SetTextColor(RedColor);
-						else if(Title4.Value == 1)
-							lblMLT4.SetTextColor(PurpleColor);
-						else if(Title4.Value == 2)
-							lblMLT4.SetTextColor(LightBlueColor);
-						else if(Title4.Value == 3)
-							lblMLT4.SetTextColor(TurquoiseColor);
-						else if(Title4.Value == 4)
-							lblMLT4.SetTextColor(GreenColor);
-						else if(Title4.Value == 5)
-							lblMLT4.SetTextColor(OrangeColor);
-						else if(Title4.Value == 6)
-							lblMLT4.SetTextColor(YellowColor);
-						else if(Title4.Value == 7)
-							lblMLT4.SetTextColor(PinkColor);
-						else if(Title4.Value == 8)
-							lblMLT4.SetTextColor(WhiteColor);
-						else if(Title4.Value == 9)
-							lblMLT4.SetTextColor(DeepBlueColor);
-						else if(Title4.Value == 10)
-							lblMLT4.SetTextColor(BlackColor);
-						Class'MapVoteClientConfig'.default.KickVoteTitleColor = int(Title4.GetValue());
-						Class'MapVoteClientConfig'.static.StaticSaveConfig();						
+						Config.KickVoteTitleColor = int(Title4.GetValue());
+						Config.SaveConfig();				
+						TitleText4.SetText(Config.GetNameOfKickVoteTitleColor());
+						lblMLT4.SetTextColor(Config.GetColorOfKickVoteTitleColor());
 					}
 					break;
 
 				case Title5:
 					if(Title5 != None && TitleText5 != None && lblMLT5 != None)
 					{
-						TitleText5.SetText(ColorCol[int(Title5.value)]);
-						if(Title5.Value == 0)
-							lblMLT5.SetTextColor(RedColor);
-						else if(Title5.Value == 1)
-							lblMLT5.SetTextColor(PurpleColor);
-						else if(Title5.Value == 2)
-							lblMLT5.SetTextColor(LightBlueColor);
-						else if(Title5.Value == 3)
-							lblMLT5.SetTextColor(TurquoiseColor);
-						else if(Title5.Value == 4)
-							lblMLT5.SetTextColor(GreenColor);
-						else if(Title5.Value == 5)
-							lblMLT5.SetTextColor(OrangeColor);
-						else if(Title5.Value == 6)
-							lblMLT5.SetTextColor(YellowColor);
-						else if(Title5.Value == 7)
-							lblMLT5.SetTextColor(PinkColor);
-						else if(Title5.Value == 8)
-							lblMLT5.SetTextColor(WhiteColor);
-						else if(Title5.Value == 9)
-							lblMLT5.SetTextColor(DeepBlueColor);
-						else if(Title5.Value == 10)
-							lblMLT5.SetTextColor(BlackColor);
-						Class'MapVoteClientConfig'.default.PlayerTitleColor = int(Title5.GetValue());
-						Class'MapVoteClientConfig'.static.StaticSaveConfig();						
+						Config.PlayerTitleColor = int(Title5.GetValue());
+						Config.SaveConfig();								
+						TitleText5.SetText(Config.GetNameOfPlayerTitleColor());
+						lblMLT5.SetTextColor(Config.GetColorOfPlayerTitleColor());
 					}
 					break;
 
 				case Title6:
 					if(Title6 != None && TitleText6 != None && lblMLT6 != None)
 					{
-						TitleText6.SetText(ColorCol[int(Title6.value)]);
-						if(Title6.Value == 0)
-							lblMLT6.SetTextColor(RedColor);
-						else if(Title6.Value == 1)
-							lblMLT6.SetTextColor(PurpleColor);
-						else if(Title6.Value == 2)
-							lblMLT6.SetTextColor(LightBlueColor);
-						else if(Title6.Value == 3)
-							lblMLT6.SetTextColor(TurquoiseColor);
-						else if(Title6.Value == 4)
-							lblMLT6.SetTextColor(GreenColor);
-						else if(Title6.Value == 5)
-							lblMLT6.SetTextColor(OrangeColor);
-						else if(Title6.Value == 6)
-							lblMLT6.SetTextColor(YellowColor);
-						else if(Title6.Value == 7)
-							lblMLT6.SetTextColor(PinkColor);
-						else if(Title6.Value == 8)
-							lblMLT6.SetTextColor(WhiteColor);
-						else if(Title6.Value == 9)
-							lblMLT6.SetTextColor(DeepBlueColor);
-						else if(Title6.Value == 10)
-							lblMLT6.SetTextColor(BlackColor);
-						Class'MapVoteClientConfig'.default.MapVoteTitleColor = int(Title6.GetValue());
-						Class'MapVoteClientConfig'.static.StaticSaveConfig();						
+						Config.MapVoteTitleColor = int(Title6.GetValue());
+						Config.SaveConfig();								
+						TitleText6.SetText(Config.GetNameOfMapVoteTitleColor());
+						lblMLT6.SetTextColor(Config.GetColorOfMapVoteTitleColor());
 					}
 					break;
 
@@ -823,19 +515,10 @@ function Notify(UWindowDialogControl C, byte E)
 					if ( sldMsgTimeOut != None && lblMsgTimeOut != None )
 					{
 						lblMsgTimeOut.SetText(string(int(sldMsgTimeOut.Value)) $ " sec");
-						Class'MapVoteClientConfig'.Default.MsgTimeOut = sldMsgTimeOut.GetValue();
-						Class'MapVoteClientConfig'.static.StaticSaveConfig();
+						Config.MsgTimeOut = sldMsgTimeOut.GetValue();
+						Config.SaveConfig();						
 					}
 					break;
-
-/*				case bStartupLogo:
-					if(bStartupLogo != None)
-					{
-						class'MapVoteClientConfig'.default.bStartupLogo = bStartupLogo.bChecked;
-						class'MapVoteClientConfig'.static.StaticSaveConfig();
-					}
-					break;
-*/
 			}
 			break;
 	}
@@ -918,21 +601,21 @@ function SaveMapVoteConfig ()
 	{
 		return;
 	}
-	bSaveNeeded=(Class'MapVoteClientConfig'.Default.MsgTimeOut != sldMsgTimeOut.Value) || (Class'MapVoteClientConfig'.Default.bUseMsgTimeout != cbUseMsgTimeout.bChecked);
+	bSaveNeeded=(Config.MsgTimeOut != sldMsgTimeOut.Value) || (Config.bUseMsgTimeout != cbUseMsgTimeout.bChecked);
 	if ( bSaveNeeded )
 	{
-		Class'MapVoteClientConfig'.Default.MsgTimeOut=int(sldMsgTimeOut.Value);
-		Class'MapVoteClientConfig'.Default.bUseMsgTimeout=cbUseMsgTimeout.bChecked;
-		Class'MapVoteClientConfig'.StaticSaveConfig();
+		Config.MsgTimeOut=int(sldMsgTimeOut.Value);
+		Config.bUseMsgTimeout=cbUseMsgTimeout.bChecked;
+		Config.SaveConfig();
 	}
-	if ( Class'MapVoteClientConfig'.Default.bUseMsgTimeout )
+	if ( Config.bUseMsgTimeout )
 	{
-		Class'SayMessagePlus'.Default.Lifetime=Class'MapVoteClientConfig'.Default.MsgTimeOut;
-		Class'CriticalStringPlus'.Default.Lifetime=Class'MapVoteClientConfig'.Default.MsgTimeOut;
-		Class'RedSayMessagePlus'.Default.Lifetime=Class'MapVoteClientConfig'.Default.MsgTimeOut;
-		Class'TeamSayMessagePlus'.Default.Lifetime=Class'MapVoteClientConfig'.Default.MsgTimeOut;
-		Class'StringMessagePlus'.Default.Lifetime=Class'MapVoteClientConfig'.Default.MsgTimeOut;
-		Class'DeathMessagePlus'.Default.Lifetime=Class'MapVoteClientConfig'.Default.MsgTimeOut;
+		Class'SayMessagePlus'.Default.Lifetime=Config.MsgTimeOut;
+		Class'CriticalStringPlus'.Default.Lifetime=Config.MsgTimeOut;
+		Class'RedSayMessagePlus'.Default.Lifetime=Config.MsgTimeOut;
+		Class'TeamSayMessagePlus'.Default.Lifetime=Config.MsgTimeOut;
+		Class'StringMessagePlus'.Default.Lifetime=Config.MsgTimeOut;
+		Class'DeathMessagePlus'.Default.Lifetime=Config.MsgTimeOut;
 	}
 }
 
@@ -1235,26 +918,4 @@ defaultproperties
       lblMsgTimeOut=None
       bSliderInited=False
       cbUseMsgTimeout=None
-      ColorCol(0)="Red"
-      ColorCol(1)="Purple"
-      ColorCol(2)="Light Blue"
-      ColorCol(3)="Turquoise"
-      ColorCol(4)="Green"
-      ColorCol(5)="Orange"
-      ColorCol(6)="Yellow"
-      ColorCol(7)="Pink"
-      ColorCol(8)="White"
-      ColorCol(9)="Deep Blue"
-      ColorCol(10)="Black"
-      WhiteColor=(R=255,G=255,B=255,A=0)
-      BlackColor=(R=0,G=0,B=0,A=0)
-      RedColor=(R=255,G=0,B=0,A=0)
-      PurpleColor=(R=128,G=0,B=128,A=0)
-      LightBlueColor=(R=0,G=100,B=255,A=0)
-      TurquoiseColor=(R=0,G=255,B=255,A=0)
-      GreenColor=(R=0,G=255,B=0,A=0)
-      OrangeColor=(R=255,G=120,B=0,A=0)
-      YellowColor=(R=255,G=255,B=0,A=0)
-      PinkColor=(R=255,G=0,B=255,A=0)
-      DeepBlueColor=(R=0,G=0,B=255,A=0)
 }

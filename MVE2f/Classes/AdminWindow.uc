@@ -66,6 +66,8 @@ var UWindowEditControl txtASClass;
 var UWindowCheckbox cbRemoveCrashedMaps;
 var UWindowCheckbox cbUseExcludeFilter;
 
+var MapVoteClientConfig MapVoteClientConfig;
+
 function Created ()
 {
 	local Color C;
@@ -739,10 +741,19 @@ function Notify (UWindowDialogControl C, byte E)
 	}
 }
 
+function MapVoteClientConfig GetConfig()
+{
+	if (MapVoteClientConfig == None) 
+	{
+		MapVoteClientConfig = class'MapVoteClientConfig'.static.GetInstance();
+	}
+	return MapVoteClientConfig;
+}
+
 function Paint (Canvas C, float MouseX, float MouseY)
 {
 	Super.Paint(C,MouseX,MouseY);
-	C.DrawColor = Class'MapVoteClientConfig'.Default.BackgroundColor;
+	C.DrawColor = GetConfig().BackgroundColor;
 	DrawStretchedTexture(C,0.0,0.0,WinWidth,WinHeight,Texture'BackgroundTexture');
 	C.DrawColor.R = 0;
 	C.DrawColor.G = 255;

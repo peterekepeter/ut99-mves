@@ -9,6 +9,8 @@ var UWindowSmallButton SaveButton;
 var float CloseRequestTime;
 var UMenuLabelControl lblMessage;
 
+var Color BackgroundColor;
+
 function Created ()
 {
 	local Color C;
@@ -36,6 +38,7 @@ function Created ()
 	lblMessage.bAcceptsFocus=False;
 	SetAcceptsFocus();
 	LoadExistingKeys();
+      BackgroundColor = class'MapVoteClientConfig'.static.GetInstance().BackgroundColor;
 }
 
 function KeyDown (int Key, float X, float Y)
@@ -132,7 +135,7 @@ function SetKey (string KeyName, string CommandString)
 
 function Paint (Canvas C, float MouseX, float MouseY)
 {
-	C.DrawColor = class'MapVoteClientConfig'.Default.BackgroundColor;
+	C.DrawColor = BackgroundColor;
 	DrawStretchedTexture(C,0.00,0.00,WinWidth,WinHeight,Texture'BackgroundTexture');
 	Super.Paint(C,MouseX,MouseY);
 	C.DrawColor.R=255;

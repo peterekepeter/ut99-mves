@@ -17,15 +17,16 @@ simulated function bool SetupWindow ()
 {
 	local int i;
 	local WindowConsole C;
+	local MapVoteClientConfig Cfg;
 
-	if ( Class'MapVoteClientConfig'.Default.bUseMsgTimeout )
+	if ( Cfg.bUseMsgTimeout )
 	{
-		Class'SayMessagePlus'.Default.Lifetime=Class'MapVoteClientConfig'.Default.MsgTimeOut;
-		Class'CriticalStringPlus'.Default.Lifetime=Class'MapVoteClientConfig'.Default.MsgTimeOut;
-		Class'RedSayMessagePlus'.Default.Lifetime=Class'MapVoteClientConfig'.Default.MsgTimeOut;
-		Class'TeamSayMessagePlus'.Default.Lifetime=Class'MapVoteClientConfig'.Default.MsgTimeOut;
-		Class'StringMessagePlus'.Default.Lifetime=Class'MapVoteClientConfig'.Default.MsgTimeOut;
-		Class'DeathMessagePlus'.Default.Lifetime=Class'MapVoteClientConfig'.Default.MsgTimeOut;
+		Class'SayMessagePlus'.Default.Lifetime = Cfg.MsgTimeOut;
+		Class'CriticalStringPlus'.Default.Lifetime = Cfg.MsgTimeOut;
+		Class'RedSayMessagePlus'.Default.Lifetime = Cfg.MsgTimeOut;
+		Class'TeamSayMessagePlus'.Default.Lifetime = Cfg.MsgTimeOut;
+		Class'StringMessagePlus'.Default.Lifetime = Cfg.MsgTimeOut;
+		Class'DeathMessagePlus'.Default.Lifetime = Cfg.MsgTimeOut;
 	}
 	if ( (ServerInfoURL != "") && Class'MapVoteNavBar'.Default.bShowWelcomeWindow )
 	{

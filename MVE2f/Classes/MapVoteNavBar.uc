@@ -12,6 +12,8 @@ var UWindowSmallButton AboutButton;
 var UWindowSmallButton CloseButton;
 var bool bShowWelcomeWindow;
 
+var Color BackgroundColor;
+
 /*var string RealKeyName[255];
 var UMenuLabelControl  lblKeyBind;
 var UMenuLabelControl  lblMenuKey;
@@ -66,6 +68,7 @@ function Created ()
 	CloseButton=UWindowSmallButton(CreateControl(Class'UWindowSmallButton',WinWidth - 89,0,80.00,10.00));
 	CloseButton.Text="Close";
 	//CloseButton.DownSound=Sound'WindowClose';
+	BackgroundColor = class'MapVoteClientConfig'.static.GetInstance().BackgroundColor;
 }
 
 function Notify (UWindowDialogControl C, byte E)
@@ -138,7 +141,7 @@ function Notify (UWindowDialogControl C, byte E)
 
 function Paint (Canvas C, float X, float Y)
 {
-	C.DrawColor = class'MapVoteClientConfig'.Default.BackgroundColor;
+	C.DrawColor = BackgroundColor;
 	DrawStretchedTexture(C,0.00,0.00,WinWidth,WinHeight,Texture'BackgroundTexture');
 }
 function Close (bool ByParent)
@@ -149,12 +152,5 @@ function Close (bool ByParent)
 
 defaultproperties
 {
-      ServerInfoButton=None
-      MapInfoButton=None
-      ReportButton1=None
-      ReportButton2=None
-      TipsButton=None
-      AboutButton=None
-      CloseButton=None
-      bShowWelcomeWindow=True
+	bShowWelcomeWindow=True
 }

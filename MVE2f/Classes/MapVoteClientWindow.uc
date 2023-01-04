@@ -214,145 +214,14 @@ function Created ()
 	//local float XL;
 
 	Super.Created();
-	ClientConf = new (class'MapVoteClientConfig', 'MapVoteClientConfig') class'MapVoteClientConfig';
+	ClientConf = class'MapVoteClientConfig'.static.GetInstance();
 
-	if(Class'MapVoteClientConfig'.default.GameModTitleColor == 0)
-		TitleColor1 = RedColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 1)
-		TitleColor1 = PurpleColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 2)
-		TitleColor1 = LightBlueColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 3)
-		TitleColor1 = TurquoiseColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 4)
-		TitleColor1 = GreenColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 5)
-		TitleColor1 = OrangeColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 6)
-		TitleColor1 = YellowColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 7)
-		TitleColor1 = PinkColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 8)
-		TitleColor1 = WhiteColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 9)
-		TitleColor1 = DeepBlueColor;
-	else if(Class'MapVoteClientConfig'.default.GameModTitleColor == 10)
-		TitleColor1 = BlackColor;
-
-	if(Class'MapVoteClientConfig'.default.RuleTitleColor == 0)
-		TitleColor2 = RedColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 1)
-		TitleColor2 = PurpleColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 2)
-		TitleColor2 = LightBlueColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 3)
-		TitleColor2 = TurquoiseColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 4)
-		TitleColor2 = GreenColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 5)
-		TitleColor2 = OrangeColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 6)
-		TitleColor2 = YellowColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 7)
-		TitleColor2 = PinkColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 8)
-		TitleColor2 = WhiteColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 9)
-		TitleColor2 = DeepBlueColor;
-	else if(Class'MapVoteClientConfig'.default.RuleTitleColor == 10)
-		TitleColor2 = BlackColor;
-
-	if(Class'MapVoteClientConfig'.default.MapTitleColor == 0)
-		TitleColor3 = RedColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 1)
-		TitleColor3 = PurpleColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 2)
-		TitleColor3 = LightBlueColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 3)
-		TitleColor3 = TurquoiseColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 4)
-		TitleColor3 = GreenColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 5)
-		TitleColor3 = OrangeColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 6)
-		TitleColor3 = YellowColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 7)
-		TitleColor3 = PinkColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 8)
-		TitleColor3 = WhiteColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 9)
-		TitleColor3 = DeepBlueColor;
-	else if(Class'MapVoteClientConfig'.default.MapTitleColor == 10)
-		TitleColor3 = BlackColor;
-
-	if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 0)
-		TitleColor4 = RedColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 1)
-		TitleColor4 = PurpleColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 2)
-		TitleColor4 = LightBlueColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 3)
-		TitleColor4 = TurquoiseColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 4)
-		TitleColor4 = GreenColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 5)
-		TitleColor4 = OrangeColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 6)
-		TitleColor4 = YellowColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 7)
-		TitleColor4 = PinkColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 8)
-		TitleColor4 = WhiteColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 9)
-		TitleColor4 = DeepBlueColor;
-	else if(Class'MapVoteClientConfig'.default.KickVoteTitleColor == 10)
-		TitleColor4 = BlackColor;
-
-	if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 0)
-		TitleColor5 = RedColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 1)
-		TitleColor5 = PurpleColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 2)
-		TitleColor5 = LightBlueColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 3)
-		TitleColor5 = TurquoiseColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 4)
-		TitleColor5 = GreenColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 5)
-		TitleColor5 = OrangeColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 6)
-		TitleColor5 = YellowColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 7)
-		TitleColor5 = PinkColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 8)
-		TitleColor5 = WhiteColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 9)
-		TitleColor5 = DeepBlueColor;
-	else if(Class'MapVoteClientConfig'.default.PlayerTitleColor == 10)
-		TitleColor5 = BlackColor;
-
-	if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 0)
-		TitleColor6 = RedColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 1)
-		TitleColor6 = PurpleColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 2)
-		TitleColor6 = LightBlueColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 3)
-		TitleColor6 = TurquoiseColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 4)
-		TitleColor6 = GreenColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 5)
-		TitleColor6 = OrangeColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 6)
-		TitleColor6 = YellowColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 7)
-		TitleColor6 = PinkColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 8)
-		TitleColor6 = WhiteColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 9)
-		TitleColor6 = DeepBlueColor;
-	else if(Class'MapVoteClientConfig'.default.MapVoteTitleColor == 10)
-		TitleColor6 = BlackColor;
+	TitleColor1 = ClientConf.GetColorOfGameModTitleColor();
+	TitleColor2 = ClientConf.GetColorOfRuleTitleColor();
+	TitleColor3 = ClientConf.GetColorOfMapTitleColor();
+	TitleColor4 = ClientConf.GetColorOfKickVoteTitleColor();
+	TitleColor5 = ClientConf.GetColorOfPlayerTitleColor();
+	TitleColor6 = ClientConf.GetColorOfMapVoteTitleColor();
 
 	TextColor.R=171;
 	TextColor.G=171;
@@ -1003,7 +872,7 @@ function Paint (Canvas C, float MouseX, float MouseY)
 	originalStyle = C.Style;
 	C.bNoSmooth = false; // make screenshot and background smoother
 	
-	C.DrawColor = class'MapVoteClientConfig'.Default.BackgroundColor;
+	C.DrawColor = ClientConf.BackgroundColor;
 	DrawStretchedTexture(C,0.00,0.00,WinWidth,WinHeight,Texture'BackgroundTexture');
 	
 	if (  !bMapAlreadySet && (LogoTexture != "") && (Screenshot == None) )
@@ -1372,15 +1241,4 @@ defaultproperties
       bMapAlreadySet=False
       PrefixDictionary=""
       ClientConf=None
-      RedColor=(R=255,G=0,B=0,A=0)
-      PurpleColor=(R=128,G=0,B=128,A=0)
-      LightBlueColor=(R=0,G=100,B=255,A=0)
-      TurquoiseColor=(R=0,G=255,B=255,A=0)
-      GreenColor=(R=0,G=255,B=0,A=0)
-      OrangeColor=(R=255,G=120,B=0,A=0)
-      YellowColor=(R=255,G=255,B=0,A=0)
-      PinkColor=(R=255,G=0,B=255,A=0)
-      WhiteColor=(R=255,G=255,B=255,A=0)
-      DeepBlueColor=(R=0,G=0,B=255,A=0)
-      BlackColor=(R=0,G=0,B=0,A=0)
 }
