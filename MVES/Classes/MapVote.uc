@@ -394,9 +394,7 @@ event PostBeginPlay()
 
 	if ( Cmd ~= Left(TravelInfo.TravelString, Len(Cmd) ) )  //CRASH DIDN'T HAPPEN, SETUP GAME
 	{
-		MapIdx = MapList.FindMapWithGame( Cmd, TravelInfo.TravelIdx);
-		if ( MapIdx >= 0 )
-			MapList.History.NewMapPlayed( MapIdx, TravelInfo.TravelIdx, MapCostAddPerLoad);
+		MapList.History.NewMapPlayed( CurrentMap );
 		CurrentMode = CurrentGame.GameName @ "-" @ CurrentGame.RuleName;
 		if (bAutoSetGameName) {
 			Level.Game.GameName = CurrentGame.RuleName@CurrentGame.GameName;

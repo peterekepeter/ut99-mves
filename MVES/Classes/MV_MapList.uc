@@ -326,10 +326,7 @@ function GlobalLoad(bool bFullscan)
 	//Mutator.Extension.CloseVoteWindows( Mutator.WatcherList);
 	Mutator.UpdateMapListCaches();
 	SaveConfig();
-	History.iMe = 0;
-	History.SaveConfig();
 	Mutator.BroadcastMessage("[MVE] Map list has been reloaded, wait 5 seconds to reopen the vote window.",True);
-
 }
 
 //Returns a chunk of the fingerprint
@@ -468,6 +465,12 @@ function bool IsValidMap( out string MapString, out string reason )
 		GameIdx = "0"$GameIdx;
 	}
 	MapName = Left( MapString, iLen);
+
+	if (History.IsExcluded(MapName))
+	{
+		reason = "map is on cooldown";
+		return False;
+	}
 
 	// find map in list 
 	bMapFound = False;
