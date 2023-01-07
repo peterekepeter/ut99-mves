@@ -80,7 +80,7 @@ function Notify (UWindowDialogControl C, byte E)
 	local string Dev;
 	local string Line1, Line2, Line3, Line4, Line5, Line6, Line7, Line8, Line9;
 
-	Core="<html><body><center><br><br><h1><font color=\"FFFF00\">Map Vote Extended 2e</font></h1><br><br><b>Core developement: BDB (Bruce Bickar)<br><br>";
+	Core="<html><body><center><br><br><h1><font color=\"FFFF00\">Map Vote Extended</font></h1><br><br><b>Core developement: BDB (Bruce Bickar)<br><br>";
 	Dev="Enhancements by: (Deepu)<br><br>Support: <a href=\"http://forum.ultimateut.tk\">Ultimate UT Forum</a></b></center></body></html>";
 
 	Line1="<html><body><center><br><br><h1><font color=\"#0000FF\">Map Vote Tips</font></h1><br><br></center>";
