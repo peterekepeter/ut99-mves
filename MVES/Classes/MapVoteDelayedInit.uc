@@ -12,6 +12,7 @@ event InitializeDelayedInit(MapVote mutator)
 event Timer()
 {
 	EnsureSingleMapVoteMutatorIsActive();
+	EnsureScoreboardUpdated();
 	Destroy();
 }
 
@@ -48,6 +49,11 @@ function EnsureSingleMapVoteMutatorIsActive()
 		Level.Game.BaseMutator.AddMutator(MapVote);
 		Nfo("Added MapVote mutator");
 	}
+}
+
+function EnsureScoreboardUpdated()
+{
+	Level.Game.InitGameReplicationInfo();
 }
 
 static function Err(coerce string message)

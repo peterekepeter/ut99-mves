@@ -487,8 +487,6 @@ event PostBeginPlay()
 	PlayerDetector = Spawn(class'MV_PlayerDetector');
 	PlayerDetector.Initialize(self);
 	
-	// propagate MapVote's GameInfo changes to scoreboard
-	Level.Game.InitGameReplicationInfo();
 }
 
 function EvalCustomGame(int idx)
