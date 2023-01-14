@@ -1,4 +1,39 @@
-# June 2022
+
+# MVE - Map Vote Extended
+
+MapVote lets players to choose the next gametype and map when a match ends.
+
+![Screeshot of MapVote](./map-vote-screen.png)
+
+The goal of MVE is to be able to host a large variety of gametypes and maps. 
+It sits at the core of the Friday Frag Nights server where we currently have
+around ~1400 maps and ~70 gametypes enabled in production on a single server.
+
+Known limitations:
+ - MAX maps: 4096
+ - MAX gametypes: 100
+
+Map management:
+ - include/exclude filters
+ - map prefix filter
+ - map tags filter
+ - premade lists
+
+Compatible with:
+ - Assault (including LeagueAssault)
+ - Jailbreak (fixed spectator bug)
+ - Coop campaigns with fixed map order
+ - DeathMatch, CTF & Domination
+ - MonsterHunt
+ - BunnyTrack
+
+Important Features:
+ - ServerPackages set per gametype, players only download what's needed for 
+   the current gametype.
+ - Mutators, ServerActors, settings are all configurable individually 
+   for every gametype.
+
+# Additional Information
 
 ## Green background for players that voted
 
