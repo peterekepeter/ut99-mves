@@ -1,39 +1,11 @@
 
-# MVE - Map Vote Extended
+# Map Vote Extended Documentation
 
-MapVote lets players to choose the next gametype and map when a match ends.
+## Known Limitations
 
-![Screeshot of MapVote](./map-vote-screen.png)
+ - **MAX** maps: 4096
+ - **MAX** gametypes: 100
 
-The goal of MVE is to be able to host a large variety of gametypes and maps. 
-It sits at the core of the Friday Frag Nights server where we currently have
-around ~1400 maps and ~70 gametypes enabled in production on a single server.
-
-Known limitations:
- - MAX maps: 4096
- - MAX gametypes: 100
-
-Map management:
- - include/exclude filters
- - map prefix filter
- - map tags filter
- - premade lists
-
-Compatible with:
- - Assault (including LeagueAssault)
- - Jailbreak (fixed spectator bug)
- - Coop campaigns with fixed map order
- - DeathMatch, CTF & Domination
- - MonsterHunt
- - BunnyTrack
-
-Important Features:
- - ServerPackages set per gametype, players only download what's needed for 
-   the current gametype.
- - Mutators, ServerActors, settings are all configurable individually 
-   for every gametype.
-
-# Additional Information
 
 ## Green background for players that voted
 
@@ -41,6 +13,7 @@ Players that vote recieve a green background. This was a broken feature.
 Players did receive the green background but only when mapvote window 
 opens. Now with the fixes applied the player background shouls switch to
 green as soon as they vote.
+
 
 ## Logo Texture 
 
@@ -54,6 +27,7 @@ Example:
 ClientLogoTexture=Botpack.ASMDAlt_a00
 ```
 
+
 ## Populate ServerPackages for Known Properties [EXPERIMENTAL]
 
 When `bOverrideServerPackages` is enabled then mapvote will automatically 
@@ -66,6 +40,7 @@ detect and populate packages from the following properties:
 This means you dont have to manually set these server packages. But currently
 the changes to take place need a new map to be voted through mapvote.
 
+
 ## Screenshot Bundle [EXPERIMENTAL]
 
 In order to have screenshot and level summary for every level in the map,
@@ -73,8 +48,6 @@ there is an experimental feature in place that allows players to load
 screenshots from a dedicated package which contains all screenshots for 
 the levels.
 
-
-# May 2022
 
 ## Map Tags Feature [EXPERIMENTAL]
 
@@ -125,8 +98,6 @@ MapTags[5]=DM-Crane:DM:LARGE
 MapTags[6]=DM-Morpheus:DM:MEDIUM:LG
 ```
 
-# April 2022
-
 ## Gametype Limit Increased
 
 The limit of 63 gametypes was lifted. It's now possible to have more gametypes.
@@ -152,7 +123,6 @@ without try add it to Mutator list, as do option Mutators.
 - Added option bAvoidRandom for each GameConfig. Done in really dumb way. Random 
 still same, but if pick game mode which forbidden random restart. Up to 1024 times.
 
-# January 2022
 
 ## MapOverrides
 
@@ -186,7 +156,6 @@ player joins the server, instead of waiting for the imter interval to pass.
 The timer interval is still there as a safety net for gametypes that have custom
 player ID assignment.
 
-# December 2021
 
 ## Improved PlayerPawn filtering
 
@@ -198,6 +167,7 @@ actually vote.
 The logic improvement improves calculation of vote percentages as it should now
 only consider real human players. (sorry bots)
 
+
 ## Don't broadcast already voted map
 
 Players voting the same map twice won't broadcast to all players. This was
@@ -205,7 +175,6 @@ previosely abused by players to spam the chat. Instead of broadcast the voter
 gets a message that they already voted so they know their vote was already
 registered.
 
-# November 2021
 
 ## Improved Assault compatibility
 
@@ -227,7 +196,6 @@ Fixed a bug where was a bug where MapVote interface would never show up at the
 end of MonsterHunt games. The issue here was MapVote wrongly checking for tie
 between players in monster hunt games.
 
-# October 2021
 
 ## Improved JailBreak compatibility
 
@@ -236,6 +204,7 @@ player detection was implemented. This is now fixed by having player detection
 run in a timer loop, so at fixed intervals the server checks and adds players to
 the mapvote who were previosely not added. This ensures that all players can
 vote.
+
 
 ## Configurable Shutdown on travel
 
