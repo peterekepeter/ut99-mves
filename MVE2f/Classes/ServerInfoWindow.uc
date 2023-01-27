@@ -22,13 +22,15 @@ var string ServerInfoURL;
 var string MapInfoURL;
 var string version;
 
+const SupportLink = "https://ut99.org/viewtopic.php?p=140965";
+
 function Created ()
 {
 	local string Core;
 	local string Dev;
 
 	Core="<html><body><center><br><br><h1><font color=\"FFFF00\">Map Vote Extended</font></h1><br><br><b>Core developement: BDB (Bruce Bickar)<br><br>";
-	Dev="Enhancements by: (Deepu)<br><br>Support: <a href=\"http://forum.ultimateut.tk\">Ultimate UT Forum</a></b></center></body></html>";
+	Dev="Enhancements by: (Deepu)<br><br>Support: <a href=\""@SupportLink@"\">UT99 Forum</a></b></center></body></html>";
 
 	Super.Created();
 	version=Left(string(self.Class),InStr(string(self.Class),"."));
