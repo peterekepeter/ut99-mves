@@ -1478,9 +1478,12 @@ final function bool SetupTravelString( string mapStringWithIdx )
 	TickRate = DefaultTickRate;
 	if (CustomGame[idx].TickRate != 0)
 		TickRate = CustomGame[idx].TickRate;
-	ConsoleCommand( "set ini:Engine.Engine.NetworkDevice NetServerMaxTickRate "$CustomGame[idx].TickRate);
-	ConsoleCommand( "set ini:Engine.Engine.NetworkDevice LanServerMaxTickRate "$CustomGame[idx].TickRate);
-	Nfo("-> TickRate: `"$TickRate$"`");
+	if (TickRate > 0)
+	{
+		ConsoleCommand( "set ini:Engine.Engine.NetworkDevice NetServerMaxTickRate "$CustomGame[idx].TickRate);
+		ConsoleCommand( "set ini:Engine.Engine.NetworkDevice LanServerMaxTickRate "$CustomGame[idx].TickRate);
+		Nfo("-> TickRate: `"$TickRate$"`");
+	}
 	return true; // SUCCESS!!!
 }
 
