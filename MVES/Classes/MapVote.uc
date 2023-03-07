@@ -12,6 +12,8 @@ var() config string HTTPMapListLocation; //HTTPMapListPort is needs to be attach
 
 var() config int VoteTimeLimit;
 var() config int HTTPMapListPort;
+var() config int DefaultMapSwitchAfterIdleMinutes;
+var() config string DefaultMap;
 var() config int DefaultGameTypeIdx; //For crashes
 var() config name ServerCodeName; //Necessary for our ServerCode
 
@@ -232,9 +234,12 @@ event PostBeginPlay()
 	local string CurrentPackages;
 	local bool bGotoSuccess;
 	local bool bNeedToRestorePackages, bNeedToRestoreMap;
+	local MV_IdleTimer MV_IdleTimer;
 
 	TravelInfo = Spawn(class'MV_TravelInfo');
 	Spawn(class'MapVoteDelayedInit').InitializeDelayedInit(self);
+	MV_IdleTimer = Spawn(class'MV_IdleTimer');
+	MV_IdleTimer.Initialize(self);
 
 	if (bReloadOnEveryRun)
 	{
@@ -631,6 +636,13 @@ function bool CheckForTie ()
 			if ( P.bIsPlayer && (BestP != P) && (P.PlayerReplicationInfo.Score == BestP.PlayerReplicationInfo.Score) )
 				return True;
 	}
+}
+
+function bool SwitchToDefaultMap()
+{
+	local string TravelMap;
+	TravelMap = DefaultMap$":"$DefaultGameTypeIdx;
+	return GotoMap(TravelMap, True);
 }
 
 event Timer()
@@ -1743,6 +1755,8 @@ defaultproperties
       CurrentMode=""
       VoteTimeLimit=60
       HTTPMapListPort=0
+      DefaultMap="DM-Deck16]["
+      DefaultMapSwitchAfterIdleMinutes=10
       DefaultGameTypeIdx=0
       ServerCodeName="UT-Server"
       MidGameVotePercent=51
