@@ -16,34 +16,16 @@
             "problemMatcher": []
         },
         {
+            "label": "build client, build and run server",
+            "type": "shell",
+            "command": "ucx build MVE2g && ucx build MVES && ucx ucc server",
+            "problemMatcher": []
+        },
+        {
             "label": "build and run server",
             "type": "shell",
             "command": "ucx build MVES && ucx ucc server",
-            "problemMatcher": [
-                {
-                    "pattern": [
-                        {
-                            "regexp": "(Classes(?:\\\\[A-Za-z0-9.]+)+)\\((\\d+)\\)\\s*:\\s*Error,?\\s*(.*)$",
-                            "file": 1,
-                            "location": 2,
-                            "message": 3
-                        }
-                    ]
-                }
-            ],
-            "runOptions": {
-                "instanceLimit": 1,
-                "reevaluateOnRerun": true
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "group": "groupA",
-                "showReuseMessage": true,
-                "clear": true
-            }
+            "problemMatcher": []
         },
         {
             "label": "watch test",

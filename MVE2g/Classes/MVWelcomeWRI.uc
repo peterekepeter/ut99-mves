@@ -52,7 +52,7 @@ simulated function Timer ()
 	{
 		MVWelcomeWindow(TheWindow).bHasStartWindow=bHasStartWindow;
 		ServerInfoWindow(TheWindow.FirstChildWindow).SetInfoServerAddress(ServerInfoURL,MapInfoURL);
-		ServerInfoWindow(TheWindow.FirstChildWindow).BrowseWebPage(ServerInfoURL);
+		ServerInfoWindow(TheWindow.FirstChildWindow).ShowServerInfoPage();
 	}
 	C=WindowConsole(PlayerPawn(Owner).Player.Console);
 	bHotKeyBound=HotKeyBound();

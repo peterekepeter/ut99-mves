@@ -4,6 +4,8 @@
 
 class MapVoteWRI extends WRI;
 
+var string ServerInfoURL;
+var string MapInfoURL;
 var string MapList[4096];
 var string RuleList[100];
 var int RuleListCount;
@@ -44,8 +46,6 @@ var int KickPercent;
 var bool bAutoOpen;
 var int ScoreBoardDelay;
 var bool bCheckOtherGameTie;
-var string ServerInfoURL;
-var string MapInfoURL;
 var string ReportText;
 var string Mode;
 var int RepeatLimit;
@@ -595,13 +595,14 @@ simulated function Timer()
 		{
 			AdminWindow(CWindow.AdminWindow.ClientArea).txtServerInfoURL.SetValue(ServerInfoURL);
 		}
+		MapVoteNavBar(CWindow.InfoWindow.VSplitter.BottomClientWindow).ServerInfoButton.bDisabled = false;
 	}
 	else
 	{
 		MapVoteNavBar(CWindow.InfoWindow.VSplitter.BottomClientWindow).ServerInfoButton.bDisabled = true;
 	}
-	MapVoteNavBar(CWindow.InfoWindow.VSplitter.BottomClientWindow).ReportButton1.bDisabled = false;
-	MapVoteNavBar(CWindow.InfoWindow.VSplitter.BottomClientWindow).ReportButton2.bDisabled = false;
+	// MapVoteNavBar(CWindow.InfoWindow.VSplitter.BottomClientWindow).ReportButton1.bDisabled = false;
+	// MapVoteNavBar(CWindow.InfoWindow.VSplitter.BottomClientWindow).ReportButton2.bDisabled = false;
 	CWindow.MapWindow.PrefixDictionary = PrefixDictionary;
 	if(!bMapListLoad)
 	{
