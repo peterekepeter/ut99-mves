@@ -4,7 +4,7 @@ Installation
 2) add to the UnrealTournament.ini in section [Engine.GameEngine] the following entry
 
 [Engine.GameEngine] 
-ServerPackages=MVE2f
+ServerPackages=MVE2g
 
 3) Add this line to server startup mutator list.
 

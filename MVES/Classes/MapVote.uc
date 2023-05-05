@@ -12,7 +12,9 @@ var() config string HTTPMapListLocation; //HTTPMapListPort is needs to be attach
 
 var() config int VoteTimeLimit;
 var() config int HTTPMapListPort;
-var() config int DefaultMapSwitchAfterIdleMinutes;
+var() config bool bSwitchToRandomMapOnIdle;
+var() config bool bSwitchToDefaultMapOnIdle;
+var() config int ServerIdleAfterMinutes;
 var() config string DefaultMap;
 var() config int DefaultGameTypeIdx; //For crashes
 var() config name ServerCodeName; //Necessary for our ServerCode
@@ -238,8 +240,7 @@ event PostBeginPlay()
 
 	TravelInfo = Spawn(class'MV_TravelInfo');
 	Spawn(class'MapVoteDelayedInit').InitializeDelayedInit(self);
-	MV_IdleTimer = Spawn(class'MV_IdleTimer');
-	MV_IdleTimer.Initialize(self);
+	Spawn(class'MV_IdleTimer').Initialize(self);
 
 	if (bReloadOnEveryRun)
 	{
@@ -641,8 +642,15 @@ function bool CheckForTie ()
 function bool SwitchToDefaultMap()
 {
 	local string TravelMap;
+	Log("[MVE] SwitchToDefaultMap");
 	TravelMap = DefaultMap$":"$DefaultGameTypeIdx;
 	return GotoMap(TravelMap, True);
+}
+
+function bool SwitchToRandomMap()
+{
+	Log("[MVE] SwitchToRandomMap");
+	return GotoMap("Random", True);
 }
 
 event Timer()
@@ -1748,7 +1756,7 @@ defaultproperties
 {
       bAutoSetGameName=True
       bSortAndDeduplicateMaps=True
-      ClientPackage="MVE2f"
+      ClientPackage="MVE2g"
       ServerInfoURL=""
       MapInfoURL=""
       HTTPMapListLocation=""
@@ -1756,8 +1764,10 @@ defaultproperties
       VoteTimeLimit=60
       HTTPMapListPort=0
       DefaultMap="DM-Deck16]["
-      DefaultMapSwitchAfterIdleMinutes=10
       DefaultGameTypeIdx=0
+      bSwitchToRandomMapOnIdle=True
+      bSwitchToDefaultMapOnIdle=False
+      ServerIdleAfterMinutes=60
       ServerCodeName="UT-Server"
       MidGameVotePercent=51
       KickPercent=51

@@ -6,7 +6,7 @@
         {
             "label": "build client package",
             "type": "shell",
-            "command": "ucx build MVE2f",
+            "command": "ucx build MVE2g",
             "problemMatcher": []
         },
         {
@@ -48,7 +48,7 @@
         {
             "label": "watch test",
             "type": "shell",
-            "command": "nodemon -e uc -x \"ucx build MVE2f && ucx build MVES && ucx build TestMVE && ucx ucc TestMVE.TestAll\"",
+            "command": "nodemon -e uc -x \"ucx build MVE2g && ucx build MVES && ucx build TestMVE && ucx ucc TestMVE.TestAll\"",
             "problemMatcher": [
                 {
                     "pattern": [

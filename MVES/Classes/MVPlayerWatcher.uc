@@ -131,6 +131,8 @@ GetCache:
 			MapListCacheActor.SetPropertyText("HTTPMapListLocation","None");
 			MapListCacheActor.SetPropertyText("ClientScreenshotPackage", Mutator.ClientScreenshotPackage );
 			MapListCacheActor.SetPropertyText("ClientLogoTexture", Mutator.ClientLogoTexture );
+			MapListCacheActor.SetPropertyText("ServerInfoURL", Mutator.ServerInfoURL );
+			MapListCacheActor.SetPropertyText("MapInfoURL", Mutator.MapInfoURL );
 			Mutator.Extension.MLC_Rules( MapListCacheActor); 	Sleep(0.5);
 			Mutator.Extension.MLC_MapList_1( MapListCacheActor); 	Sleep(0.5);
 			Mutator.Extension.MLC_MapList_2( MapListCacheActor);	Sleep(0.5);

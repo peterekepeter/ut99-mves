@@ -48,6 +48,8 @@ var string HTTPLastParameter;
 var bool bHTTPError;
 var string ClientScreenshotPackage;
 var string ClientLogoTexture;
+var string ServerInfoURL;
+var string MapInfoURL;
 
 replication
 {
@@ -67,7 +69,7 @@ replication
 
 	reliable if(Role == ROLE_Authority)
 		HTTPMapListLocation, LastUpdate, 
-		ServerCode, iNewMaps, ClientScreenshotPackage, ClientLogoTexture;
+		ServerCode, iNewMaps, ClientScreenshotPackage, ClientLogoTexture, ServerInfoURL, MapInfoURL;
 
 	reliable if(Role < ROLE_Authority)
 		NeedServerMapList, bChaceCheck, 

@@ -586,9 +586,11 @@ simulated function Timer()
 		CWindow.MapWindow.LogoTexture = ClientCache.ClientLogoTexture;
 	}
 	CWindow.MapWindow.ClientScreenshotPackage = ClientCache.ClientScreenshotPackage;
-	if(ServerInfoURL != "")
+	Log("ServerInfoURL is "$ClientCache.ServerInfoURL);
+	if(ClientCache.ServerInfoURL != "")
 	{
-		CWindow.InfoWindow.SetInfoServerAddress(ServerInfoURL, MapInfoURL);
+		Log("Set ServerInfoURL to window "$CWindow.InfoWindow);
+		CWindow.InfoWindow.SetInfoServerAddress(ClientCache.ServerInfoURL, ClientCache.MapInfoURL);
 		if(CWindow.AdminWindow != none)
 		{
 			AdminWindow(CWindow.AdminWindow.ClientArea).txtServerInfoURL.SetValue(ServerInfoURL);

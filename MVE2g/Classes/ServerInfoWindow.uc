@@ -50,7 +50,14 @@ function BrowseWebPage (string p_URLString)
 {
 	local int P1;
 	local int P2;
+	local int p;
 
+	if (InStr(p_URLString, "http://") == 0)
+	{
+		p_URLString = Mid(p_URLString,7);
+	}
+
+	Log("Brose: "$p_URLString);
 	P1=InStr(p_URLString,"/");
 	if ( P1 <= 0 )
 	{
@@ -64,13 +71,17 @@ function BrowseWebPage (string p_URLString)
 	{
 		Port=80;
 	} else {
-		if ( int(Mid(WebServer,P2 + 1)) < 2 )
+		Log("Parse port"$Mid(WebServer,P2 + 1));
+		p = int(Mid(WebServer,P2 + 1));
+		Log("Parsed port "$p);
+		Port = p;
+		if ( p < 2 )
 		{
 			Log("Invalid web server port");
 			return;
 		}
 		WebServer=Left(WebServer,P2);
-		Port=int(Mid(WebServer,P2 + 1));
+		Port=p;
 	}
 	Log("WebServer=" $ WebServer);
 	Log("FilePath=" $ FilePath);
