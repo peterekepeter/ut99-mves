@@ -9,7 +9,6 @@ function BeginPlay ()
 {
 	Super.BeginPlay();
 	TitleStr = Left(string(Default.Class),InStr(string(Default.Class),"."));
-	TitleStr = Mid(TitleStr,0,Len(TitleStr) - 1);
 	ClientClass = Class'MapVoteTabWindow';
 	WindowTitle = TitleStr;
 }
@@ -28,8 +27,8 @@ function SetDimensions()
 function Created ()
 {
 	Super.Created();
-	WinWidth=666;
-	WinHeight=550;
+	WinWidth = 666;
+	WinHeight = 550;
 	WinLeft = (Root.WinWidth - WinWidth) / 2;
 	WinTop = (Root.WinHeight - WinHeight) / 2;
 }

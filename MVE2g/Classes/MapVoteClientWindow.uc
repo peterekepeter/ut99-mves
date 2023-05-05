@@ -328,26 +328,26 @@ function Created ()
 	lstKickStatus = KickStatusListBox(CreateControl(Class'KickStatusListBox',10.0,231.0,MapListwidth * 2 + 10,-192.0 + ListHeight));
 	lstKickStatus.bAcceptsFocus = False;
 	lstKickStatus.Items.Clear();
-	lblMaptxt1 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',30.0 + 2 * MapListwidth,140.0,PlayerListwidth,10.0));
+	lblMaptxt1 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',30.0 + 2 * MapListwidth - 10.0 ,140.0,PlayerListwidth + 20.0, 10.0));
 	lblMaptxt1.SetTextColor(TextColor);
 	lblMaptxt1.Align=TA_Center;
-	lblMaptxt2 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',30.0 + 2 * MapListwidth,149.0,PlayerListwidth,10.0));
+	lblMaptxt2 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',30.0 + 2 * MapListwidth - 10.0 ,149.0,PlayerListwidth + 20.0, 10.0));
 	lblMaptxt2.SetTextColor(TextColor);
 	lblMaptxt2.Align=TA_Center;
-	lblMaptxt3 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',30.0 + 2 * MapListwidth,158.0,PlayerListwidth,10.0));
+	lblMaptxt3 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',30.0 + 2 * MapListwidth - 10.0 ,158.0,PlayerListwidth + 20.0, 10.0));
 	lblMaptxt3.SetTextColor(TextColor);
 	lblMaptxt3.Align=TA_Center;
 	lblTitle1 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',0.0,10.0,MapListwidth + 20,20.0));
 	lblTitle1.SetFont(1);
 	lblTitle1.Align=TA_Center;
 	lblTitle1.SetTextColor(TextColorTitles);
-	lblTitle1.SetText("Game Mode");
+	lblTitle1.SetText("1. Game Mode");
 	lblTitle1.SetTextColor(TitleColor1);
 	lblTitle2 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',10.0 + MapListwidth,10.0,MapListwidth + 20,20.0));
 	lblTitle2.SetFont(1);
 	lblTitle2.Align=TA_Center;
 	lblTitle2.SetTextColor(TextColorTitles);
-	lblTitle2.SetText("Rule");
+	lblTitle2.SetText("2. Rule");
 	lblTitle2.SetTextColor(TitleColor2);
 	lblTitle = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',15.0 + 2 * MapListwidth,10.0,PlayerListwidth + 30,20.0));
 	lblTitle.SetFont(1);
@@ -446,6 +446,7 @@ function Notify (UWindowDialogControl C, byte E)
 {
 	local int listNum;
 	local int i;
+	local string s;
 
 	Super.Notify(C,E);
 	switch (E)
@@ -582,7 +583,12 @@ function Notify (UWindowDialogControl C, byte E)
 					MapListBox[listNum].WinWidth = MapListwidth * 2 + 10;
 					MapListBox[listNum].WinHeight = ListHeight + 12;
 					MapListBox[listNum].Resized();
-					lblTitle3.SetText(string(MapListBox[listNum].Count) @ "Map / Priority=" $ Mid(string(MapListBox[listNum].VotePriority),0,3));
+					s = "3. Maps";
+					if (MapListBox[listNum].VotePriority != 1.0)
+					{
+						s = s$" / Priority="$Mid(string(MapListBox[listNum].VotePriority),0,3);
+					}
+					lblTitle3.SetText(s);
 					break;
 					
 				case SendButton:
@@ -864,6 +870,7 @@ function Paint (Canvas C, float MouseX, float MouseY)
 	local float W;
 	local float H;
 	local float R;
+	local float S,F,size;
 	local bool originalNoSmooth;
 	local int originalStyle;
 
@@ -886,6 +893,8 @@ function Paint (Canvas C, float MouseX, float MouseY)
 	}
 	if ( Screenshot != None )
 	{
+		size = 128;
+
 		C.DrawColor.R=255;
 		C.DrawColor.G=255;
 		C.DrawColor.B=255;
@@ -897,18 +906,20 @@ function Paint (Canvas C, float MouseX, float MouseY)
 
 		// set height based on aspect ration
 		H = PlayerListwidth * R;
-		if (H > 110.00){
-			// downscale to fit height 110.00
-			W *= 110.00 / H;
-			H = 110.00;
+		if (H > size){
+			// downscale to fit height size
+			W *= size / H;
+			H = size;
 		}
 
 		// base position + adjustment to keep it centered
 		X = 30.00 + 2 * MapListwidth + (PlayerListwidth - W) / 2;
-		Y = 27.00 + (110.00 - H) / 2;
+		Y = 12.00 + (size - H) / 2;
 		
 		C.Style = ScreenshotStyle;
 		DrawStretchedTexture(C, X, Y, W, H, Screenshot);
+
+		// restore
 		C.Style = originalStyle;
 	}
 	if ( MapTitle != "" )
