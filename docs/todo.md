@@ -23,6 +23,19 @@ Fix random map to exclude game configs with bAvoidRandom
 
 accept !vote as command, more explicit
 
+## Priority List
+
+- switch to a default map/gametype when server empty (configurable threshold 5mins 10mins 15mins)
+- limit the gametype randomness when nobody votes
+- render screenshot with better filtering
+- maintain view of last map when window reopens
+- map search on client side
+- extra URL arguments per gametype
+- custom map folders
+- find a way do not replicate map list after map list is loaded
+
+
+
 ## Cleanup Aliases
 
 Alias structure recommended by [rev]rato.skt!

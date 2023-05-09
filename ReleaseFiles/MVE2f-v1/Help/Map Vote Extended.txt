@@ -6,6 +6,11 @@ Installation
 [Engine.GameEngine] 
 ServerPackages=MVE2g
 
-3) Add this line to server startup mutator list.
+3) Add this line to server startup mutator list or add it to server actor list.
 
 MVES.MapVote
+
+4) Whenever you want the map list to be updated you need to run the reload command
+the reload command will re-scan paths for maps and will match them against filters
+
+mutate bdbmapvote reload
