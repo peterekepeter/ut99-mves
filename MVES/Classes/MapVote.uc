@@ -238,9 +238,11 @@ event PostBeginPlay()
 	local bool bNeedToRestorePackages, bNeedToRestoreMap;
 	local MV_IdleTimer MV_IdleTimer;
 
+	Log("[MVE] Map Vote Extended version: "$ClientPackage);
+
 	TravelInfo = Spawn(class'MV_TravelInfo');
 	Spawn(class'MapVoteDelayedInit').InitializeDelayedInit(self);
-	Spawn(class'MV_IdleTimer').Initialize(self);
+	Spawn(class'MV_IdleTimer').Initialize(self, TravelInfo.bIsIdle, TravelInfo.EmptyMinutes);
 
 	if (bReloadOnEveryRun)
 	{
@@ -342,10 +344,6 @@ event PostBeginPlay()
 		{
 			Nfo("Mapvote will reload the map to update the required ServerPackages.");
 		}
-		else 
-		{
-			Nfo("ServerPackages are correctly set up!");
-		}
 	}
 
 	Cmd = Extension.ByDelimiter( string(self), ".");
@@ -360,7 +358,6 @@ event PostBeginPlay()
 	else 
 	{
 		bNeedToRestoreMap = false;
-		Nfo("Current map is `"$TravelMap$"`");
 	}
 
 	if ((bNeedToRestorePackages || bNeedToRestoreMap) && TravelInfo.RestoreTryCount < 3) {
@@ -493,14 +490,14 @@ event PostBeginPlay()
 	PlayerDetector = Spawn(class'MV_PlayerDetector');
 	PlayerDetector.Initialize(self);
 	
+      // finally done!
+	Log("[MVE] Successfully loaded map: `"$TravelMap$"` idx: "$TravelInfo.TravelIdx$" mode: "$CurrentMode);
 }
 
 function EvalCustomGame(int idx)
 {
-	CurrentGame=CustomGame[idx];
-	Nfo("");
+	CurrentGame = CustomGame[idx];
 }
-
 
 function Mutate( string MutateString, PlayerPawn Sender)
 {
@@ -637,6 +634,13 @@ function bool CheckForTie ()
 			if ( P.bIsPlayer && (BestP != P) && (P.PlayerReplicationInfo.Score == BestP.PlayerReplicationInfo.Score) )
 				return True;
 	}
+}
+
+function SaveIdleState(bool isIdle, int minutes) 
+{
+	TravelInfo.EmptyMinutes = minutes;
+	TravelInfo.bIsIdle = isIdle;
+	TravelInfo.SaveConfig();
 }
 
 function bool SwitchToDefaultMap()

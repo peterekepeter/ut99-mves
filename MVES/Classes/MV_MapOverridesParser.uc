@@ -12,7 +12,6 @@ function ParseConfiguration(MV_MapOverrides target, MapOverridesConfig config)
 			Err(errorCount$" errors in MapOverrides["$i$"]");
 		}
 	}
-	Nfo(target.RuleCount$" map override rules were loaded!");
 }
 
 function private int TryAddConfigLine(MV_MapOverrides target, string line)

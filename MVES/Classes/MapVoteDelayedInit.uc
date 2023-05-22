@@ -38,16 +38,10 @@ function EnsureSingleMapVoteMutatorIsActive()
 		Err("Detected multiple instances of MapVote");
 		Err("Please use Mapvote either as ServerActor or Mutator");
 		Err("Never add it as both ServerActor and Mutator at the same time");
-		return;
-	}
-	if (bIsThisRegistered)
-	{
-		Nfo("MapVote mutator is active");
 	}
 	else
 	{
 		Level.Game.BaseMutator.AddMutator(MapVote);
-		Nfo("Added MapVote mutator");
 	}
 }
 

@@ -1,16 +1,21 @@
 class MV_IdleTimer extends Info;
 
-const EMPTY = "[MVE] IdleTimer: server has been empty for ";
-
 var MapVote MapVote;
-var int IdleMinutes;
+var int EmptyMinutes;
 var bool bIsIdle;
 
-function Initialize(MapVote MapVote)
+function Initialize(MapVote MapVote, bool isIdle, int EmptyMinutes)
 {
+	local string time;
 	Self.MapVote = MapVote;
+	Self.EmptyMinutes = EmptyMinutes;
+	Self.bIsIdle = isIdle;
+	if (isIdle)
+	{
+		time = GetRelativeTime(EmptyMinutes);
+		Log("[MVE] Currently idle, has been empty for at least "$time);
+	}
 	SetTimer(60, True);
-	bIsIdle = False;
 }
 
 function Timer()
@@ -20,6 +25,8 @@ function Timer()
 
 	count = 0;
 
+	// TODO: idea improve watch and handle player count changes
+	// so each class is notified of change rather than each class tracking
 	for (P = Level.PawnList; P != None; P = P.NextPawn)
 	{
 		if (P.bIsPlayer && PlayerPawn(P) != None)
@@ -30,19 +37,28 @@ function Timer()
 
 	if (count > 0)
 	{
-		IdleMinutes = 0;   
-		bIsIdle = False;
+		EmptyMinutes = 0;   
+		
+		if (bIsIdle)
+		{
+			// state transition -> not idle
+			Log("[MVE] Server not in idle mode any longer");
+			bIsIdle = False;
+			SaveIdleState();
+		}
 	}
 	else 
 	{
-		IdleMinutes += 1;
-
-		LogIdleMessage(IdleMinutes);
+		EmptyMinutes += 1;
+		LogIdleMessage(EmptyMinutes);
 	}
 
-	if (!bIsIdle && MapVote.ServerIdleAfterMinutes != 0 && IdleMinutes >= MapVote.ServerIdleAfterMinutes)
+	if (!bIsIdle && MapVote.ServerIdleAfterMinutes != 0 && EmptyMinutes >= MapVote.ServerIdleAfterMinutes)
 	{   
-		bIsIdle = True;
+		// state transition -> idle
+		Log("[MVE] Server is switching to idle mode");
+		bIsIdle = True; 
+		SaveIdleState();
 		if (MapVote.bSwitchToDefaultMapOnIdle)
 		{
 			MapVote.SwitchToDefaultMap();
@@ -54,27 +70,83 @@ function Timer()
 	}
 }
 
-
 function LogIdleMessage(int m)
 {
-	if (m <= 15 && m % 5 == 0)  
+	local string time;
+	time = GetIdleMessage(m);
+	if (time == "")
 	{
-		Log(EMPTY$m$" minutes");
+		// noop
 	}
-	else if (m <= 60 && m % 15 == 0)
+	else if (bIsIdle)
 	{
-		Log(EMPTY$m$" minutes");
+		SaveIdleState();
+		Log("[MVE] Server has been empty for "$time);
 	}
-	else if (m <= 60 * 12 && m % 60 == 0)
+	else 
 	{
-		Log(EMPTY$(m / 60)$" hours");
+		SaveIdleState();
+		Log("[MVE] Server is idle and has been empty for "$time);
 	}
-	else if (m <= 60 * 24 && m % 120 == 0)
+}
+
+static function string GetIdleMessage(int m)
+{
+	local int modulo;
+	local string message;
+
+	modulo = 0;
+	message = "";
+
+	if (m <= 15)  
 	{
-		Log(EMPTY$(m / 60)$" hours");
+		modulo = 5; // log every 5 minutes
 	}
-	else if (m % (24&60) == 0)
+	else if (m <= 60)
 	{
-		Log(EMPTY$(m / 60 / 24)$" days");
+		modulo = 15; // log every 15 minutes
 	}
+	else if (m <= 60 * 12)
+	{
+		// less than 12 hours
+		modulo = 60; // log every hour
+	}
+	else if (m <= 60 * 24)
+	{
+		// less or equal to 1 day
+		modulo = 2 * 60; // log every second hour
+	}
+	else
+	{
+		modulo = 24 * 60; // otherlise log daily
+	}
+
+	// execute
+	if (modulo > 0 && m % modulo == 0) 
+	{
+		message = GetRelativeTime(m);
+	}
+
+	return message;
+}
+
+static function string GetRelativeTime(int m)
+{
+	if (m <= 60)
+	{
+		return m$" minutes";
+	}
+	else if (m <= 60 * 24)
+	{
+		return (m / 60)$" hours";
+	}
+	else
+	{
+		return (m / 60 / 24)$" days";
+	}
+}
+
+function SaveIdleState()
+{
+	MapVote.SaveIdleState(bIsIdle, EmptyMinutes);
 }

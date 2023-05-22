@@ -1,3 +1,15 @@
+# `2g-v1` May 22, 2023
+
+ - Cleaner startup log. MapVote will now log version when starting up and
+ a success message when startup has finished. A succesful startup should be
+ relatively clean and should only result in 2 log lines. Unsuccessful startups
+ should log more errors and diagnostics.
+
+    ```
+    [MVE] Map Vote Extended version: MVE2g
+    [MVE] Successfully loaded map: `AS-Frigate` idx: 0 mode: Assault - Normal
+    ```
+
 # `2f-v1`  Jan 14, 2023
 
  - **EXPERIMENTAL**: New gametype evaluation and setup code. For now everything
