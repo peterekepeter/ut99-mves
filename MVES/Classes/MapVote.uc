@@ -84,6 +84,7 @@ var int pos;
 var() config GameType CustomGame[100];
 var GameType EmptyGame;
 var GameType CurrentGame;
+var int CurrentGameIdx;
 var int iGames;
 
 
@@ -189,7 +190,7 @@ state Voting
 	Sleep(1 * Level.TimeDilation);
 	Vote_End:
 	Sleep(0.0);
-	CountMapVotes( True);
+	CountMapVotes(True);
 }
 
 state DelayedTravel
@@ -497,6 +498,7 @@ event PostBeginPlay()
 function EvalCustomGame(int idx)
 {
 	CurrentGame = CustomGame[idx];
+	CurrentGameIdx = idx;
 }
 
 function Mutate( string MutateString, PlayerPawn Sender)
@@ -520,10 +522,6 @@ function Mutate( string MutateString, PlayerPawn Sender)
 		else if ( Mid(MutateString,11,8) ~= "VOTEMENU" )
 		{
 			OpenWindowFor(Sender);
-			// if ( (Level.TimeSeconds > 15) || (Level.NetMode == 0) || Sender.bAdmin )
-			// 	OpenWindowFor( Sender);
-			// else
-			// 	Sender.ClientMessage("Please wait a few seconds to vote");
 		}
 		else if ( Mid(MutateString,11,3) ~= "MAP" )
 			PlayerVoted( Sender, Mid(MutateString,15) );
@@ -647,14 +645,26 @@ function bool SwitchToDefaultMap()
 {
 	local string TravelMap;
 	Log("[MVE] SwitchToDefaultMap");
-	TravelMap = DefaultMap$":"$DefaultGameTypeIdx;
+	TravelMap = GetDefaultMapWithDefaultMode();
 	return GotoMap(TravelMap, True);
 }
 
 function bool SwitchToRandomMap()
 {
+	local string TravelMap;
 	Log("[MVE] SwitchToRandomMap");
-	return GotoMap("Random", True);
+	TravelMap = GetRandomMapWithCurrentMode();
+	return GotoMap(TravelMap, True);
+}
+
+function string GetDefaultMapWithDefaultMode() 
+{
+	return DefaultMap $ ":" $ DefaultGameTypeIdx;
+}
+
+function string GetRandomMapWithCurrentMode()
+{
+	return "Random:" $ CurrentGameIdx;
 }
 
 event Timer()
@@ -1189,25 +1199,18 @@ function CountMapVotes( optional bool bForceTravel)
 		}
 	}
 
-	if ( bForceTravel && UniqueVotes[iBest] == none ) //Random map
+	if ( bForceTravel && UniqueVotes[iBest] == none ) 
 	{
-		// very dumb way
-		for (i = 0; i < 1024; i++) {
-			iU = Rand(MapList.iMapList);
-			iBest = MapList.RandomGame(iU);
-			if (!CustomGame[iBest].bAvoidRandom || i == 1023) {
-				WinningVote = MapList.MapName(iU) $ ":" $ string(iBest);
-				
-				iU = int(Extension.ByDelimiter(WinningVote, ":", 1));
-				PrettyVote = Extension.ByDelimiter(WinningVote, ":") @ GameRuleCombo(iU);
-
-				WinningVoteMessage = "No votes sent, "$PrettyVote$" has been selected";
-			}
-		}
+		// Nobody voted, choose random map
+		iU = CurrentGameIdx;
+		WinningVote = GetRandomMapWithCurrentMode();
+		PrettyVote = "Random" @ GameRuleCombo(iU);
+		WinningVoteMessage = "No votes sent, next map will be randomly selected";
 	}
-	else if ( (UniqueCount[iBest] / Total) >= 0.51 ) //Absolute majority
+	else if ( (UniqueCount[iBest] / Total) >= 0.51 ) 
 	{
-		bForceTravel = true;
+		// Absolute majority
+		bForceTravel = true; // upgrade to force travel
 		WinningVote = UniqueVotes[iBest].PlayerVote;
 
 		iU = int(Extension.ByDelimiter(WinningVote, ":", 1));
@@ -1217,6 +1220,7 @@ function CountMapVotes( optional bool bForceTravel)
 	}
 	else if ( bForceTravel && bTie )
 	{
+            // Choose tiebreaker at random
 		Current = 1;
 		For ( i=iBest+1 ; i<iU ; i++ )
 		{
@@ -1236,6 +1240,7 @@ function CountMapVotes( optional bool bForceTravel)
 	}
 	else if ( bForceTravel )
 	{
+            // Simple majority
 		WinningVote = UniqueVotes[iBest].PlayerVote;
 
 		iU = int(Extension.ByDelimiter(WinningVote, ":", 1));
@@ -1428,13 +1433,17 @@ final function bool SetupTravelString( string mapStringWithIdx )
 	local MapVoteResult Result;
 	local LevelInfo info;
 
-	class'MV_Parser'.static.TrySplit(mapStringWithIdx, ":", mapFileName, idxString);
+	if (!class'MV_Parser'.static.TrySplit(mapStringWithIdx, ":", mapFileName, idxString)) 
+	{
+		Log("[MVE] Failed to parse map string `" $ mapStringWithIdx $ "` defaulting to current mode ");
+		idxString = "" $ CurrentGameIdx;
+	}
 	
 	Result = GenerateMapResult(mapFileName, int(idxString));
 
-	//RANDOM MAP CHOSEN!
 	if ( Result.Map ~= "Random" )
 	{
+		// TODO idea random map should factor in number of players
 		Result.Map = MapList.RandomMap(Result.GameIndex);
 	}
 
