@@ -1,14 +1,70 @@
-# `2g-v1` May 22, 2023
+# `2g-v1` May 27, 2023
+ 
+- **NEW FEATURE**: Idle time tracking and idle map switch. MVE will keep
+  track to see if the server is empty and if its empty for a configurable 
+  amount of time the MVE will transition into idle state. This adds extra 
+  logging to let you know at a glance the status of the server.
 
- - Cleaner startup log. MapVote will now log version when starting up and
- a success message when startup has finished. A succesful startup should be
- relatively clean and should only result in 2 log lines. Unsuccessful startups
- should log more errors and diagnostics.
+  ```
+  [MVE] Map Vote Extended version: MVE2g
+  [MVE] Currently idle, has been empty for at least 60 minutes
+  [MVE] Server has been empty for 2 hours
+  [MVE] Server has been empty for 3 hours
+  ```
 
-    ```
-    [MVE] Map Vote Extended version: MVE2g
-    [MVE] Successfully loaded map: `AS-Frigate` idx: 0 mode: Assault - Normal
-    ```
+  When going to idle mode you have 2 configurable options now, wether you 
+  want the server to switch to a random or a default map. This can help ensure
+  that the server is in a clean state ready for new players. Or if you have a 
+  hub or welcome map you can have MVE switch to that. All this is configurable
+  with the following properties:
+
+  ```ini
+  [MVES.MapVote]
+  bSwitchToRandomMapOnIdle=True
+  bSwitchToDefaultMapOnIdle=False
+  ServerIdleAfterMinutes=60
+  DefaultMap=DM-Deck16][
+  DefaultGameTypeIdx=0
+  ```
+
+- **REVIVED OLD FEATURE**: ServerInfoURL can now be used to display a 
+  basic html page. An example can be found in the `www/server-info.html` 
+  this example is provided for you so that you can edit it. To enable this 
+  feature you need to configure the property:
+
+  ```ini
+  [MVES.MapVote]
+  ServerInfoURL=http://<<your-http-host>>/pages/server-info.html
+  ```
+
+  This file needs to be hosted on a public HTTP server. Servers that force 
+  HTTPS won't work. But if you have redirect server you can put it there.
+
+  For links to work the should start with `http://` your browser should
+  be able to redirect you to the echivalent `https://` site
+
+  The HTML that's supported here is very old and primitive, you cannot use
+  CSS or JavaScript and only very basic tags work
+
+  ![Screeshot of ServerInfo](./server-info-screen.png)
+
+- Updated about page. The support link now points to ut99 forum thread.
+  I've also added myself to the list of credits.
+
+- Small UI adjustments: screenshots are now slightly bigger. They should be
+ 128x128 size on 100% GUI scaling. There is slightly more space for map info
+ below the screenshots for long map/author names.
+
+- Cleaner startup log. MapVote will now log version when starting up and
+  a success message when startup has finished. A succesful startup should be
+  relatively cleaner than before. Unsuccessful startups should log errors and
+  and diagnostics.
+
+  ```
+  [MVE] Map Vote Extended version: MVE2g
+  [MVE] Successfully loaded map: `AS-Frigate` idx: 0 mode: Assault - Normal
+  ```
+
 
 # `2f-v1`  Jan 14, 2023
 
