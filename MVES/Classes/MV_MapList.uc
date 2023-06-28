@@ -727,16 +727,7 @@ final simulated function float GetVotePriority( int Idx)
 
 function MV_MapTags GetMapTagsObject()
 {
-	local MapTagsConfig MapTagsConfig;
-	local MV_MapTags MapTags;
-	local MV_MapTagsFactory MapTagsFactory;
-
-	MapTagsConfig = new class'MapTagsConfig';
-	MapTagsConfig.RunMigration();
-	MapTagsFactory = new class'MV_MapTagsFactory';
-	MapTags = MapTagsFactory.CreateMapTags(MapTagsConfig);
-
-	return MapTags;
+	return (new class'MapTagsConfig').GetConfiguredMapTags();
 }
 
 function bool TestIfMapCanBeLoaded(string mapName) 

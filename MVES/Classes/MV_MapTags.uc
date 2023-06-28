@@ -34,6 +34,24 @@ function bool TestTagMatch(string name, string newQueryTags)
 	return True; // all of the query tags matched
 }
 
+function AddConfigLine(string line)
+{
+	local int colonPosition;
+	local string name, tags;
+	if (line == "")
+	{
+		return;
+	}
+	colonPosition = InStr(line, ":");
+	if (colonPosition < 0)
+	{
+		Err("Invalid tags config: "$line);
+		return;
+	}
+	name = Mid(line, 0, colonPosition);
+	tags = Mid(line, colonPosition);
+	Self.AddMapTags(name, tags);
+}
 
 function AddMapTags(string name, string tags)
 {
@@ -42,7 +60,8 @@ function AddMapTags(string name, string tags)
 	if (index >= 0)
 	{
 		// add to existing
-		MapTags[index] = MapTags[index]$tags;
+		MapTags[index] = MapTags[index]$tags$":";
+		Log("added to existing "$MapTags[index]);
 		return;
 	}
 	if (Count + 1 >= MaxCount)
@@ -55,7 +74,6 @@ function AddMapTags(string name, string tags)
 	MapTags[Count] = ":"$tags$":";
 	Count += 1;
 }
-
 
 function private string FindTags(string name)
 {
@@ -81,7 +99,6 @@ function private int FindIndex(string name)
 	}
 	return -1;
 }
-
 
 function private AcceptNewQueryTags(string newQueryTags)
 {

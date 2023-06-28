@@ -311,6 +311,7 @@ event PostBeginPlay()
 	if (bOverrideServerPackages && !bXCGE_DynLoader){
 	// check that current packages contains all packages specified by mapvote
 		CurrentPackages = ConsoleCommand("Get ini:Engine.Engine.GameEngine ServerPackages");
+            Log("[MVE] CurrentPackages is "$CurrentPackages);
 		LogoTexturePackage = GetPackageNameFromString(ClientLogoTexture);
 		if (LogoTexturePackage != "" && InStr(CurrentPackages, "\""$LogoTexturePackage$"\"") < 0)
 		{
