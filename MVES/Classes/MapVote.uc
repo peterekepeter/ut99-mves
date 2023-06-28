@@ -44,6 +44,7 @@ var() config bool bEnableHTTPMapList;
 var() config bool bEnableMapOverrides;
 var() config bool bEnableMapTags;
 var() config bool bAutoSetGameName;
+var() config bool bFixMutatorsQueryLagSpikes;
 
 var() config bool bOverrideServerPackages;
 var() config bool bResetServerPackages;
@@ -491,8 +492,12 @@ event PostBeginPlay()
 	// init player detector
 	PlayerDetector = Spawn(class'MV_PlayerDetector');
 	PlayerDetector.Initialize(self);
+
+	if (bFixMutatorsQueryLagSpikes){
+		ApplyFixForMutatorsQueryLagSpikes();
+	}
 	
-      // finally done!
+	// finally done!
 	Log("[MVE] Successfully loaded map: `"$TravelMap$"` idx: "$TravelInfo.TravelIdx$" mode: "$CurrentMode);
 }
 
@@ -1674,6 +1679,15 @@ final function string ParseAliases( string Command)
 	return Command;
 }
 
+function ApplyFixForMutatorsQueryLagSpikes() {
+	// fixes common issue of server query DDOS-ing the game engine
+	// https://ut99.org/viewtopic.php?p=142091
+	Level.Game.GetRules();
+	if (Level.Game.EnabledMutators == "") {
+		Level.Game.EnabledMutators = "MapVote "$ClientPackage;
+	}
+}
+
 //***************************************
 //*************** TRIGGERS *************
 //***************************************
@@ -1770,6 +1784,7 @@ defaultproperties
 {
       bAutoSetGameName=True
       bSortAndDeduplicateMaps=True
+      bFixMutatorsQueryLagSpikes=True
       ClientPackage="MVE2g"
       ServerInfoURL=""
       MapInfoURL=""
