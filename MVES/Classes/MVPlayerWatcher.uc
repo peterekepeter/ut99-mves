@@ -230,11 +230,11 @@ function bool GetCacheActor()
 			MapListCacheActor.SetPropertyText( "HTTPMapListLocation", Mutator.HTTPMapListLocation $ "/MapList" $ chr(47) $ string(Mutator.ServerCodeName) ); //Reset just in case
 		return true;
 	}
-	MapListCacheActor = Spawn( class<Info>( DynamicLoadObject( Mutator.ClientPackage$".MapListCache",class'class')), Watched);
+	MapListCacheActor = Spawn( class<Info>( DynamicLoadObject( Mutator.ClientPackageInternal$".MapListCache",class'class')), Watched);
 	if ( MapListCacheActor == none )
 	{
 		Log("[MVE] !!! FATAL ERROR !!!");
-		Log("[MVE] failed to spawn "$Mutator.ClientPackage$".MapListCache");
+		Log("[MVE] failed to spawn "$Mutator.ClientPackageInternal$".MapListCache");
 		Log("[MVE] make sure you have the correct client package in MVE_Config");
 		return false;
 	}

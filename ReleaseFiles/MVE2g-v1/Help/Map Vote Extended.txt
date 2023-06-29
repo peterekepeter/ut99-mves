@@ -1,21 +1,62 @@
-Installation
-============
-1) copy the .u, .int and .ini files to the UT\System folder
-2) add to the UnrealTournament.ini in section [Engine.GameEngine] the following entry
+Quickstart
+==========
+
+1) copy the .u, .int and .ini files to the UT/System folder
+
+2) Add this line to server startup mutator list or add it to server actor list.
+
+ucc server MVES.MapVote
+
+3) Whenever you want the map list to be updated you need to run the reload command
+the reload command will re-scan paths for maps and will match them against filters
+
+mutate bdbmapvote reload
+
+
+Support
+=======
+
+The official forum post with latest updates goes here. You can report bugs or
+ask for help in the thread:
+
+https://ut99.org/viewtopic.php?t=15657
+
+
+Advanced Installation
+=====================
+
+- If bOverrideServerPackages=True then MapVote will manage ServerPackages for
+you and will automatically add the user interface package MVE2g to ServerPackages
+By default bOverrideServerPackages=True but if you have set 
+bOverrideServerPackages=False you will need to manually add the client package 
+yourself to ServerPackages:
 
 [Engine.GameEngine] 
 ServerPackages=MVE2g
 
-3) rename to the MVE_Config.ini in section [MVES.MapVote] the following entry
 
-[MVES.MapVote]
-ClientPackage=MVE2g
+- MapVote can be installed both in mutator or server actor mode. This will 
+affect the initialization order a bit. This may influence initialization of 
+other mutators. Ultimately this is a choice for you to use whichever mode is
+more comfortable working with. Here are some ways you can run MapVote:
 
-4) Add this line to server startup mutator list or add it to server actor list.
+    1) as server actor, edit UnrealTournament.ini add the following:
 
-MVES.MapVote
+    [Engine.GameEngine]
+    ServerActors=MVES.MapVote
 
-5) Whenever you want the map list to be updated you need to run the reload command
-the reload command will re-scan paths for maps and will match them against filters
+    1) as server mutator start the server with the following:
+    
+    ucc server DM-Agony?mutator=MVES.MapVote
 
-mutate bdbmapvote reload
+    2) single player / standalone you can run the game with arguments:
+
+    UnrealTournament.exe CityIntro?mutator=MVES.MapVote -log
+
+
+- The installation package should come with a MVE_Config.ini file. This is 
+provided as a convenience of good defaults and a baseline configuration. If
+you feel lost or misconfigured something, you can use it as a reference to 
+set things back to good defaults. If you already have a configuration file 
+make sure you don't override it when installing updates. It's also a good 
+practice to keep backups of this file or to put it under version control.

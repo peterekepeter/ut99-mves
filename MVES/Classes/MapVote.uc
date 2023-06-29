@@ -3,7 +3,11 @@
 //================================================================================
 class MapVote expands Mutator config(MVE_Config);
 
+const ClientPackageDeprecatedValue = "automatic (will be removed)";
+const ClientPackageInternal = "MVE2g";
+
 var() config string ClientPackage;		// Load this package
+
 var() config string ClientScreenshotPackage; // Load this package
 var() config string ClientLogoTexture; // Clients will load and display this texture
 var() config string ServerInfoURL;
@@ -240,7 +244,7 @@ event PostBeginPlay()
 	local bool bNeedToRestorePackages, bNeedToRestoreMap;
 	local MV_IdleTimer MV_IdleTimer;
 
-	Log("[MVE] Map Vote Extended version: "$ClientPackage);
+	Log("[MVE] Map Vote Extended version: "$ClientPackageInternal);
 
 	TravelInfo = Spawn(class'MV_TravelInfo');
 	Spawn(class'MapVoteDelayedInit').InitializeDelayedInit(self);
@@ -258,7 +262,7 @@ event PostBeginPlay()
 	{
 		bXCGE_DynLoader = true;
 		default.bXCGE_DynLoader = true; //So we get to see if it worked from clients!
-		AddToPackageMap(ClientPackage);
+		AddToPackageMap(ClientPackageInternal);
 		if (ClientScreenshotPackage != "") 
 		{
 			AddToPackageMap(ClientScreenshotPackage);
@@ -312,7 +316,7 @@ event PostBeginPlay()
 	if (bOverrideServerPackages && !bXCGE_DynLoader){
 	// check that current packages contains all packages specified by mapvote
 		CurrentPackages = ConsoleCommand("Get ini:Engine.Engine.GameEngine ServerPackages");
-            Log("[MVE] CurrentPackages is "$CurrentPackages);
+		Log("[MVE] CurrentPackages is "$CurrentPackages);
 		LogoTexturePackage = GetPackageNameFromString(ClientLogoTexture);
 		if (LogoTexturePackage != "" && InStr(CurrentPackages, "\""$LogoTexturePackage$"\"") < 0)
 		{
@@ -324,9 +328,9 @@ event PostBeginPlay()
 			Nfo(ClientScreenshotPackage$" is missing from ServerPackages");
 			bNeedToRestorePackages = true;
 		}
-		if (ClientPackage != "" && InStr(CurrentPackages, "\""$ClientPackage$"\"") < 0)
+		if (ClientPackageInternal != "" && InStr(CurrentPackages, "\""$ClientPackageInternal$"\"") < 0)
 		{
-			Nfo(ClientPackage$" is missing from ServerPackages");
+			Nfo(ClientPackageInternal$" is missing from ServerPackages");
 			bNeedToRestorePackages = true;
 		}
 		Cmd = CurrentGame.Packages;
@@ -337,7 +341,7 @@ event PostBeginPlay()
 		while ( Cmd != "" )
 		{
 			NextParm = Extension.NextParameter( Cmd, ",");
-			if ( NextParm != "" && InStr(CurrentPackages, "\""$ClientPackage$"\"") < 0)
+			if ( NextParm != "" && InStr(CurrentPackages, "\""$ClientPackageInternal$"\"") < 0)
 			{
 				Nfo(NextParm$" is missing from ServerPackages");
 				bNeedToRestorePackages = true;
@@ -947,6 +951,12 @@ function CleanRules()
 {
 	local int i, j;
 	local bool bSave;
+
+	if (ClientPackage != ClientPackageDeprecatedValue)
+	{
+		ClientPackage = ClientPackageDeprecatedValue;
+		bSave = true;
+	}
 	
 	For ( j=0 ; j<ArrayCount(CustomGame) ; j++ )
 	{
@@ -1486,7 +1496,7 @@ final function bool SetupTravelString( string mapStringWithIdx )
 			Result.AddPackages(ClientScreenshotPackage);
 		}
 		// add client package
-		Result.AddPackages(ClientPackage);
+		Result.AddPackages(ClientPackageInternal);
 		// add logo texture package
 		if (ClientLogoTexture != "")
 		{
@@ -1684,7 +1694,7 @@ function ApplyFixForMutatorsQueryLagSpikes() {
 	// https://ut99.org/viewtopic.php?p=142091
 	Level.Game.GetRules();
 	if (Level.Game.EnabledMutators == "") {
-		Level.Game.EnabledMutators = "MapVote "$ClientPackage;
+		Level.Game.EnabledMutators = "MapVote "$ClientPackageInternal;
 	}
 }
 
@@ -1785,7 +1795,6 @@ defaultproperties
       bAutoSetGameName=True
       bSortAndDeduplicateMaps=True
       bFixMutatorsQueryLagSpikes=True
-      ClientPackage="MVE2g"
       ServerInfoURL=""
       MapInfoURL=""
       HTTPMapListLocation=""
