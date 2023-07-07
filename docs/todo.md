@@ -1,3 +1,4 @@
+ - RELOAD can fail, write state to config before reload to prevent infinite crash loop
 
  - populate/patch server mutators string
  - inject CLIENT_VERSION and SERVER_VERSION
