@@ -34,8 +34,6 @@ enum EIDType
 
 var() config EIDType PlayerIDType;
 
-//?bDeprecated=True
-var() config bool bFirstRun; 
 var() config bool bSaveConfigOnNextRun, bReloadOnNextRun, bReloadOnEveryRun, bFullscanOnNextRun;
 var() config bool bShutdownServerOnTravel;
 var() config bool bWelcomeWindow;
@@ -719,14 +717,9 @@ event Tick( float DeltaTime)
 		bFullscanOnNextRun = false;
 		bSaveConfigOnNextRun = true;
 	}
-	if ( bSaveConfigOnNextRun || bFirstRun )
+	if ( bSaveConfigOnNextRun )
 	{
-		if (bFirstRun){
-			Nfo("bFirstRun is deprecated and will be removed"@
-				"use bSaveConfigOnNextRun instead");
-		}
 		bSaveConfigOnNextRun = false;
-		bFirstRun = false;
 		SaveConfig(); // generates properties for configuration
 	}
 	LastMsg = "";
@@ -1814,7 +1807,6 @@ defaultproperties
       MapCostAddPerLoad=0
       MapCostMaxAllow=0
       PlayerIDType=PID_Default
-      bFirstRun=False
       bShutdownServerOnTravel=False
       bWelcomeWindow=False
       bSpecsAllowed=False
