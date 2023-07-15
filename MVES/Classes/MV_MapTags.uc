@@ -61,7 +61,6 @@ function AddMapTags(string name, string tags)
 	{
 		// add to existing
 		MapTags[index] = MapTags[index]$tags$":";
-		Log("added to existing "$MapTags[index]);
 		return;
 	}
 	if (Count + 1 >= MaxCount)
@@ -86,18 +85,23 @@ function private string FindTags(string name)
 	return NoTags;
 }
 
-
 function private int FindIndex(string name)
 {
 	local int i;
-	for (i = 0; i < Count; i += 1)
+	i = -1;
+	
+	do 
 	{
-		if (MapName[i] ~= name)
-		{
-			return i;
-		}
+		i += 1;
 	}
-	return -1;
+	until (MapName[i] ~= name || i >= Count);
+
+	if (i >= Count)
+	{
+		return -1;
+	}
+
+	return i;
 }
 
 function private AcceptNewQueryTags(string newQueryTags)
@@ -116,6 +120,6 @@ function private AcceptNewQueryTags(string newQueryTags)
 			continue;
 		}
 		queryTagSplit[queryTagSplitCount] = ":"$newTag$":";
-		queryTagSplitCount += 1;
+		queryTagSplitCount += 1; 
 	}
 }
