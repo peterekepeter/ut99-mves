@@ -313,8 +313,9 @@ event PostBeginPlay()
 	}
 
 	bNeedToRestorePackages = false;
-	if (bOverrideServerPackages && !bXCGE_DynLoader){
-	// check that current packages contains all packages specified by mapvote
+	if (bOverrideServerPackages && !bXCGE_DynLoader)
+	{
+	      // check that current packages contains all packages specified by mapvote
 		CurrentPackages = ConsoleCommand("Get ini:Engine.Engine.GameEngine ServerPackages");
 		Log("[MVE] CurrentPackages is "$CurrentPackages);
 		LogoTexturePackage = GetPackageNameFromString(ClientLogoTexture);
@@ -654,16 +655,16 @@ function SaveIdleState(bool isIdle, int minutes)
 function bool SwitchToDefaultMap()
 {
 	local string TravelMap;
-	Log("[MVE] SwitchToDefaultMap");
 	TravelMap = GetDefaultMapWithDefaultMode();
+	Log("[MVE] SwitchToDefaultMap "$TravelMap);
 	return GotoMap(TravelMap, True);
 }
 
 function bool SwitchToRandomMap()
 {
 	local string TravelMap;
-	Log("[MVE] SwitchToRandomMap");
 	TravelMap = GetRandomMapWithCurrentMode();
+	Log("[MVE] SwitchToRandomMap "$TravelMap);
 	return GotoMap(TravelMap, True);
 }
 
@@ -1111,6 +1112,7 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 
 	if ( Sender.bAdmin )
 	{
+		Nfo("Admin force switch to "$prettyMapName);
 		GotoMap(MapString,true);
 		SaveConfig();
 		BroadcastMessage("Server Admin has force a map switch to " $ prettyMapName, True);
@@ -1267,7 +1269,7 @@ function CountMapVotes( optional bool bForceTravel)
 
 	if ( bForceTravel )
 	{
-		// travel to winning vote
+		Nfo("Travel to winning vote"$PrettyVote);
 		bGotoSuccess = GotoMap(WinningVote, false);
 		if (bGotoSuccess)
 		{

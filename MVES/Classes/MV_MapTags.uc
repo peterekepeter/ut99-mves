@@ -88,8 +88,8 @@ function private string FindTags(string name)
 function private int FindIndex(string name)
 {
 	local int i;
-	i = -1;
 	
+	i = -1;
 	do 
 	{
 		i += 1;

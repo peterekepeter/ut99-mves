@@ -3,8 +3,6 @@
  - populate/patch server mutators string
  - inject CLIENT_VERSION and SERVER_VERSION
  - test the release package with a clean UT99 to see if it works
- - ALL map switch attempts by MVE should be logged
- - MVES on boot should print version so that server admins know that it started
 
 ## Map Groups
 
