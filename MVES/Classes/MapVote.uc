@@ -272,20 +272,22 @@ event PostBeginPlay()
 			{
 				AddToPackageMap(LogoTexturePackage);
 			}
-			else {
+			else 
+			{
 				Err("Invalid value for LogoTexturePackage, expected Package.Texture");
 			}
 		}
 	}
+	MapList = new class'MV_MapList';
+	MapList.Reader = Spawn(class'MapListReader');
+	MapList.Mutator = self;
 	if ( ExtensionClass != "" )
 		ExtensionC = class<MV_MainExtension>( DynamicLoadObject(ExtensionClass,class'class') );
 	if ( ExtensionC == none )
 		ExtensionC = class'MV_MainExtension';
 	Extension = new ExtensionC;
 	if ( bEnableHTTPMapList && (Level.NetMode != NM_Standalone) )
-		Extension.SetupWebApp();
-	MapList = Spawn(class'MV_MapList');
-	MapList.Mutator = self;
+		Extension.SetupWebApp(MapList);
 	RegisterMessageMutator();
 	
 	if ( DefaultSettings != "" )
@@ -729,7 +731,8 @@ function GenerateMapList(bool bFullscan)
 {
 	if ( MapList == none )
 	{
-		MapList = Spawn(class'MV_MapList');
+		MapList = new class'MV_MapList';
+		MapList.Reader = Spawn(class'MapListReader');
 		MapList.Mutator = self;
 	}
 	MapList.GlobalLoad(bFullscan);

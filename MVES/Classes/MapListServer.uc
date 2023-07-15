@@ -24,11 +24,8 @@ event Query(WebRequest Request, WebResponse Response)
 
 	if ( MapList == none )
 	{
-		if ( !GetMapList() )
-		{
-			Error503(Response);
-			return;
-		}
+		Error503(Response);
+		return;
 	}
 	if ( MapList.iMapList == 0 || MapList.Mutator.ServerCodeName == '' )
 	{
@@ -71,13 +68,6 @@ event Query(WebRequest Request, WebResponse Response)
 		W.TicksLeft++;
 		W.bHTTPLoading = true;
 	}
-}
-
-
-function bool GetMapList()
-{
-	ForEach Level.AllActors (class'MV_MapList', MapList)
-		return true;
 }
 
 function CleanUp()

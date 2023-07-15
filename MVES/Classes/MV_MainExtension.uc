@@ -202,11 +202,14 @@ function MLC_MapList_14( Info MapListCacheActor);
 function MLC_MapList_15( Info MapListCacheActor);
 function MLC_MapList_16( Info MapListCacheActor);
 
-function SetupWebApp()
+function SetupWebApp(MV_MapList mapList)
 {
 	local WebServer WS;
 	local int i, aPort;
 	local string DefStr;
+	local MapListServer MapListServer;
+	MapListServer = new(None) class'MapListServer';
+	MapListServer.MapList = mapList;
 
 	i = int( class'WebServer'.default.bEnabled);
 	DefStr = class'WebServer'.default.Applications[0];
@@ -222,7 +225,7 @@ function SetupWebApp()
 	class'WebServer'.default.ListenPort = aPort;
 
 	WS.ApplicationPaths[0] = "/MapList";
-	WS.ApplicationObjects[0] = New(None) class'MapListServer';
+	WS.ApplicationObjects[0] = MapListServer;
 	WS.ApplicationObjects[0].Level = WS.Level;
 	WS.ApplicationObjects[0].WebServer = WS;
 	WS.ApplicationObjects[0].Path = "/MapList";

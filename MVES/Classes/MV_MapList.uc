@@ -1,7 +1,7 @@
 //================================================================================
 // MV_MapList.
 //================================================================================
-class MV_MapList expands Info config(MVE_MapList);
+class MV_MapList expands MV_Util config(MVE_MapList);
 
 var MapVote Mutator; // required input var
 const MAX_MAPS = 4096;
@@ -34,6 +34,7 @@ var config string M[16384];
 
 var string MapListString; //Send this over the net!
 var MapHistory History;
+var MapListReader Reader;
 
 event PostBeginPlay()
 {
@@ -46,10 +47,9 @@ event PostBeginPlay()
 //Else add to list and find rules that use it
 function GlobalLoad(bool bFullscan)
 {
-	local string FirstMap, CurMap, CurMapWithoutExtension, ClearMap, NewMaps, Maps[16384];
-	local int iSeek;
+	local string CurMap, CurMapWithoutExtension, ClearMap, NewMaps, Maps[16384];
 	local string CurFP, CurRules, PrevRules;
-	local int i, j, k, iLen, iMaps, firstHas;
+	local int i, j, k, iLen, iMaps, firstHas, prevAdded;
 	local string sTest;
 	local bool bAddTag;
 	local MV_MapTags MapTags;
@@ -66,7 +66,6 @@ function GlobalLoad(bool bFullscan)
 		Mutator.SetPropertyText("ServerCodeName",string(rand(MaxInt)) $ string(rand(MaxInt))  );
 	CacheCodes();
 	iMapList = 0;
-	iSeek = 1;
 
 	// collect game names that have random enabled into CurRules string
       
@@ -89,13 +88,14 @@ function GlobalLoad(bool bFullscan)
 		PrevRules = CurRules;
 	}
 	
-	FirstMap = GetMapName("","",0);
-	CurMap = FirstMap;
+	Log("[MVE] Reloading map list, this may take a while!");
+	Reader.Reset();
 	sorter = new class'MV_Sort';
 
-	Log("[MVE] Reloading map list, this may take a while!");
-	while (True) 
+	do
 	{
+		CurMap = Reader.GetMap();
+		
 		if (bFullscan)
 		{
 			if (TestIfMapCanBeLoaded(CurMap) == False)
@@ -110,20 +110,13 @@ function GlobalLoad(bool bFullscan)
 
 		sorter.AddItem(CurMap);
             
-		// get next map from filesystem (to be processed on next loop)
-		CurMap = GetMapName("", FirstMap, iSeek ++ );
-
 		if (sorter.ItemCount >= 4095)
 		{
 			Log("[MVE] Map limit reached with `"$CurMap$"`");
 			break;
 		}
-		if (CurMap == FirstMap || CurMap == "" )
-		{
-			// finished scanning all maps
-			break;
-		}
 	}
+	until (Reader.MoveNext());
       
 	if (Mutator.bSortAndDeduplicateMaps)
 	{
@@ -282,7 +275,7 @@ function GlobalLoad(bool bFullscan)
 	}
 
 	// reload report 
-	Log("[MVE] Matched "$iMaps$" maps to "$iTmpC$" gametypes from "$(iSeek - 1)$" scanned maps.");
+	Log("[MVE] Reloaded "$iMaps$" maps matched to "$iTmpC$" gametypes from "$(Reader.GetMapCount())$" scanned maps.");
 	if (iMaps == 0) 
 	{
 		Log("[MVE]");
@@ -310,7 +303,7 @@ function GlobalLoad(bool bFullscan)
 		}
 		// CustomGame[i].bEnabled && (CustomGame[i].GameClass != "") && (CustomGame[i].GameName != "") && (CustomGame[i].RuleName != "") && (CustomGame[i].VotePriority > 0) 
 	}
-	if (iSeek - 1 <= 10)
+	if (Reader.GetMapCount() <= 10)
 	{
 		Log("[MVE]");
 		Log("[MVE] [WARNING] Unusually low number of maps were found on filesystem!");
@@ -320,7 +313,6 @@ function GlobalLoad(bool bFullscan)
 		Log("[MVE]");
 	}
 
-	Log("[MVE] Map list has been reloaded, check results in the `MVE_MapList.ini`");
 	EnumerateGames();
 	GenerateString();
 	//Mutator.Extension.CloseVoteWindows( Mutator.WatcherList);
