@@ -1,6 +1,14 @@
 class TestMapListEncoder extends TestClass;
 
 var string L[1024];
+
+// reader props
+var int R;
+var string ReadLine;
+var string ReadMapEntry;
+var string ReadMapName;
+
+// writer props
 var int P;
 var int RangeStart;
 var int PrevIndex;
@@ -21,6 +29,63 @@ function TestMain()
 	TestGameCodesBackreference();
 	TestMapNameReuse();
 	TestMultilineEncode();
+	TestDecode();
+}
+
+function TestDecode() 
+{
+	local string m;
+
+	Describe("Basic entry read");
+	Reset();
+	L[0] = "DM-Deck16][:";
+	AssertEquals(ReadNextMap(m), "True", "advances to next map");
+	AssertEquals(m, "DM-Deck16][", "map is Deck16");
+	AssertEquals(ReadNextMap(m), "False", "no next map");
+}
+
+function ResetReader() 
+{
+	R = 0;
+	ReadLine = EMPTY_STRING;
+	ReadMapEntry = EMPTY_STRING;
+	// noop for now
+}
+
+function bool ReadNextMap(out string resultMap) 
+{
+	if (ReadLine == "")
+	{
+		if (L[R] != "")
+		{
+			ReadLine = L[R];
+			R += 1;
+		}
+		else 
+		{
+			return False;
+		}
+	}
+	
+	if (Parse(ReadMapEntry, "|", ReadLine))
+	{
+		if (Parse(ReadMapName, ":", ReadMapEntry))
+		{
+			resultMap = ReadMapName;
+			return True;
+		}
+		else 
+		{
+			// repeat game list from prev map
+			resultMap = ReadMapEntry;
+			return True;
+		}
+	}
+	else 
+	{
+		ReadNextMap(resultMap);
+	}
+	
 }
 
 function TestGameCodeEncode() 
@@ -428,7 +493,37 @@ function ResetWriter()
 	CharsPerLine = InitialCharsPerLine;
 }
 
-function ResetReader() 
+// TODO reuse from utils
+static function bool Parse(out string resultItem, string separator, out string mutableInput)
 {
-	// noop for now
+	return TrySplit(mutableInput, separator, resultItem, mutableInput);
+}
+
+const EMPTY_STRING = "";
+
+static function bool TrySplit(string input, string separator, out string first, out string rest)
+{
+	local int pos;
+
+	if (input == EMPTY_STRING) 
+	{
+		first = EMPTY_STRING;
+		rest = EMPTY_STRING;
+		return False;
+	}
+
+	pos = InStr(input, separator);
+
+	if (pos >= 0) 
+	{
+		first = Left(input, pos);
+		rest = Mid(input, pos + Len(separator));
+		return True;
+	} 
+	else if (pos == -1) 
+	{
+		first = input;
+		rest = "";
+		return True;
+	}
 }
