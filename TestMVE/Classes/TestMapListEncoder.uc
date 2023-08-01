@@ -6,7 +6,7 @@ var int RangeStart;
 var int PrevIndex;
 var int CharsPerLine;
 var int PredictedCode;
-const MaxCharsPerLine = 1000;
+const InitialCharsPerLine = 500;
 var string PrevCodes[8];
 var int PrevCodesIndex;
 var string Codes;
@@ -20,6 +20,7 @@ function TestMain()
 	TestGameCodeEncode();
 	TestGameCodesBackreference();
 	TestMapNameReuse();
+	TestMultilineEncode();
 }
 
 function TestGameCodeEncode() 
@@ -206,7 +207,32 @@ function TestMapNameReuse()
 	Reset();
 	AddMap("DM-1on1-Rose-v2"); AddToGame(0);
 	AddMap("DM-1on1-Rose"); AddToGame(0);
-	AssertLine(0, "DM-1on1-Rose-v2:|10>", "full name 12 char resuse");
+	AddMap("DM-1on1-R"); AddToGame(0);
+	AssertLine(0, "DM-1on1-Rose-v2:|10>|7>", "full name resuse");
+}
+
+function TestMultilineEncode()
+{
+	Describe("List is written to new line when limit is exceeded");
+
+	Reset();
+	CharsPerLine = 30;
+	AddMap("AS-Frigate"); AddToGame(0);
+	AddMap("DM-Deck16]["); AddToGame(1);
+	AddMap("CTF-Face"); AddToGame(2);
+	AssertLine(0, "AS-Frigate:|DM-Deck16][:0", "first contains first 2 maps");
+	AssertLine(1, "CTF-Face:1", "second line contains 3rd map");
+
+	Describe("List items all written to newlines when limit is to low");
+
+	Reset();
+	CharsPerLine = 4;
+	AddMap("AS-Frigate"); AddToGame(0);
+	AddMap("DM-Deck16]["); AddToGame(1);
+	AddMap("CTF-Face"); AddToGame(2);
+	AssertLine(0, "AS-Frigate:", "first line contains first map");
+	AssertLine(1, "DM-Deck16][:0", "second line second map");
+	AssertLine(2, "CTF-Face:1", "third line third map");
 }
 
 function AssertLine(int line, string expected, string because)
@@ -349,12 +375,21 @@ function FinalizeMapEntry()
 
 		if (L[P] != "") 
 		{
-			L[P] = L[P]$"|"$s;
+			if (CharsPerLine < Len(L[P]) + Len(s) + 1)
+			{
+				P += 1;
+				L[P] = L[P]$s;
+			}
+			else 
+			{
+				L[P] = L[P]$"|"$s;
+			}
 		}
 		else 
 		{
 			L[P] = L[P]$s;
 		}
+
 		Codes = "";
 		PrevMap = NextMap;
 		PredictedCode = 0;
@@ -367,6 +402,12 @@ function Finalize()
 }
 
 function Reset() 
+{
+	ResetReader();
+	ResetWriter();
+}
+
+function ResetWriter() 
 {
 	local int i;
 	for (i = 0; i <= P; i+=1) 
@@ -384,5 +425,10 @@ function Reset()
 	RangeStart = NA;
 	Codes = "";
 	PrevMap = "";
-	CharsPerLine = MaxCharsPerLine;
+	CharsPerLine = InitialCharsPerLine;
+}
+
+function ResetReader() 
+{
+	// noop for now
 }
