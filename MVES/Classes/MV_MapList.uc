@@ -673,15 +673,6 @@ final function bool IsEdited( int i)
 	return MapList[i] != default.MapList[i];
 }
 
-final function int RandomGame( int i)
-{
-	local int j;
-	local string s;
-	s = Mid( MapList[i], InStr( MapList[i], ":") );
-	j = Len(s) / 3;
-	return int( Mid(s, Rand(j) * 3 + 1, 2) );
-}
-
 final function string RandomMap( int Game)
 {
 	local int MaxRandom, i, iRandom;
