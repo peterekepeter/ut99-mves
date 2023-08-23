@@ -239,6 +239,57 @@ function string GetSongString()
 	return OriginalSong;
 }
 
+function string GetIdealPlayerCountString()
+{
+	local string result;
+	result = GetLevelSummaryObject().IdealPlayerCount;
+	if (result == "") result = GetLevelInfoObject().IdealPlayerCount;
+	return result;
+}
+
+function int GetAvgIdealPlayerCount() 
+{
+	local int dashAt, temp, value, weight;
+	local string str;
+	str = GetIdealPlayerCountString();
+	dashAt = InStr(str, "-");
+	value = 0;
+	weight = 0;
+	if (dashAt >= 0) 
+	{
+		temp = int(Left(str, dashAt));
+		if (temp > 0) 
+		{
+			value += temp;
+			weight += 1;
+		}
+		temp = int(Mid(str, dashAt + 1));
+		if (temp > 0) 
+		{
+			value += temp;
+			weight += 1;
+		}
+	}
+	else 
+	{
+		temp = int(str);
+		if (temp > 0) 
+		{
+			value += temp;
+			weight += 1;
+		}
+	}
+	if (value > 0 && weight > 0) 
+	{
+		return value / weight;
+	}
+	else 
+	{
+		// value not known
+		return -1; 
+	}
+}
+
 function LoadSongInformation()
 {
 	if (OriginalSong == "")

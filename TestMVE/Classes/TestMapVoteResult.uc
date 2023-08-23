@@ -31,6 +31,8 @@ function TestMapLoading()
 	s.Map = "DM-Fractal";
 	AssertEquals(s.CanMapBeLoaded(), True, "can be loaded");
 	AssertEquals(s.GetSongString(), "Mech8.Mech8", "song is mech8");
+	AssertEquals(s.GetIdealPlayerCountString(), "2-4", "ideal player count string is 2-4");
+	AssertEquals(s.GetAvgIdealPlayerCount(), 3, "parsed ideal player count is 3");
 
 	Describe("randomgarbage map");
 	s.Map = "randomgarbage";

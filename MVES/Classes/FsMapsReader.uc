@@ -1,4 +1,4 @@
-class MapListReader extends Info;
+class FsMapsReader extends Info;
 
 var int iSeek;
 var String FirstMap;

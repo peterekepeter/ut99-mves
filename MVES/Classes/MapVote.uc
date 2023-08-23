@@ -279,7 +279,7 @@ event PostBeginPlay()
 		}
 	}
 	MapList = new class'MV_MapList';
-	MapList.Reader = Spawn(class'MapListReader');
+	MapList.Reader = Spawn(class'FsMapsReader');
 	MapList.Mutator = self;
 	if ( ExtensionClass != "" )
 		ExtensionC = class<MV_MainExtension>( DynamicLoadObject(ExtensionClass,class'class') );
@@ -732,7 +732,7 @@ function GenerateMapList(bool bFullscan)
 	if ( MapList == none )
 	{
 		MapList = new class'MV_MapList';
-		MapList.Reader = Spawn(class'MapListReader');
+		MapList.Reader = Spawn(class'FsMapsReader');
 		MapList.Mutator = self;
 	}
 	MapList.GlobalLoad(bFullscan);
@@ -1365,6 +1365,24 @@ final function float VotePriority( int i)
 	return CustomGame[i].VotePriority;
 }
 
+final function int GetPlayerCount() 
+{
+	local int count;
+	local Pawn p;
+
+	count = 0;
+
+	for (p = Level.PawnList; p != None; p = p.NextPawn)
+	{
+		if (PlayerPawn(p) != None && !p.IsA('Spectator'))
+		{
+			count += 1;
+		}
+	}
+	
+	return count;
+}
+
 final function bool CanVote(PlayerPawn Sender)
 {
 	if (Sender.Player == None) 
@@ -1442,7 +1460,7 @@ function PrintCircularExtendsError(MapVoteResult r, int idx){
 final function bool SetupTravelString( string mapStringWithIdx )
 {
 	local string spk, GameClassName, LogoTexturePackage, mapFileName, idxString;
-	local int idx, TickRate;
+	local int idx, TickRate, playerCount;
 	local MV_MapOverrides MapOverrides;
 	local MapVoteResult Result;
 	local LevelInfo info;
@@ -1457,8 +1475,8 @@ final function bool SetupTravelString( string mapStringWithIdx )
 
 	if ( Result.Map ~= "Random" )
 	{
-		// TODO idea random map should factor in number of players
-		Result.Map = MapList.RandomMap(Result.GameIndex);
+		PlayerCount = GetPlayerCount();
+		Result.Map = MapList.RandomMap(Result.GameIndex, PlayerCount);
 	}
 
 	if (Result.CanMapBeLoaded() == false){

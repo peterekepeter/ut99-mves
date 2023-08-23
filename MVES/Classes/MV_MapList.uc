@@ -34,12 +34,12 @@ var config string M[16384];
 
 var string MapListString; //Send this over the net!
 var MapHistory History;
-var MapListReader Reader;
+var FsMapsReader Reader;
 
 event PostBeginPlay()
 {
-	History = new(self) class'MapHistory';	
-	History.MapList = self;
+	History = new(Self) class'MapHistory';	
+	History.MapList = Self;
 }
 
 //We scan all maps, check if they match our filters
@@ -63,7 +63,7 @@ function GlobalLoad(bool bFullscan)
 	Mutator.CleanRules();
 	Mutator.CountFilters();
 	if ( Mutator.ServerCodeName == '' )
-		Mutator.SetPropertyText("ServerCodeName",string(rand(MaxInt)) $ string(rand(MaxInt))  );
+		Mutator.SetPropertyText("ServerCodeName",string(rand(MaxInt))$string(rand(MaxInt))  );
 	CacheCodes();
 	iMapList = 0;
 
@@ -77,13 +77,13 @@ function GlobalLoad(bool bFullscan)
 		}
 		if ( Mutator.HasRandom(i) ) 
 		{
-			CurRules = CurRules $ ":" $ TwoDigits(i);
+			CurRules = CurRules$":"$TwoDigits(i);
 		}
 	}
 
 	if ( CurRules != "" )
 	{
-		MapList[iMapList] = "Random" $ CurRules $ ";";
+		MapList[iMapList] = "Random"$CurRules$";";
 		iMapList ++ ;
 		PrevRules = CurRules;
 	}
@@ -146,7 +146,7 @@ function GlobalLoad(bool bFullscan)
 			iLen = Len( TmpCodes[i]);
 			for ( j = FStart[i] ; j < FEnd[i] ; j ++ )
 			{
-				if ( ! (Left( Mutator.GetMapFilter(j), iLen) ~= TmpCodes[i]) ) //Check that this IS a filter for this gamemode
+				if (! (Left( Mutator.GetMapFilter(j), iLen) ~= TmpCodes[i]) ) //Check that this IS a filter for this gamemode
 					continue;
 				sTest = Mid( Mutator.GetMapFilter(j), iLen);
 				if ( Mutator.bEnableMapTags && InStr(sTest, ":") == 0 ) //Tag match
@@ -181,7 +181,7 @@ function GlobalLoad(bool bFullscan)
 			}
 			
 			if ( bAddTag )
-				CurRules = CurRules $ GameTags[i];
+				CurRules = CurRules$GameTags[i];
 		}
 		if ( CurRules != "" )
 		{
@@ -190,11 +190,11 @@ function GlobalLoad(bool bFullscan)
 			Maps[ iMaps ++ ] = ClearMap;
 			if (CurRules == PrevRules)
 			{
-				MapList[ iMapList ] = ClearMap $ ";";
+				MapList[ iMapList ] = ClearMap$";";
 			}
 			else 
 			{
-				MapList[ iMapList ] = ClearMap $ CurRules $ ";";
+				MapList[ iMapList ] = ClearMap$CurRules$";";
 			}
 			iMapList ++ ;
 			PrevRules = CurRules;
@@ -204,15 +204,15 @@ function GlobalLoad(bool bFullscan)
 	Log("[MVE] Remove old + add new maps...");
 	NewMaps = ":";
 	for (i = 0; i < iMaps; i ++ )
-		NewMaps = NewMaps $ Maps[i] $ ":";	
+		NewMaps = NewMaps$Maps[i]$":";	
 
 	ClearMap = ":";
 	j = 0;
 	for (i = 0; i < iM; i ++ ) 
 	{
-		if (InStr(NewMaps, ":" $ M[i] $ ":") != -1) 
+		if (InStr(NewMaps, ":"$M[i]$":") != -1) 
 		{
-			ClearMap = ClearMap $ M[i] $ ":";
+			ClearMap = ClearMap$M[i]$":";
 			if (i != j)
 				M[j] = M[i];
 			j ++ ;
@@ -222,7 +222,7 @@ function GlobalLoad(bool bFullscan)
 	
 	for (i = 0; i < iMaps; i ++ ) 
 	{
-		if (InStr(ClearMap, ":" $ Maps[i] $ ":") == -1)
+		if (InStr(ClearMap, ":"$Maps[i]$":") == -1)
 			M[j ++ ] = Maps[i];
 	}
 	iM = j;
@@ -231,12 +231,12 @@ function GlobalLoad(bool bFullscan)
 		
 	ClearMap = ":";
 	for (i = 0; i < iMapList; i ++ )
-		ClearMap = ClearMap $ Left(MapList[i], InStr(MapList[i], ":")) $ ":" $ i $ ":";	
+		ClearMap = ClearMap$Left(MapList[i], InStr(MapList[i], ":"))$":"$i$":";	
 	
 	for (j = 0; j < ArrayCount(iNewMaps) && iM - j > 0; j ++ ) 
 	{
 		NewMaps = M[iM - j - 1];
-		k = InStr(ClearMap, ":" $ NewMaps $ ":");
+		k = InStr(ClearMap, ":"$NewMaps$":");
 		if (k == -1) 
 		{
 			iNewMaps[j] = 0;
@@ -258,11 +258,11 @@ function GlobalLoad(bool bFullscan)
 			for ( j = FStart[i] ; j < FEnd[i] ; j ++ )
 			{
 				//Check that this IS a filter for this gamemode
-				if ( ! (Left( Mutator.GetMapFilter(j), iLen) ~= TmpCodes[i]) ) 
+				if (! (Left( Mutator.GetMapFilter(j), iLen) ~= TmpCodes[i]) ) 
 				{
 					continue;
 				}
-				MapList[iMapList] = Mid( Mutator.GetMapFilter(j), iLen) $ GameTags[i] $ ";";
+				MapList[iMapList] = Mid( Mutator.GetMapFilter(j), iLen)$GameTags[i]$";";
 				iMapList ++ ;
 			}
 		}
@@ -330,18 +330,18 @@ function CacheCodes()
 
 	for ( i = 0 ; i < Mutator.iGames ; i ++ )
 	{
-		tmpCode = Mutator.MutatorCode(i) $ " ";
+		tmpCode = Mutator.MutatorCode(i)$" ";
 		if ( tmpCode != " " )
 		{
 			for ( j = 0 ; j < k ; j ++ )
 				if ( TmpCodes[j] == tmpCode )
 				{
-					GameTags[j] = GameTags[j] $ ":" $ TwoDigits(i);
+					GameTags[j] = GameTags[j]$":"$TwoDigits(i);
 					goto END_LOOP;
 				}
 			if ( Left(tmpCode,7) ~= "premade" )
 				IsPremade[k] = 1;
-			GameTags[k] = ":" $ TwoDigits(i);
+			GameTags[k] = ":"$TwoDigits(i);
 			TmpCodes[k ++ ] = tmpCode;
 		}
 		END_LOOP:
@@ -418,7 +418,7 @@ function EnumerateGames()
 				if ( TmpGameName[j] ~= gameName )
 				{
 					// add to existing rule from RuleList
-					RuleList[j] = RuleList[j] $ ":" $ TwoDigits(i);
+					RuleList[j] = RuleList[j]$":"$TwoDigits(i);
 					found = True;
 				}
 			}
@@ -426,7 +426,7 @@ function EnumerateGames()
 			{
 				// add new entry into RuleList
 				TmpGameName[iRules] = gameName;
-				RuleList[iRules] = ":" $ TwoDigits(i);
+				RuleList[iRules] = ":"$TwoDigits(i);
 				iRules ++ ;
 			}
 		}
@@ -483,7 +483,7 @@ function bool IsValidMap( out string MapString, out string reason )
 			{
 				// found!
 				// normalize string for voting stage
-				MapString = Left(MapList[i], iLen) $ ":" $ GameIdx; 
+				MapString = Left(MapList[i], iLen)$":"$GameIdx; 
 				// TODO check if map on coldown
 				// TODO check if map in crashed state
 				return True;
@@ -548,26 +548,26 @@ function GenerateString()
 	local string S;
 
 	for ( i = 0 ; i < iRules ; i ++ )
-		MapListString = MapListString $ "RuleList[" $ string(i) $ "]=" $ RuleList[i] $ chr(13);
+		MapListString = MapListString$"RuleList["$string(i)$"]="$RuleList[i]$chr(13);
 	for ( i = 0 ; i < iGameC ; i ++ )
 	{
 		if ( GameNames[i] != "" )
 		{
 			j ++ ;
-			MapListString = MapListString $ "GameModeName[" $ string(i) $ "]=" $ GameNames[i] $ chr(13)
-				$ "RuleName[" $ string(i) $ "]=" $ RuleNames[i] $ chr(13)
-				$ "VotePriority[" $ string(i) $ "]=" $ string(VotePriority[i]) $ chr(13);
+			MapListString = MapListString$"GameModeName["$string(i)$"]="$GameNames[i]$chr(13)
+				$"RuleName["$string(i)$"]="$RuleNames[i]$chr(13)
+				$"VotePriority["$string(i)$"]="$string(VotePriority[i])$chr(13);
 		}
 	}
 	GameCount = j; //HACK FIX
 	
 	for ( i = 0 ; i < iMapList ; i ++ )
-		MapListString = MapListString $ "MapList[" $ string(i) $ "]=" $ MapList[i] $ chr(13);
+		MapListString = MapListString$"MapList["$string(i)$"]="$MapList[i]$chr(13);
 
 	MapListString = MapListString 
-		$ "MapCount=" $ string(iMapList) $ chr(13)
-		$ "RuleListCount=" $ string(iRules) $ chr(13)
-		$ "RuleCount=" $ string(GameCount) $ chr(13);
+		$"MapCount="$string(iMapList)$chr(13)
+		$"RuleListCount="$string(iRules)$chr(13)
+		$"RuleCount="$string(GameCount)$chr(13);
 
 	GenerateCode();
 }
@@ -589,7 +589,7 @@ function GenerateCode()
 		}
 		i ++ ;
 	}
-	LastUpdate = class'MV_MainExtension'.static.NumberToByte(K) $ class'MV_MainExtension'.static.NumberToByte(j);
+	LastUpdate = class'MV_MainExtension'.static.NumberToByte(K)$class'MV_MainExtension'.static.NumberToByte(j);
 }
 
 function string GetStringSection( string StartsFrom)
@@ -611,9 +611,9 @@ function string GetStringSection( string StartsFrom)
 		Result = Left( Result, Len(Result) -1);
 
 	if (!bNext )
-		return "[START]" $ chr(13) $ Result $ "[END]" $ chr(13) $ "[NEXT]" $ chr(13);
+		return "[START]"$chr(13)$Result$"[END]"$chr(13)$"[NEXT]"$chr(13);
 	//Notify END of list, add the "[X]" on individual map entries!
-	return "[START]" $ chr(13) $ Result $ "[NEXT]" $ chr(13) $ "[END]" $ chr(13);
+	return "[START]"$chr(13)$Result$"[NEXT]"$chr(13)$"[END]"$chr(13);
 }
 
 function string RemoveExtension( string aStr)
@@ -639,13 +639,8 @@ function string RemoveExtension( string aStr)
 function string TwoDigits( int i)
 {
 	if ( i < 10 )
-		return "0"$ string(i);
+		return "0"$string(i);
 	return string(i);
-}
-
-final function string MapName( int i)
-{
-	return class'MV_MainExtension'.static.ByDelimiter(MapList[i],":");
 }
 
 final function string MapGames( int i)
@@ -673,34 +668,74 @@ final function bool IsEdited( int i)
 	return MapList[i] != default.MapList[i];
 }
 
-final function string RandomMap( int Game)
+final function string RandomMap( int gameIdx, int forPlayerCount )
 {
-	local int MaxRandom, i, iRandom;
-	local string GameString, Result;
-	
-	GameString = ":" $ TwoDigits( Game);
-	MaxRandom = 1;
-	for ( i = 1 ; i < iMapList ; i ++ )
+	local MapListDecoder decoder;
+	local int i, j, code;
+	local string result;
+	local string options[4096];
+	local string bestResult;
+	local string levelString;
+	local MapVoteResult map;
+	local int bestScore, resultScore;
+	local int count, idealPlayers, delta;
+
+	decoder = new class'MapListDecoder';
+	count = 0;
+
+	for (i = 0; i < iMapList; i+=1)
 	{
-		if ( (InStr( MapList[i], GameString) > 0) && (Left(MapList[i], 3) != "[X]") )
+		decoder.L[i] = MapList[i];
+		while (decoder.ReadEntry(result)) 
 		{
-			if ( Rand(MaxRandom ++ ) == 0 )
-				Result = MapList[i];
+			while (decoder.ReadCode(code)) {
+				if (code == gameIdx ) 
+				{
+					options[count] = result;
+					count += 1;
+					continue;
+				}
+			}
 		}
 	}
-	if ( Result != "" )
-		return class'MV_MainExtension'.static.ByDelimiter(Result,":");
-	//All maps red?
-	MaxRandom = 1;
-	for ( i = 1 ; i < iMapList ; i ++ )
+
+	levelString = ""$decoder;
+	decoder.Parse(levelString, ".", levelString);
+	bestScore = -1000;
+	for (i = 0; i < 10; i += 1) 
 	{
-		if ( (InStr( MapList[i], GameString) > 0)  )
+		result = options[(Rand(count) + gameIdx * 7 + count * 13) % count];
+		resultScore = 0;
+		map = class'MapVoteResult'.static.Create(result, gameIdx);
+		if (result ~= "Random") 
 		{
-			if ( Rand(MaxRandom ++ ) == 0 )
-				Result = MapList[i];
+			resultScore -= 100;
+		}
+		else if (!map.CanMapBeLoaded())
+		{
+			resultScore -= 100;
+		}
+		else if (forPlayerCount >= 0)
+		{
+			idealPlayers = map.GetAvgIdealPlayerCount();
+			if (idealPlayers >= 0) 
+			{
+				delta = forPlayerCount - idealPlayers;
+				if (delta < 0)
+				{
+					delta = -delta;
+				}
+				resultScore += 32 - delta;
+			}
+		}
+		if (result ~= levelString) resultScore -= 10;
+		if (bestScore <= resultScore) 
+		{
+			bestResult = result;
+			bestScore = resultScore;
 		}
 	}
-	return class'MV_MainExtension'.static.ByDelimiter(Result,":");
+	return bestResult;
 }
 
 final simulated function float GetVotePriority( int Idx)

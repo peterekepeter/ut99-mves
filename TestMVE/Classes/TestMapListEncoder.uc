@@ -7,6 +7,8 @@ var int R;
 var string ReadLine;
 var string ReadMapEntry;
 var string ReadMapName;
+var string PrevReadCodes[8];
+var int PrevReadCodesAt;
 
 // writer props
 var int P;
@@ -74,27 +76,39 @@ function TestDecode()
 
 	Describe("Read legacy ommited codes are repeated");
 	Reset();
-	L[0] = "A:1:2|B|C";
+	L[0] = "A:3:4:5|B";
 	ReadEntry(m); AssertEquals(m, "A", "first entry is A");
-	ReadCode(c); AssertEquals(c, 1, "first code is 1");
-	ReadCode(c); AssertEquals(c, 2, "second code is 2");
+	ReadCode(c); AssertEquals(c, 3, "1st code is 3");
+	ReadCode(c); AssertEquals(c, 4, "2nd code is 4");
+	ReadCode(c); AssertEquals(c, 5, "3rd code is 5");
 	ReadEntry(m); AssertEquals(m, "B", "second entry is B");
-	ReadCode(c); AssertEquals(c, 1, "first code is 1");
-	ReadCode(c); AssertEquals(c, 2, "second code is 2");
-	ReadEntry(m); AssertEquals(m, "C", "second entry is B");
-	ReadCode(c); AssertEquals(c, 1, "first code is 1");
-	ReadCode(c); AssertEquals(c, 2, "second code is 2");
+	ReadCode(c); AssertEquals(c, 3, "1st code is 3");
+	ReadCode(c); AssertEquals(c, 4, "2nd code is 4");
+	ReadCode(c); AssertEquals(c, 5, "3rd code is 5");
+
+	Describe("Read legacy entry with semicolon");
+	Reset();
+	L[0] = "DM-Agony;";
+	ReadEntry(m); AssertEquals(m, "DM-Agony", "legacy semicolon is trimmed");
 }
 
 function ResetReader() 
 {
+	local int i;
 	R = 0;
 	ReadLine = EMPTY_STRING;
 	ReadMapEntry = EMPTY_STRING;
+	PrevReadCodesAt = 0;
+	for (i = 0; i < ArrayCount(PrevCodes); i+=1)
+	{
+		PrevCodes[i] = EMPTY_STRING;
+	}
 }
 
 function bool ReadEntry(out string resultMap) 
 {
+	local bool trimLegacySemicolon; 
+
 	if (ReadLine == "")
 	{
 		if (L[R] != "")
@@ -107,26 +121,51 @@ function bool ReadEntry(out string resultMap)
 			return False;
 		}
 	}
+
+	// detect legacy semicolon mode
+	// workaround implemented on 2023-08-23
+	trimLegacySemicolon = InStr(ReadMapEntry, "|") == -1;
 	
 	if (Parse(ReadMapEntry, "|", ReadLine))
 	{
 		if (Parse(ReadMapName, ":", ReadMapEntry))
 		{
 			resultMap = ReadMapName;
+			if (ReadMapEntry == EMPTY_STRING) 
+			{
+				if (trimLegacySemicolon) 
+				{
+					// map list is from  version of mve which has suffixed semicolons
+					if (Right(resultMap, 1) == ";") 
+					{
+						resultMap = Left(resultMap, Len(resultMap) -1);
+					}
+				}
+				// backreference to previous codes
+				ReadMapEntry = PrevReadCodes[(PrevReadCodesAt - 1) & 7];
+			}
+			else if (Mid(ReadMapEntry, 0, 1) == "-") 
+			{
+				// handle long backreference
+				ReadMapEntry = PrevReadCodes[(int(ReadMapEntry) -2) & 7];
+			}
+			else 
+			{
+				// new code definition
+				PrevReadCodes[PrevReadCodesAt] = ReadMapEntry;
+				PrevReadCodesAt = (PrevReadCodesAt + 1) & 7;
+			}
 			return True;
 		}
 		else 
 		{
-			// repeat game list from prev map
-			resultMap = ReadMapEntry;
-			return True;
+			// ignore empty entry, reproduce with |||| or emtpy config lines
 		}
 	}
 	else 
 	{
 		ReadEntry(resultMap);
 	}
-	
 }
 
 function bool ReadCode(out int code)
