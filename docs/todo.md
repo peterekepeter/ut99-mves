@@ -18,8 +18,6 @@ Tournament maps groupped by size.
     ServerIdleAfterMinutes=60
 ```
 
-Fix random map to exclude game configs with bAvoidRandom
-
 accept !vote as command, more explicit
 
 ## Priority List
