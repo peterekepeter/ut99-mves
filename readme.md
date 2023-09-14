@@ -33,7 +33,7 @@ Important Features:
 
 To install, grab one of the [latest release](../../releases/latest) and follow the readme 
 from the that comes with the release. You should be able to find an 
-[installation guide](./ReleaseFiles/MVE2g-v1/Help/Map%20Vote%20Extended.txt)
+[installation guide](./ReleaseFiles/MVE2h/Help/Map%20Vote%20Extended.txt)
 inside the Help folder.
 
 

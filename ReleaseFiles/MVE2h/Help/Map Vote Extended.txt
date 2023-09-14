@@ -26,13 +26,13 @@ Advanced Installation
 =====================
 
 - If bOverrideServerPackages=True then MapVote will manage ServerPackages for
-you and will automatically add the user interface package MVE2g to ServerPackages
+you and will automatically add the user interface package MVE2h to ServerPackages
 By default bOverrideServerPackages=True but if you have set 
 bOverrideServerPackages=False you will need to manually add the client package 
 yourself to ServerPackages:
 
 [Engine.GameEngine] 
-ServerPackages=MVE2g
+ServerPackages=MVE2h
 
 
 - MapVote can be installed both in mutator or server actor mode. This will 
