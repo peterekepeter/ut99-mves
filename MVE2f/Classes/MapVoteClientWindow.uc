@@ -310,15 +310,15 @@ function Created ()
 	lblStatusTitles2.SetText("Map Name");
 	lblStatusTitles2.SetFont(0);
 	lblStatusTitles2.SetTextColor(TextColor);
-	lblStatusTitles3 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',188.50 + 10,LowSectionStart - 3,60.0,10.0));
+	lblStatusTitles3 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',249.50 + 10,LowSectionStart - 3,60.0,10.0));
 	lblStatusTitles3.SetText("Game Mode");
 	lblStatusTitles3.SetFont(0);
 	lblStatusTitles3.SetTextColor(TextColor);
-	lblStatusTitles4 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',349.50 + 10,LowSectionStart - 3,60.0,10.0));
+	lblStatusTitles4 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',424.50 + 10,LowSectionStart - 3,60.0,10.0));
 	lblStatusTitles4.SetText("Rule");
 	lblStatusTitles4.SetFont(0);
 	lblStatusTitles4.SetTextColor(TextColor);
-	lblStatusTitles5 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',521.00,LowSectionStart - 3,60.0,10.0));
+	lblStatusTitles5 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',610.00,LowSectionStart - 3,60.0,10.0));
 	lblStatusTitles5.SetText("Votes");
 	lblStatusTitles5.SetFont(0);
 	lblStatusTitles5.SetTextColor(TextColor);
