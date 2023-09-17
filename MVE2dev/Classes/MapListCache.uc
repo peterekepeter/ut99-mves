@@ -50,6 +50,7 @@ var string ClientScreenshotPackage;
 var string ClientLogoTexture;
 var string ServerInfoURL;
 var string MapInfoURL;
+var MV_Callbacks ServerCallbacks;
 
 replication
 {
@@ -72,7 +73,7 @@ replication
 		ServerCode, iNewMaps, ClientScreenshotPackage, ClientLogoTexture, ServerInfoURL, MapInfoURL;
 
 	reliable if(Role < ROLE_Authority)
-		NeedServerMapList, bChaceCheck, 
+		NeedServerMapList, FinishServerMapList, bChaceCheck, 
 		bClientLoadEnd;
 }
 
@@ -466,11 +467,13 @@ final simulated function ChaceCheck()
 	class'MapListCacheHelper'.static.ConvertServerCode(self);
 	MVC = new (class'MapVoteCache', class'MapListCacheHelper'.default.ServerCodeN) class'MapVoteCache';
 	bChaceCheck = true;
-	dlog("client: ChaceCheckEnd!");
+
+	Log("bCached "$MVC.bCached$" MVC.LastUpdate "$MVC.LastUpdate);
 
 	if(!MVC.bCached || MVC.LastUpdate != LastUpdate)
 	{
 		bNeedServerMapList = true;
+		Log("bNeedServerMapList set to true");
 
 		if(HTTPMapListLocation ~= "None")
 		{
@@ -488,6 +491,7 @@ final simulated function ChaceCheck()
 	}
 
 	// no need to transfer, load from ini
+	Log("load from ini");
 
 	for (i = 0; i < ArrayCount(RuleList); ++i)
 	{
@@ -520,27 +524,44 @@ final simulated function ChaceCheck()
 	
 	}
 	MapCount = MVC.MapCount;
+	FinishServerMapList();
 }
 
 final function NeedServerMapList()
 {
 	//local string S;
-	Log("NeedServerMapList() was called call, Role:"$Role);
-
 	if(Role != ROLE_Authority)
 	{
 		return;
 	}
+
+	Log("NeedServerMapList() was called call, Role:"$Role);
+
 	HTTPMapListLocation = "None";
 	bNeedServerMapList = true;
+	ServerCallbacks.RequestFullCache();
 /*     S = Left(string(default.Class), InStr(string(default.Class), "."));
 	S = Mid(S, 0, Len(S) - 1);
 	Helper = class<MapListCacheHelper>(DynamicLoadObject(S $ "S.MapListCacheHelperS", Class.Class));
 	Helper.static.NeedServerMapList(self); */
 }
 
+final function FinishServerMapList()
+{
+	if(Role != ROLE_Authority)
+	{
+		return;
+	}
+
+	Log("FinishServerMapList() was called call, Role:"$Role);
+	SetTimer(0.0,False);
+	bNeedServerMapList = false;
+	ServerCallbacks.FullCacheLoaded();
+}
+
 simulated function Timer ()
 {
+	Log("MapListCache Timer");
 	if ( Owner == None )
 	{
 		Destroy();
@@ -631,6 +652,8 @@ final simulated function MapListCheck ()
 		{
 			SaveToMapVoteCache();
 		}
+		bNeedServerMapList = False;
+		FinishServerMapList();
 	}
 }
 
@@ -644,10 +667,6 @@ final simulated function int MapCounter (string S)
 
 final function dlog (string S)
 {
-	if ( !bDebugMode )
-	{
-		return;
-	}
 	Log(S,Class.Name);
 }
 

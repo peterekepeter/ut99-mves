@@ -2,7 +2,7 @@
 // Player watcher for players
 //
 
-class MVPlayerWatcher expands Info;
+class MVPlayerWatcher expands MV_Callbacks;
 
 var MapVote Mutator;
 var PlayerPawn Watched;
@@ -114,9 +114,9 @@ GetCache:
 	TicksLeft = 15;
 	if ( ViewPort(Watched.Player) != none ) //Local player, proceed to hack the MLC
 	{
-		MapListCacheActor.SetPropertyText("bNeedServerMapList","1");
+		// MapListCacheActor.SetPropertyText("bNeedServerMapList","1");
 		MapListCacheActor.SetPropertyText("bClientLoadEnd","1");
-		MapListCacheActor.SetPropertyText("HTTPMapListLocation","None");
+		// MapListCacheActor.SetPropertyText("HTTPMapListLocation","None");
 		MapListCacheActor.SetPropertyText("bChaceCheck","1");
 		MapListCacheActor.SetPropertyText("LoadMapCount", string(Mutator.MapList.iMapList) );
 		MapListCacheActor.SetPropertyText("LoadRuleCount", string(Mutator.MapList.GameCount) );
@@ -127,29 +127,30 @@ GetCache:
 		if ( NeedsFullCache() )
 		{
 			FullCache:
-			MapListCacheActor.SetPropertyText("bNeedServerMapList","1");
-			MapListCacheActor.SetPropertyText("HTTPMapListLocation","None");
-			MapListCacheActor.SetPropertyText("ClientScreenshotPackage", Mutator.ClientScreenshotPackage );
-			MapListCacheActor.SetPropertyText("ClientLogoTexture", Mutator.ClientLogoTexture );
-			MapListCacheActor.SetPropertyText("ServerInfoURL", Mutator.ServerInfoURL );
-			MapListCacheActor.SetPropertyText("MapInfoURL", Mutator.MapInfoURL );
-			Mutator.Extension.MLC_Rules( MapListCacheActor); 	Sleep(0.5);
-			Mutator.Extension.MLC_MapList_1( MapListCacheActor); 	Sleep(0.5);
-			Mutator.Extension.MLC_MapList_2( MapListCacheActor);	Sleep(0.5);
-			Mutator.Extension.MLC_MapList_3( MapListCacheActor);	Sleep(0.5);
-			Mutator.Extension.MLC_MapList_4( MapListCacheActor);	Sleep(0.5);
-			Mutator.Extension.MLC_MapList_5( MapListCacheActor);	Sleep(0.5);
-			Mutator.Extension.MLC_MapList_6( MapListCacheActor);	Sleep(0.5);
-			Mutator.Extension.MLC_MapList_7( MapListCacheActor);	Sleep(0.5);
-			Mutator.Extension.MLC_MapList_8( MapListCacheActor);	Sleep(0.5);
-			Mutator.Extension.MLC_MapList_9( MapListCacheActor);	Sleep(0.5);
-			Mutator.Extension.MLC_MapList_10( MapListCacheActor);	Sleep(0.5);
-			Mutator.Extension.MLC_MapList_11( MapListCacheActor);	Sleep(0.5);
-			Mutator.Extension.MLC_MapList_12( MapListCacheActor);	Sleep(0.5);
-			Mutator.Extension.MLC_MapList_13( MapListCacheActor);	Sleep(0.5);
-			Mutator.Extension.MLC_MapList_14( MapListCacheActor);	Sleep(0.5);
-			Mutator.Extension.MLC_MapList_15( MapListCacheActor);	Sleep(0.5);
-			Mutator.Extension.MLC_MapList_16( MapListCacheActor);
+			Log("[MVE] Client needs full cache ");
+			// MapListCacheActor.SetPropertyText("bNeedServerMapList","1");
+			// MapListCacheActor.SetPropertyText("HTTPMapListLocation","None");
+			// MapListCacheActor.SetPropertyText("ClientScreenshotPackage", Mutator.ClientScreenshotPackage );
+			// MapListCacheActor.SetPropertyText("ClientLogoTexture", Mutator.ClientLogoTexture );
+			// MapListCacheActor.SetPropertyText("ServerInfoURL", Mutator.ServerInfoURL );
+			// MapListCacheActor.SetPropertyText("MapInfoURL", Mutator.MapInfoURL );
+			// Mutator.Extension.MLC_Rules( MapListCacheActor); 	Sleep(0.5);
+			// Mutator.Extension.MLC_MapList_1( MapListCacheActor); 	Sleep(0.5);
+			// Mutator.Extension.MLC_MapList_2( MapListCacheActor);	Sleep(0.5);
+			// Mutator.Extension.MLC_MapList_3( MapListCacheActor);	Sleep(0.5);
+			// Mutator.Extension.MLC_MapList_4( MapListCacheActor);	Sleep(0.5);
+			// Mutator.Extension.MLC_MapList_5( MapListCacheActor);	Sleep(0.5);
+			// Mutator.Extension.MLC_MapList_6( MapListCacheActor);	Sleep(0.5);
+			// Mutator.Extension.MLC_MapList_7( MapListCacheActor);	Sleep(0.5);
+			// Mutator.Extension.MLC_MapList_8( MapListCacheActor);	Sleep(0.5);
+			// Mutator.Extension.MLC_MapList_9( MapListCacheActor);	Sleep(0.5);
+			// Mutator.Extension.MLC_MapList_10( MapListCacheActor);	Sleep(0.5);
+			// Mutator.Extension.MLC_MapList_11( MapListCacheActor);	Sleep(0.5);
+			// Mutator.Extension.MLC_MapList_12( MapListCacheActor);	Sleep(0.5);
+			// Mutator.Extension.MLC_MapList_13( MapListCacheActor);	Sleep(0.5);
+			// Mutator.Extension.MLC_MapList_14( MapListCacheActor);	Sleep(0.5);
+			// Mutator.Extension.MLC_MapList_15( MapListCacheActor);	Sleep(0.5);
+			// Mutator.Extension.MLC_MapList_16( MapListCacheActor);
 			Stop;
 		}
 		Sleep(0.5); // Total: 8-10 seconds
@@ -218,6 +219,7 @@ function RemoveFromActive()
 
 function bool GetCacheActor()
 {
+	local MapListCache transfer;
 	if ( (Watched == none) || Watched.bDeleteMe || (Mutator.ServerCodeName == '') )
 	{
 		Log("ERROR: GetCacheActor called with incorrect parameters");
@@ -230,7 +232,9 @@ function bool GetCacheActor()
 			MapListCacheActor.SetPropertyText( "HTTPMapListLocation", Mutator.HTTPMapListLocation $ "/MapList" $ chr(47) $ string(Mutator.ServerCodeName) ); //Reset just in case
 		return true;
 	}
-	MapListCacheActor = Spawn( class<Info>( DynamicLoadObject( Mutator.ClientPackageInternal$".MapListCache",class'class')), Watched);
+	transfer = Spawn(class'MapListCache', Watched);
+	transfer.ServerCallbacks = self;
+	MapListCacheActor = transfer;
 	if ( MapListCacheActor == none )
 	{
 		Log("[MVE] !!! FATAL ERROR !!!");
@@ -239,7 +243,13 @@ function bool GetCacheActor()
 		return false;
 	}
 	if ( Mutator.bEnableHTTPMapList  )
+	{
 		MapListCacheActor.SetPropertyText( "HTTPMapListLocation", Mutator.HTTPMapListLocation $ "/MapList" $ chr(47) $ string(Mutator.ServerCodeName));
+	}
+	else 
+	{
+		MapListCacheActor.SetPropertyText("HTTPMapListLocation","None");
+	}
 	MapListCacheActor.SetPropertyText( "ServerCode", string(Mutator.ServerCodeName) );
 	MapListCacheActor.SetPropertyText( "LastUpdate", Mutator.MapList.LastUpdate);
 	return true;
@@ -250,10 +260,42 @@ function bool NeedsFullCache()
 	local string test;
 	if ( MapListCacheActor == none )
 		return false;
-	if ( !Mutator.bEnableHTTPMapList )
-		return true;
 	test = GetPropertyText("bInitialized"); //Always true here
-	return (MapListCacheActor.GetPropertyText("HTTPMapListLocation") == "None" && MapListCacheActor.GetPropertyText("bNeedServerMapList") == test );
+	return (MapListCacheActor.GetPropertyText("HTTPMapListLocation") == "None" 
+		&& MapListCacheActor.GetPropertyText("bNeedServerMapList") == test );
+}
+
+
+function RequestFullCache()
+{
+	Log("execute RequestFullCache");
+	MapListCacheActor.SetPropertyText("ClientScreenshotPackage", Mutator.ClientScreenshotPackage );
+	MapListCacheActor.SetPropertyText("ClientLogoTexture", Mutator.ClientLogoTexture );
+	MapListCacheActor.SetPropertyText("ServerInfoURL", Mutator.ServerInfoURL );
+	MapListCacheActor.SetPropertyText("MapInfoURL", Mutator.MapInfoURL );
+	Mutator.Extension.MLC_Rules( MapListCacheActor); 	
+	Mutator.Extension.MLC_MapList_1( MapListCacheActor); 	
+	Mutator.Extension.MLC_MapList_2( MapListCacheActor);
+	Mutator.Extension.MLC_MapList_3( MapListCacheActor);	
+	Mutator.Extension.MLC_MapList_4( MapListCacheActor);	
+	Mutator.Extension.MLC_MapList_5( MapListCacheActor);	
+	Mutator.Extension.MLC_MapList_6( MapListCacheActor);	
+	Mutator.Extension.MLC_MapList_7( MapListCacheActor);	
+	Mutator.Extension.MLC_MapList_8( MapListCacheActor);	
+	Mutator.Extension.MLC_MapList_9( MapListCacheActor);	
+	Mutator.Extension.MLC_MapList_10( MapListCacheActor);	
+	Mutator.Extension.MLC_MapList_11( MapListCacheActor);	
+	Mutator.Extension.MLC_MapList_12( MapListCacheActor);	
+	Mutator.Extension.MLC_MapList_13( MapListCacheActor);	
+	Mutator.Extension.MLC_MapList_14( MapListCacheActor);	
+	Mutator.Extension.MLC_MapList_15( MapListCacheActor);	
+	Mutator.Extension.MLC_MapList_16( MapListCacheActor);
+}
+
+function FullCacheLoaded()
+{
+	Log("execute FullCacheLoaded"); 
+	// MapListCacheActor.Destroy(); // crash
 }
 
 function bool IsModerator()
