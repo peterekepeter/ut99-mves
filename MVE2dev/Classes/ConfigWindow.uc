@@ -7,6 +7,7 @@ var UMenuLabelControl  lblMenuKey;
 var UMenuRaisedButton  ButMenuKey;
 var string OldMenuKey;
 var bool   bMenu;
+var float ConfigChangeTime;
 
 var UWindowHSliderControl RSlider, GSlider, BSlider, RBSlider, GBSlider, BBSlider;
 var UWindowHSliderControl BXT, Title1, Title2, Title3, Title4, Title5, Title6;
@@ -397,7 +398,7 @@ function Notify(UWindowDialogControl C, byte E)
 					if(RSlider != None)
 					{
 						Config.BackgroundColor.R = RSlider.GetValue();
-						Config.SaveConfig();
+						SaveConfigWithDebounce();
 					}
 					break;
 
@@ -405,7 +406,7 @@ function Notify(UWindowDialogControl C, byte E)
 					if(GSlider != None)
 					{
 						Config.BackgroundColor.G = GSlider.GetValue();
-						Config.SaveConfig();
+						SaveConfigWithDebounce();
 					}
 					break;
 
@@ -413,7 +414,7 @@ function Notify(UWindowDialogControl C, byte E)
 					if(BSlider != None)
 					{
 						Config.BackgroundColor.B = BSlider.GetValue();
-						Config.SaveConfig();
+						SaveConfigWithDebounce();
 					}
 					break;
 
@@ -421,7 +422,7 @@ function Notify(UWindowDialogControl C, byte E)
 					if(RBSlider != None)
 					{
 						Config.BoxesColor.R = RBSlider.GetValue();
-						Config.SaveConfig();
+						SaveConfigWithDebounce();
 					}
 					break;
 
@@ -429,7 +430,7 @@ function Notify(UWindowDialogControl C, byte E)
 					if(GBSlider != None)
 					{
 						Config.BoxesColor.G = GBSlider.GetValue();
-						Config.SaveConfig();
+						SaveConfigWithDebounce();
 					}
 					break;
 
@@ -437,7 +438,7 @@ function Notify(UWindowDialogControl C, byte E)
 					if(BBSlider != None)
 					{
 						Config.BoxesColor.B = BBSlider.GetValue();
-						Config.SaveConfig();
+						SaveConfigWithDebounce();
 					}
 					break;
 
@@ -445,7 +446,7 @@ function Notify(UWindowDialogControl C, byte E)
 					if(BXT != None && BXTL != None && lblBXT != None)
 					{
 						Config.BoxesTextColor = int(BXT.GetValue());
-						Config.SaveConfig();
+						SaveConfigWithDebounce();
 						BXTL.SetText(Config.GetNameOfBoxesTextColor());
 						lblBXT.SetTextColor(Config.GetColorOfBoxesTextColor());
 					}
@@ -455,7 +456,7 @@ function Notify(UWindowDialogControl C, byte E)
 					if(Title1 != None && TitleText1 != None && lblMLT1 != None)
 					{
 						Config.GameModTitleColor = int(Title1.GetValue());
-						Config.SaveConfig();				
+						SaveConfigWithDebounce();				
 						TitleText1.SetText(Config.GetNameOfGameModTitleColor());
 						lblMLT1.SetTextColor(Config.GetColorOfGameModTitleColor());
 					}
@@ -465,7 +466,7 @@ function Notify(UWindowDialogControl C, byte E)
 					if(Title2 != None && TitleText2 != None && lblMLT2 != None)
 					{
 						Config.RuleTitleColor = int(Title2.GetValue());
-						Config.SaveConfig();				
+						SaveConfigWithDebounce();				
 						TitleText2.SetText(Config.GetNameOfRuleTitleColor());
 						lblMLT2.SetTextColor(Config.GetColorOfRuleTitleColor());
 					}
@@ -475,7 +476,7 @@ function Notify(UWindowDialogControl C, byte E)
 					if(Title3 != None && TitleText3 != None && lblMLT3 != None)
 					{
 						Config.MapTitleColor = int(Title3.GetValue());
-						Config.SaveConfig();					
+						SaveConfigWithDebounce();					
 						TitleText3.SetText(Config.GetNameOfMapTitleColor());
 						lblMLT3.SetTextColor(Config.GetColorOfMapTitleColor());	
 					}
@@ -485,7 +486,7 @@ function Notify(UWindowDialogControl C, byte E)
 					if(Title4 != None && TitleText4 != None && lblMLT4 != None)
 					{
 						Config.KickVoteTitleColor = int(Title4.GetValue());
-						Config.SaveConfig();				
+						SaveConfigWithDebounce();				
 						TitleText4.SetText(Config.GetNameOfKickVoteTitleColor());
 						lblMLT4.SetTextColor(Config.GetColorOfKickVoteTitleColor());
 					}
@@ -495,7 +496,7 @@ function Notify(UWindowDialogControl C, byte E)
 					if(Title5 != None && TitleText5 != None && lblMLT5 != None)
 					{
 						Config.PlayerTitleColor = int(Title5.GetValue());
-						Config.SaveConfig();								
+						SaveConfigWithDebounce();								
 						TitleText5.SetText(Config.GetNameOfPlayerTitleColor());
 						lblMLT5.SetTextColor(Config.GetColorOfPlayerTitleColor());
 					}
@@ -505,7 +506,7 @@ function Notify(UWindowDialogControl C, byte E)
 					if(Title6 != None && TitleText6 != None && lblMLT6 != None)
 					{
 						Config.MapVoteTitleColor = int(Title6.GetValue());
-						Config.SaveConfig();								
+						SaveConfigWithDebounce();								
 						TitleText6.SetText(Config.GetNameOfMapVoteTitleColor());
 						lblMLT6.SetTextColor(Config.GetColorOfMapVoteTitleColor());
 					}
@@ -516,7 +517,7 @@ function Notify(UWindowDialogControl C, byte E)
 					{
 						lblMsgTimeOut.SetText(string(int(sldMsgTimeOut.Value)) $ " sec");
 						Config.MsgTimeOut = sldMsgTimeOut.GetValue();
-						Config.SaveConfig();						
+						SaveConfigWithDebounce();						
 					}
 					break;
 			}
@@ -590,6 +591,7 @@ function SetMenuKey(int KeyNo, string KeyName)
 function Close (optional bool bByParent)
 {
 	SaveMapVoteConfig();
+	SaveClientConfigPendingChanges();
 	Super.Close(bByParent);
 }
 
@@ -606,7 +608,7 @@ function SaveMapVoteConfig ()
 	{
 		Config.MsgTimeOut=int(sldMsgTimeOut.Value);
 		Config.bUseMsgTimeout=cbUseMsgTimeout.bChecked;
-		Config.SaveConfig();
+		SaveConfigWithDebounce();
 	}
 	if ( Config.bUseMsgTimeout )
 	{
@@ -615,8 +617,29 @@ function SaveMapVoteConfig ()
 		Class'RedSayMessagePlus'.Default.Lifetime=Config.MsgTimeOut;
 		Class'TeamSayMessagePlus'.Default.Lifetime=Config.MsgTimeOut;
 		Class'StringMessagePlus'.Default.Lifetime=Config.MsgTimeOut;
-		Class'DeathMessagePlus'.Default.Lifetime=Config.MsgTimeOut;
+		Class'DeathMessagePlus'.Default.Lifetime=Config.M
+		Log("SaveConfigWithDebounce");sgTimeOut;
 	}
+}
+
+function SaveConfigWithDebounce() 
+{
+	ConfigChangeTime = GetPlayerOwner().Level.TimeSeconds;
+}
+
+function Tick(float DeltaTime)
+{
+	if ( (ConfigChangeTime != 0) && (GetPlayerOwner().Level.TimeSeconds > ConfigChangeTime + 1) )
+	{
+		SaveClientConfigPendingChanges();
+	}
+	Super.Tick(DeltaTime);
+}
+
+function SaveClientConfigPendingChanges()
+{
+	Config.SaveClientConfig();
+	ConfigChangeTime = 0;
 }
 
 defaultproperties

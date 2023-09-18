@@ -55,6 +55,7 @@ var string MapAuthor;
 var string IdealPlayerCount;
 var float LastVoteTime;
 var float SelectionTime;
+var float ConfigChangeTime;
 var string LogoTexture;
 var string ClientScreenshotPackage;
 var int MapListwidth;
@@ -170,23 +171,24 @@ function SelectMapFromSearch(int Index)
  */
 function MapVoteListBox GetMapVoteList(int Num)
 {
-	if (Num < 0)
+	if ( Num < 0 )
 		return MapVoteListDummy;
-    return MapListBox[Num];
+	return MapListBox[Num];
 }
 
 function int GetMapVoteListNum(MapVoteListBox MLB)
 {
-    local int i;
-    if (MLB == MapVoteListDummy) {
-    	return UMenuMapVoteList(MapVoteListDummy.SelectedItem).CGNum;
-    }
+	local int i;
+	if ( MLB == MapVoteListDummy ) 
+	{
+		return UMenuMapVoteList(MapVoteListDummy.SelectedItem).CGNum;
+	}
 
-    for (i = 0; i < ArrayCount(MapListBox); ++ i)
-    {
-        if (MLB == MapListBox[i])
-            return i;
-    }
+	for ( i = 0; i < ArrayCount(MapListBox); ++ i )
+	{
+		if ( MLB == MapListBox[i] )
+			return i;
+	}
 }
 
 function Created ()
@@ -223,15 +225,15 @@ function Created ()
 	TitleColor5 = ClientConf.GetColorOfPlayerTitleColor();
 	TitleColor6 = ClientConf.GetColorOfMapVoteTitleColor();
 
-	TextColor.R=171;
-	TextColor.G=171;
-	TextColor.B=171;
-	TextColorTitles.R=255;
-	TextColorTitles.G=10;
-	TextColorTitles.B=10;
-	TextColorTitle.R=255;
-	TextColorTitle.G=255;
-	TextColorTitle.B=10;
+	TextColor.R = 171;
+	TextColor.G = 171;
+	TextColor.B = 171;
+	TextColorTitles.R = 255;
+	TextColorTitles.G = 10;
+	TextColorTitles.B = 10;
+	TextColorTitle.R = 255;
+	TextColorTitle.G = 255;
+	TextColorTitle.B = 10;
 
 	MapListwidth = 120;
 	PlayerListwidth = 120;
@@ -267,7 +269,7 @@ function Created ()
 	// commenting out next line disables prefix for new maps section
   // MapVoteListDummy.CW = self; 
 	
-	for ( i = 0; i < ArrayCount(RListBox); i++ )
+	for ( i = 0; i < ArrayCount(RListBox); i ++ )
 	{
 		RListBox[i] = RuleListBox(CreateControl(Class'RuleListBox',20.0 + MapListwidth,26.0,0.0,0.0));
 		RListBox[i].Items.Clear();
@@ -276,20 +278,22 @@ function Created ()
 	}
 	
 	VoteButton = UWindowSmallButton(CreateControl(Class'UWindowSmallButton',40.0 + 2 * MapListwidth + PlayerListwidth,ListHeight + 46,MapListwidth * 2 + 10,21.0));
-	VoteButton.DownSound=Sound'Click';
+	VoteButton.DownSound = Sound'Click';
 	VoteButton.Text = "Vote";
 	VoteButton.bDisabled = False;
-	PlayerListBox = PlayerVoteListBox(CreateControl(Class'PlayerVoteListBox',30.0 + 2 * MapListwidth,219.0,PlayerListwidth,-180.0 + ListHeight));
+	PlayerListBox = PlayerVoteListBox(CreateControl(Class'PlayerVoteListBox',30.0 + 2 * MapListwidth,219.0,PlayerListwidth, -180.0 + ListHeight));
 	PlayerListBox.Items.Clear();
 	PlayerListBox.bDisabled = True;
 	KickVoteButton = UWindowSmallButton(CreateControl(Class'UWindowSmallButton',30.0 + 2 * MapListwidth,ListHeight + 46,PlayerListwidth,18.0));
-	KickVoteButton.DownSound=Sound'Click';
+	KickVoteButton.DownSound = Sound'Click';
 	
 	if ( bKickVote || GetPlayerOwner().PlayerReplicationInfo.bAdmin )
 	{
 		KickVoteButton.Text = "Kick";
 		KickVoteButton.bDisabled = True;
-	} else {
+	} 
+	else 
+	{
 		KickVoteButton.Text = "";
 		KickVoteButton.bDisabled = False;
 	}
@@ -325,82 +329,82 @@ function Created ()
 	lstMapStatus = MapStatusListBox(CreateControl(Class'MapStatusListBox',10.0,LowSectionStart + 12,550.0,84.0));
 	lstMapStatus.bAcceptsFocus = False;
 	lstMapStatus.Items.Clear();
-	lstKickStatus = KickStatusListBox(CreateControl(Class'KickStatusListBox',10.0,231.0,MapListwidth * 2 + 10,-192.0 + ListHeight));
+	lstKickStatus = KickStatusListBox(CreateControl(Class'KickStatusListBox',10.0,231.0,MapListwidth * 2 + 10, -192.0 + ListHeight));
 	lstKickStatus.bAcceptsFocus = False;
 	lstKickStatus.Items.Clear();
 	lblMaptxt1 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',30.0 + 2 * MapListwidth - 10.0 ,140.0,PlayerListwidth + 20.0, 10.0));
 	lblMaptxt1.SetTextColor(TextColor);
-	lblMaptxt1.Align=TA_Center;
+	lblMaptxt1.Align = TA_Center;
 	lblMaptxt2 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',30.0 + 2 * MapListwidth - 10.0 ,149.0,PlayerListwidth + 20.0, 10.0));
 	lblMaptxt2.SetTextColor(TextColor);
-	lblMaptxt2.Align=TA_Center;
+	lblMaptxt2.Align = TA_Center;
 	lblMaptxt3 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',30.0 + 2 * MapListwidth - 10.0 ,158.0,PlayerListwidth + 20.0, 10.0));
 	lblMaptxt3.SetTextColor(TextColor);
-	lblMaptxt3.Align=TA_Center;
+	lblMaptxt3.Align = TA_Center;
 	lblTitle1 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',0.0,10.0,MapListwidth + 20,20.0));
 	lblTitle1.SetFont(1);
-	lblTitle1.Align=TA_Center;
+	lblTitle1.Align = TA_Center;
 	lblTitle1.SetTextColor(TextColorTitles);
 	lblTitle1.SetText("1. Game Mode");
 	lblTitle1.SetTextColor(TitleColor1);
 	lblTitle2 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',10.0 + MapListwidth,10.0,MapListwidth + 20,20.0));
 	lblTitle2.SetFont(1);
-	lblTitle2.Align=TA_Center;
+	lblTitle2.Align = TA_Center;
 	lblTitle2.SetTextColor(TextColorTitles);
 	lblTitle2.SetText("2. Rule");
 	lblTitle2.SetTextColor(TitleColor2);
 	lblTitle = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',15.0 + 2 * MapListwidth,10.0,PlayerListwidth + 30,20.0));
 	lblTitle.SetFont(1);
-	lblTitle.Align=TA_Center;
+	lblTitle.Align = TA_Center;
 	lblTitle.SetTextColor(TextColorTitle);
 	lblTitle3 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',30.0 + 2.5 * MapListwidth + PlayerListwidth,10.0,MapListwidth + 20,20.0));
 	lblTitle3.SetFont(1);
-	lblTitle3.Align=TA_Center;
+	lblTitle3.Align = TA_Center;
 	lblTitle3.SetTextColor(TextColorTitles);
 	lblTitle3.SetText("New Maps");
 	lblTitle3.SetTextColor(TitleColor3);
 	lblTitle4 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',15.0 + 2 * MapListwidth,197.0,PlayerListwidth + 30,20.0));
 	lblTitle4.SetFont(1);
-	lblTitle4.Align=TA_Center;
+	lblTitle4.Align = TA_Center;
 	lblTitle4.SetTextColor(TextColorTitles);
 	lblTitle4.SetText("Player");
 	lblTitle4.SetTextColor(TitleColor5);
 	lblTitle5 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',(10.0 + MapListwidth) / 2,197.0,PlayerListwidth + 30,20.0));
 	lblTitle5.SetFont(1);
-	lblTitle5.Align=TA_Center;
+	lblTitle5.Align = TA_Center;
 	lblTitle5.SetTextColor(TextColorTitles);
 	lblTitle5.SetText("Kick Vote");
 	lblTitle5.SetTextColor(TitleColor4);
 	lblTitle6 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',(10.0 + MapListwidth) / 2,ListHeight + 70,PlayerListwidth + 30,20.0));
 	lblTitle6.SetFont(1);
-	lblTitle6.Align=TA_Center;
+	lblTitle6.Align = TA_Center;
 	lblTitle6.SetTextColor(TextColorTitles);
 	lblTitle6.SetText("Map Vote");
 	lblTitle6.SetTextColor(TitleColor6);
 	lblPriority1 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',0.0,ListHeight + 30,MapListwidth + 20,20.0));
-	lblPriority1.Align=TA_Center;
+	lblPriority1.Align = TA_Center;
 	lblPriority1.SetTextColor(TextColor);
 	lblPriority2 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',10.0 + MapListwidth,ListHeight + 30,MapListwidth + 20,20.0));
-	lblPriority2.Align=TA_Center;
+	lblPriority2.Align = TA_Center;
 	lblPriority2.SetTextColor(TextColor);
 	lblPriority3 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',30.0 + 2 * MapListwidth + PlayerListwidth,ListHeight + 30,MapListwidth + 20,20.0));
-	lblPriority3.Align=TA_Center;
+	lblPriority3.Align = TA_Center;
 	lblPriority3.SetTextColor(TextColor);
 	lblPriority4 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',40.0 + 3 * MapListwidth + PlayerListwidth,ListHeight + 30,MapListwidth + 20,20.0));
-	lblPriority4.Align=TA_Center;
+	lblPriority4.Align = TA_Center;
 	lblPriority4.SetTextColor(TextColor);
 	cbLoadScreenShot = UWindowCheckbox(CreateControl(Class'UWindowCheckbox',30.0 + 2 * MapListwidth,175.0,70.0,20.0));
 	cbLoadScreenShot.SetText("Screenshot");
-	cbLoadScreenShot.Align=TA_Right;
+	cbLoadScreenShot.Align = TA_Right;
 	cbLoadScreenShot.SetFont(0);
 	cbLoadScreenShot.SetTextColor(TextColor);
 	cbLoadScreenShot.bChecked = ClientConf.bLoadScreenShot;
-	txtMessage = UWindowEditControl(CreateControl(Class'UWindowEditControl',-3.41 * MapListwidth / 2 + 10,ListHeight + 46,3.41 * MapListwidth,20.0));
+	txtMessage = UWindowEditControl(CreateControl(Class'UWindowEditControl', -3.41 * MapListwidth / 2 + 10,ListHeight + 46,3.41 * MapListwidth,20.0));
 	txtMessage.SetNumericOnly(False);
 	txtMessage.SetHistory(True);
 	txtMessage.SetMaxLength(150);
 	SendButton = UWindowSmallButton(CreateControl(Class'UWindowSmallButton',20.0 + 2 * MapListwidth - 40,ListHeight + 46,40.0,20.0));
-	SendButton.DownSound=Sound'Click';
+	SendButton.DownSound = Sound'Click';
 	SendButton.Text = "Send";
 	SendButton.bDisabled = False;
 }
@@ -409,37 +413,40 @@ function DeSelectAllOtherMapListBoxItems (MapVoteListBox selListBox, int listNum
 {
 	local int i;
 
-	for( i = 0; i < ArrayCount(MapListBox); i++)
+	for( i = 0; i < ArrayCount(MapListBox); i ++ )
 	{
-		if(listnum != i)
+		if( listnum != i )
 		{
-			if(MapListBox[i].SelectedItem != None)
+			if( MapListBox[i].SelectedItem != None )
 			{
 				MapListBox[i].SelectedItem.bSelected = False;
 				MapListBox[i].SelectedItem = None;
 			}
 		}
 	}
-	if(listNum >= 0 && listnum < ArrayCount(RListBox))  
+	if( listNum >= 0 && listnum < ArrayCount(RListBox) )  
+	{
 		selListBox.MakeSelectedVisible();
+	}
 }
 
 function UWindowListBoxItem getSelectedItem(optional out int CGNum)
 {
-    local int i;
+	local int i;
 	
-    for( i = 0; i < ArrayCount(MapListBox); i++)
-    {
-        if(MapListBox[i].SelectedItem != none)
-        {
-            CGNum = i;
-            return MapListBox[i].SelectedItem;
-        }
-    }
-	if (MapVoteListDummy.SelectedItem != None) {
+	for( i = 0; i < ArrayCount(MapListBox); i ++ )
+	{
+		if( MapListBox[i].SelectedItem != None )
+		{
+			CGNum = i;
+			return MapListBox[i].SelectedItem;
+		}
+	}
+	if ( MapVoteListDummy.SelectedItem != None ) 
+	{
 		CGNum = UMenuMapVoteList(MapVoteListDummy.SelectedItem).CGNum;
 		return MapVoteListDummy.SelectedItem;
-    }
+	}
 }
 
 function Notify (UWindowDialogControl C, byte E)
@@ -451,320 +458,361 @@ function Notify (UWindowDialogControl C, byte E)
 	Super.Notify(C,E);
 	switch (E)
 	{
-        case DE_Change:
-            switch(C)
-            {
-				default:
-			}
-			break;
+		case DE_Change:
+			switch(C)
+			{
+			default:
+		}
+		break;
 				
 		case DE_DoubleClick:
 			switch (C)
 			{			
-				case MapVoteListBox(C):
+			case MapVoteListBox(C):
 				
-					if ( MapVoteListBox(C).SelectedItem == None )
-						return;
-					listNum = GetMapVoteListNum(MapVoteListBox(C));
-					if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
-					{
-						if ( (Left(UMenuMapVoteList(MapVoteListBox(C).SelectedItem).MapName,3) != "[X]") || GetPlayerOwner().PlayerReplicationInfo.bAdmin )
-						{
-							GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE MAP " $ UMenuMapVoteList(MapVoteListBox(C).SelectedItem).MapName $ ":" $ string(listNum));
-							LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
-						}
-					}
-					SelectionTime = GetPlayerOwner().Level.TimeSeconds;
-					DeSelectAllOtherMapListBoxItems(MapVoteListBox(C),listNum);
-					break;
+				if ( MapVoteListBox(C).SelectedItem == None )
+				return;
+			listNum = GetMapVoteListNum(MapVoteListBox(C));
+			if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
+			{
+				if ( (Left(UMenuMapVoteList(MapVoteListBox(C).SelectedItem).MapName,3) != "[X]") || GetPlayerOwner().PlayerReplicationInfo.bAdmin )
+				{
+					GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE MAP "$UMenuMapVoteList(MapVoteListBox(C).SelectedItem).MapName$":"$string(listNum));
+					LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
+				}
+			}
+			SelectionTime = GetPlayerOwner().Level.TimeSeconds;
+			DeSelectAllOtherMapListBoxItems(MapVoteListBox(C),listNum);
+			break;
 					
-				case lstMapStatus:
+			case lstMapStatus:
 				
-					if ( MapStatusListItem(lstMapStatus.SelectedItem) == None )
-						return;
-					listNum = MapStatusListItem(lstMapStatus.SelectedItem).CGNum;
-					DeSelectAllOtherMapListBoxItems(MapListBox[0],0);
-					MapListBox[listNum].SelectMap(MapStatusListItem(lstMapStatus.SelectedItem).MapName);
-					if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
-					{
-						GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE MAP " $ MapStatusListItem(lstMapStatus.SelectedItem).MapName $ ":" $ string(MapStatusListItem(lstMapStatus.SelectedItem).CGNum));
-						LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
-					}
-					SelectionTime = GetPlayerOwner().Level.TimeSeconds;
-					break;
+				if ( MapStatusListItem(lstMapStatus.SelectedItem) == None )
+				return;
+			listNum = MapStatusListItem(lstMapStatus.SelectedItem).CGNum;
+			DeSelectAllOtherMapListBoxItems(MapListBox[0],0);
+			MapListBox[listNum].SelectMap(MapStatusListItem(lstMapStatus.SelectedItem).MapName);
+			if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
+			{
+				GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE MAP "$MapStatusListItem(lstMapStatus.SelectedItem).MapName$":"$string(MapStatusListItem(lstMapStatus.SelectedItem).CGNum));
+				LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
+			}
+			SelectionTime = GetPlayerOwner().Level.TimeSeconds;
+			break;
 					
-				case PlayerListBox:
+			case PlayerListBox:
 				
-					if ( PlayerVoteListItem(PlayerListBox.SelectedItem) == None )
-						return;
-					if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
-					{
-						GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE KICK " $ PlayerVoteListItem(PlayerListBox.SelectedItem).PlayerName);
-						LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
-					}
-					break;
-					
-				case lstKickStatus:
-				
-					if ( PlayerVoteListItem(PlayerListBox.SelectedItem) == None )
-						return;
-					PlayerListBox.SelectPlayer(KickStatusListItem(lstKickStatus.SelectedItem).PlayerName);
-					Log("Select Player:" @ KickStatusListItem(lstKickStatus.SelectedItem).PlayerName);
-					if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
-					{
-						GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE KICK " $ PlayerVoteListItem(PlayerListBox.SelectedItem).PlayerName);
-						LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
-					}
-					break;
-				default:
+				if ( PlayerVoteListItem(PlayerListBox.SelectedItem) == None )
+				return;
+			if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
+			{
+				GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE KICK "$PlayerVoteListItem(PlayerListBox.SelectedItem).PlayerName);
+				LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
 			}
 			break;
+					
+			case lstKickStatus:
+				
+				if ( PlayerVoteListItem(PlayerListBox.SelectedItem) == None )
+				return;
+			PlayerListBox.SelectPlayer(KickStatusListItem(lstKickStatus.SelectedItem).PlayerName);
+			Log("Select Player:"@KickStatusListItem(lstKickStatus.SelectedItem).PlayerName);
+			if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
+			{
+				GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE KICK "$PlayerVoteListItem(PlayerListBox.SelectedItem).PlayerName);
+				LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
+			}
+			break;
+			default:
+		}
+		break;
 		
 		case DE_Click:
 			switch (C)
 			{
-				case GMListBox:
+			case GMListBox:
+				SelectGameModeListItem();
+			break;
+					
+			case RuleListBox(C):
+				SelectGameRuleListItem(C);
+			break;
+					
+			case SendButton:
+				SayTxtMessage();
+			break;
+					
+			case VoteButton:
+				SubmitVote();
+			break;
+					
+			case CloseButton:
+				ParentWindow.ParentWindow.Close();
+			break;
+					
+			case MapVoteListBox(C):
+				SelectMapListItem(C);
+			break;
+					
+			case lstMapStatus:
 				
-					if ( UMenuGameModeVoteList(GMListBox.SelectedItem) == None )
-						return;
-					listNum = UMenuGameModeVoteList(GMListBox.SelectedItem).listNum;
-					RListDummy.WinWidth = 0.0;
-					RListDummy.WinHeight = 0.0;
-					RListDummy.Resized();
-					MapVoteListDummy.WinWidth = MapListwidth * 2 + 10;
-					MapVoteListDummy.WinHeight = ListHeight + 12;
-					MapVoteListDummy.Resized();
-					lblTitle3.SetText("New Maps");
+				if ( MapStatusListItem(lstMapStatus.SelectedItem) == None ) return;
+			listNum = MapStatusListItem(lstMapStatus.SelectedItem).CGNum;
+			DeSelectAllOtherMapListBoxItems(MapListBox[0],0);
+			MapListBox[listNum].SelectMap(MapStatusListItem(lstMapStatus.SelectedItem).MapName);
+			SelectionTime = GetPlayerOwner().Level.TimeSeconds;
+			break;
 					
-					for ( i = 0; i < ArrayCount(RListBox); i++ )
-					{
-						if ( MapListBox[i].SelectedItem != None )
-						{
-							MapListBox[i].SelectedItem.bSelected = False;
-						}
-						MapListBox[i].SelectedItem = None;
-						MapListBox[i].WinWidth = 0.0;
-						MapListBox[i].WinHeight = 0.0;
-						MapListBox[i].Resized();
-						if ( RListBox[i].SelectedItem != None )
-						{
-							RListBox[i].SelectedItem.bSelected = False;
-						}
-						RListBox[i].SelectedItem = None;
-						RListBox[i].WinWidth = 0.0;
-						RListBox[i].WinHeight = 0.0;
-						RListBox[i].Resized();
-					}
-					RListBox[listNum].WinWidth = MapListwidth;
-					RListBox[listNum].WinHeight = ListHeight / 2;
-					RListBox[listNum].Resized();
-					break;
-					
-				case RuleListBox(C):
-				
-					if ( UMenuRuleVoteList(RuleListBox(C).SelectedItem) == None )
-						return;
-					listNum = UMenuRuleVoteList(RuleListBox(C).SelectedItem).listNum;
-					MapVoteListDummy.WinWidth = 0.0;
-					MapVoteListDummy.WinHeight = 0.0;
-					MapVoteListDummy.Resized();
-					
-					for ( i = 0; i < ArrayCount(RListBox); i++ )
-					{
-						if ( MapListBox[i].SelectedItem != None )
-						{
-							MapListBox[i].SelectedItem.bSelected = False;
-						}
-						MapListBox[i].SelectedItem = None;
-						MapListBox[i].WinWidth = 0.0;
-						MapListBox[i].WinHeight = 0.0;
-						MapListBox[i].Resized();
-					}
-					MapListBox[listNum].WinWidth = MapListwidth * 2 + 10;
-					MapListBox[listNum].WinHeight = ListHeight + 12;
-					MapListBox[listNum].Resized();
-					s = "3. Maps";
-					if (MapListBox[listNum].VotePriority != 1.0)
-					{
-						s = s$" / Priority="$Mid(string(MapListBox[listNum].VotePriority),0,3);
-					}
-					lblTitle3.SetText(s);
-					break;
-					
-				case SendButton:
-				
-					if ( txtMessage.GetValue() != "" )
-					{
-						GetPlayerOwner().ConsoleCommand("SAY " $ txtMessage.GetValue());
-						txtMessage.SetValue("");
-					}
-					break;
-					
-				case VoteButton:
-				
-					if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
-					{
-						if ( getSelectedItem(listNum) != None )
-						{
-							if ( (Left(UMenuMapVoteList(getSelectedItem()).MapName,3) != "[X]") || GetPlayerOwner().PlayerReplicationInfo.bAdmin )
-							{
-								if ( UMenuMapVoteList(getSelectedItem()).MapName != "" )
-								{
-									GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE MAP " $ UMenuMapVoteList(getSelectedItem()).MapName $ ":" $ string(listNum));
-								}
-								LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
-							}
-						}
-					}
-					break;
-					
-				case CloseButton:
-				
-					ParentWindow.ParentWindow.Close();
-					break;
-					
-				case MapVoteListBox(C):
-				
-					if ( MapVoteListBox(C).SelectedItem == None )
-						return;
-					listNum = GetMapVoteListNum(MapVoteListBox(C));
-					SelectionTime = GetPlayerOwner().Level.TimeSeconds;
-					DeSelectAllOtherMapListBoxItems(MapVoteListBox(C),listNum);
-					break;
-					
-				case lstMapStatus:
-				
-					if ( MapStatusListItem(lstMapStatus.SelectedItem) == None )
-						return;
-					listNum = MapStatusListItem(lstMapStatus.SelectedItem).CGNum;
-					DeSelectAllOtherMapListBoxItems(MapListBox[0],0);
-					MapListBox[listNum].SelectMap(MapStatusListItem(lstMapStatus.SelectedItem).MapName);
-					SelectionTime = GetPlayerOwner().Level.TimeSeconds;
-					break;
-					
-				case KickVoteButton:
-					if ( PlayerVoteListItem(PlayerListBox.SelectedItem) == None )
-						return;
-					if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
-					{
-						GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE KICK " $ PlayerVoteListItem(PlayerListBox.SelectedItem).PlayerName);
-						LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
-					}
-					break;
-					
-				case lstKickStatus:
-				
-					if ( KickStatusListItem(lstKickStatus.SelectedItem) == None )
-						return;
-					PlayerListBox.SelectPlayer(KickStatusListItem(lstKickStatus.SelectedItem).PlayerName);
-					break;
-				default:
+			case KickVoteButton:
+				if ( PlayerVoteListItem(PlayerListBox.SelectedItem) == None )
+				return;
+			if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
+			{
+				GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE KICK "$PlayerVoteListItem(PlayerListBox.SelectedItem).PlayerName);
+				LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
 			}
 			break;
+					
+			case lstKickStatus:
+				
+				if ( KickStatusListItem(lstKickStatus.SelectedItem) == None )
+				return;
+			PlayerListBox.SelectPlayer(KickStatusListItem(lstKickStatus.SelectedItem).PlayerName);
+			break;
+			default:
+		}
+		break;
 			
 		case DE_EnterPressed:
 			switch(C)
 			{
-				case txtMessage:
-					if ( txtMessage.GetValue() != "" )
-					{
-						GetPlayerOwner().ConsoleCommand("SAY " $ txtMessage.GetValue());
-						txtMessage.SetValue("");
-						txtMessage.FocusOtherWindow(SendButton);
-					}
-					break;
-			}
-	default:
+			case txtMessage:
+				SayTxtMessage();
+			break;
+		}
+		default:
 	}
+}
+
+function SelectMapListItem(UWindowDialogControl C)
+{
+	local int listNum;
+	
+	if ( MapVoteListBox(C).SelectedItem == None ) return;
+	listNum = GetMapVoteListNum(MapVoteListBox(C));
+	SelectionTime = GetPlayerOwner().Level.TimeSeconds;
+	DeSelectAllOtherMapListBoxItems(MapVoteListBox(C),listNum);
+
+	ClientConf.SetSelectedMap(UMenuMapVoteList(MapVoteListBox(C).SelectedItem).MapName);
+	SaveClientConfigWithDebounce();
+}
+
+function SelectGameRuleListItem(UWindowDialogControl C) 
+{
+	local int listNum, i;
+	local string s;
+
+	if ( UMenuRuleVoteList(RuleListBox(C).SelectedItem) == None )
+		return;
+	listNum = UMenuRuleVoteList(RuleListBox(C).SelectedItem).listNum;
+	MapVoteListDummy.WinWidth = 0.0;
+	MapVoteListDummy.WinHeight = 0.0;
+	MapVoteListDummy.Resized();
+		
+	for ( i = 0; i < ArrayCount(RListBox); i ++ )
+	{
+		if ( MapListBox[i].SelectedItem != None )
+		{
+			MapListBox[i].SelectedItem.bSelected = False;
+		}
+		MapListBox[i].SelectedItem = None;
+		MapListBox[i].WinWidth = 0.0;
+		MapListBox[i].WinHeight = 0.0;
+		MapListBox[i].Resized();
+	}
+	MapListBox[listNum].WinWidth = MapListwidth * 2 + 10;
+	MapListBox[listNum].WinHeight = ListHeight + 12;
+	MapListBox[listNum].Resized();
+	s = "3. Maps";
+	if ( MapListBox[listNum].VotePriority != 1.0 )
+	{
+		s = s$" / Priority="$Mid(string(MapListBox[listNum].VotePriority),0,3);
+	}
+	lblTitle3.SetText(s);
+
+	ClientConf.SetSelectedGameRule(UMenuRuleVoteList(RuleListBox(C).SelectedItem).MapName);
+	SaveClientConfigWithDebounce();
+}
+
+function SelectGameModeListItem()
+{
+	local int listNum, i;
+				
+	if ( UMenuGameModeVoteList(GMListBox.SelectedItem) == None )
+		return;
+	listNum = UMenuGameModeVoteList(GMListBox.SelectedItem).listNum;
+	RListDummy.WinWidth = 0.0;
+	RListDummy.WinHeight = 0.0;
+	RListDummy.Resized();
+	MapVoteListDummy.WinWidth = MapListwidth * 2 + 10;
+	MapVoteListDummy.WinHeight = ListHeight + 12;
+	MapVoteListDummy.Resized();
+	lblTitle3.SetText("New Maps");
+		
+	for ( i = 0; i < ArrayCount(RListBox); i ++ )
+	{
+		if ( MapListBox[i].SelectedItem != None )
+		{
+			MapListBox[i].SelectedItem.bSelected = False;
+		}
+		MapListBox[i].SelectedItem = None;
+		MapListBox[i].WinWidth = 0.0;
+		MapListBox[i].WinHeight = 0.0;
+		MapListBox[i].Resized();
+		if ( RListBox[i].SelectedItem != None )
+		{
+			RListBox[i].SelectedItem.bSelected = False;
+		}
+		RListBox[i].SelectedItem = None;
+		RListBox[i].WinWidth = 0.0;
+		RListBox[i].WinHeight = 0.0;
+		RListBox[i].Resized();
+	}
+	RListBox[listNum].WinWidth = MapListwidth;
+	RListBox[listNum].WinHeight = ListHeight / 2;
+	RListBox[listNum].Resized();
+
+	ClientConf.SetSelectedGameMode(UMenuGameModeVoteList(GMListBox.SelectedItem).MapName);
+	SaveClientConfigWithDebounce();
+}
+
+function SubmitVote()
+{
+	local int listNum; 
+
+	if ( GetPlayerOwner().Level.TimeSeconds < LastVoteTime + 0.625 ) return;
+	if ( getSelectedItem(listNum) == None ) return;
+	if ( (Left(UMenuMapVoteList(getSelectedItem()).MapName,3) == "[X]") && !GetPlayerOwner().PlayerReplicationInfo.bAdmin ) return;
+	if ( UMenuMapVoteList(getSelectedItem()).MapName != "" ) return;
+
+	GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE MAP "$UMenuMapVoteList(getSelectedItem()).MapName$":"$string(listNum));
+	LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
+}
+
+function SayTxtMessage()
+{
+	if ( txtMessage.GetValue() == "" ) return;
+	
+	GetPlayerOwner().ConsoleCommand("SAY "$txtMessage.GetValue());
+	txtMessage.SetValue("");
+	txtMessage.FocusOtherWindow(SendButton);
+}
+
+function SaveClientConfigWithDebounce() 
+{
+	Log("SaveClientConfigWithDebounce");
+	ConfigChangeTime = GetPlayerOwner().Level.TimeSeconds;
+}
+
+function SaveClientConfigPendingChanges()
+{
+	ClientConf.SaveClientConfig();
+	ConfigChangeTime = 0;
 }
 
 function int getListNum(string MapName, int CGNum)
 {
-    local int i;
+	local int i;
 
-    i = 0;
-    J0x07:
+	i = 0;
+	J0x07:
     // End:0x40 [Loop If]
-    if(i < ArrayCount(RListBox))
-    {
+	if( i < ArrayCount(RListBox) )
+	{
         // End:0x36
-        if(MapListBox[i].isMapInList(MapName))
-        {
-            return i;
-        }
-        ++ i;
+		if( MapListBox[i].isMapInList(MapName) )
+		{
+			return i;
+		}
+		++ i;
         // [Loop Continue]
-        goto J0x07;
-    }
+		goto J0x07;
+	}
 }
 
 function Tick(float DeltaTime)
 {
-    local string MapName;
+	local string MapName;
 	local float debounceTime;
 
 	debounceTime = 1;
-	if (ClientScreenshotPackage != ""){
+	if ( ClientScreenshotPackage != "" )
+	{
 		debounceTime = 0; // client package is fast, no need for debounce
 	}
 	
-    Super(UWindowWindow).Tick(DeltaTime);
+	Super(UWindowWindow).Tick(DeltaTime);
 	
 	if ( (SelectionTime != 0) && (GetPlayerOwner().Level.TimeSeconds > SelectionTime + debounceTime) && (getSelectedItem() != None) )
-    {
-        MapName = UMenuMapVoteList(getSelectedItem()).MapName;
-        SetMap(MapName);
-        SelectionTime = 0.0;
-    }
+	{
+		MapName = UMenuMapVoteList(getSelectedItem()).MapName;
+		SetSelectedMap(MapName);
+		SelectionTime = 0.0;
+	}
+	if ( (ConfigChangeTime != 0) && (GetPlayerOwner().Level.TimeSeconds > ConfigChangeTime + 1) )
+	{
+		SaveClientConfigPendingChanges();
+	}
 	Super.Tick(DeltaTime);
 }
 
-function SetMap(string MapName)
+function SetSelectedMap(string MapName)
 {
-    local int i, pos;
-    local string Prefix, RealPreFix, RealMapName;
-    local LevelSummary L;
+	local int i, pos;
+	local string Prefix, RealPreFix, RealMapName;
+	local LevelSummary L;
 	
 	if ( !cbLoadScreenShot.bChecked )
 		return;
 	
-    bMapAlreadySet = true;
-    i = InStr(Caps(MapName), ".UNR");
+	bMapAlreadySet = True;
+	i = InStr(Caps(MapName), ".UNR");
 	
-    if(i != -1)
+	if( i != -1 )
 		MapName = Left(MapName, i);
 	
-    RealMapName = GetRealMapname(MapName);
+	RealMapName = GetRealMapname(MapName);
 
-    ResolveScreenshotAndSummary(RealMapName, MapName);
+	ResolveScreenshotAndSummary(RealMapName, MapName);
 }
 
 function string GetRealMapname(string VirtualMap)
 {
 	local string MapName, Dictionary, virt, Real;
 
-	Dictionary = "TDM;DM;LMS;DM;" $ PrefixDictionary;
+	Dictionary = "TDM;DM;LMS;DM;"$PrefixDictionary;
 
-	if(Left(VirtualMap, 3) ~= "[X]")VirtualMap = Mid(VirtualMap, 3);
-		MapName = VirtualMap;
+	if( Left(VirtualMap, 3) ~= "[X]" )VirtualMap = Mid(VirtualMap, 3);
+	MapName = VirtualMap;
 
-    while(Dictionary != "")
-    {
-        virt = Left(Dictionary, InStr(Dictionary, ";"));
-        Dictionary = Mid(Dictionary, InStr(Dictionary, ";") + 1);
-        Real = Left(Dictionary, InStr(Dictionary, ";"));
-        Dictionary = Mid(Dictionary, InStr(Dictionary, ";") + 1);
+	while( Dictionary != "" )
+	{
+		virt = Left(Dictionary, InStr(Dictionary, ";"));
+		Dictionary = Mid(Dictionary, InStr(Dictionary, ";") + 1);
+		Real = Left(Dictionary, InStr(Dictionary, ";"));
+		Dictionary = Mid(Dictionary, InStr(Dictionary, ";") + 1);
 		
-        if((Left(VirtualMap, 4) != "CTF-") && Left(VirtualMap, Len(virt) + 1) ~= (virt $ "-"))
-        {
-            MapName = Real $ Mid(VirtualMap, Len(virt));
-            return MapName;
-        }
-    }
-    return MapName;
+		if( (Left(VirtualMap, 4) != "CTF-") && Left(VirtualMap, Len(virt) + 1) ~= (virt$"-") )
+		{
+			MapName = Real$Mid(VirtualMap, Len(virt));
+			return MapName;
+		}
+	}
+	return MapName;
 }
 
-function ResolveScreenshotAndSummary(string realMapName, string virtualMapName){
+function ResolveScreenshotAndSummary(string realMapName, string virtualMapName)
+{
 	local class<Commandlet> BundleClass;
 	local LevelSummary L;
 	local LevelInfo LevelInfo;
@@ -779,25 +827,26 @@ function ResolveScreenshotAndSummary(string realMapName, string virtualMapName){
 	IdealPlayerCount = "";
 	Screenshot = None;
 
-    if (virtualMapName ~= "Random")
-    {
-        MapTitle = "Random";
-        return;
-    }
+	if ( virtualMapName ~= "Random" )
+	{
+		MapTitle = "Random";
+		return;
+	}
 
 	packageName = ClientScreenshotPackage;
 	
-	if (packageName != "")
+	if ( packageName != "" )
 	{
 		// try to load screenshot and summary from ScreenshotBundle
-		BundleClass = class<Commandlet>(DynamicLoadObject(packageName$".ScreenshotBundle", class'Class'));
-		if (BundleClass != None)
+		BundleClass = class < Commandlet > (DynamicLoadObject(packageName$".ScreenshotBundle", class'Class'));
+		if ( BundleClass != None )
 		{
 			BundleInstance = new BundleClass;
 			index = BundleInstance.Main(realMapName);
 			// iTexture, iTitle, iAuthor, iPlayerCount, iEntryText, iMates, iEnemies
 			ScreenshotStr = packageName$"."$BundleInstance.HelpDesc[0];
-			if (ScreenshotStr != "") {
+			if ( ScreenshotStr != "" ) 
+			{
 				Screenshot = Texture(DynamicLoadObject(ScreenshotStr, class'Texture')); 
 			}
 			MapTitle = BundleInstance.HelpDesc[1]; 
@@ -806,55 +855,57 @@ function ResolveScreenshotAndSummary(string realMapName, string virtualMapName){
 		}
 	}
 
-	if (Screenshot == None) {
+	if ( Screenshot == None ) 
+	{
 		// fallback load screenshot directly from level (only works if level is locally avaiable)
 		Screenshot = Texture(DynamicLoadObject(realMapName$".Screenshot", class'Texture'));
 		// if fails, try to load from LevelInfo
 		// https://github.com/OldUnreal/UnrealTournamentPatches/issues/926
-        if (Screenshot == None)
-        {
-            LevelInfo = LevelInfo(DynamicLoadObject(realMapName$".LevelInfo0", class'LevelInfo'));
-            if (LevelInfo == None)
+		if ( Screenshot == None )
+		{
+			LevelInfo = LevelInfo(DynamicLoadObject(realMapName$".LevelInfo0", class'LevelInfo'));
+			if ( LevelInfo == None )
 			{
-                LevelInfo = LevelInfo(DynamicLoadObject(realMapName$".LevelInfo1", class'LevelInfo'));
+				LevelInfo = LevelInfo(DynamicLoadObject(realMapName$".LevelInfo1", class'LevelInfo'));
 			}
-            if (LevelInfo != None && LevelInfo.Screenshot != None)
+			if ( LevelInfo != None && LevelInfo.Screenshot != None )
 			{
-                Screenshot = LevelInfo.Screenshot;
+				Screenshot = LevelInfo.Screenshot;
 			}
-        }
+		}
 
 	}
-	if (Screenshot != None){
+	if ( Screenshot != None )
+	{
 		// make it solid! (STY_Normal)
 		ScreenshotStyle = 1;
 	}
 
-    if(Left(virtualMapName, 3) == "[X]")
-    {
+	if( Left(virtualMapName, 3) == "[X]" )
+	{
 		// map is on cooldown (red)
-        MapTitle = "You can not";
-        MapAuthor = "vote for this map.";
-        IdealPlayerCount = "";
-    }
-    else if (MapTitle == "" && MapAuthor == "" && IdealPlayerCount == "")
-    {
+		MapTitle = "You can not";
+		MapAuthor = "vote for this map.";
+		IdealPlayerCount = "";
+	}
+	else if (MapTitle == "" && MapAuthor == "" && IdealPlayerCount == "")
+	{
 		// fallback load summary directly from level (only works if level is locally avaiable)
-        L = LevelSummary(DynamicLoadObject(realMapName$".LevelSummary", class'LevelSummary'));
-        if(L != none)
-        {
-            MapTitle = L.Title;
-            MapAuthor = L.Author;
-            IdealPlayerCount = L.IdealPlayerCount;
-        }
-        else
-        {
+		L = LevelSummary(DynamicLoadObject(realMapName$".LevelSummary", class'LevelSummary'));
+		if( L != None )
+		{
+			MapTitle = L.Title;
+			MapAuthor = L.Author;
+			IdealPlayerCount = L.IdealPlayerCount;
+		}
+		else
+		{
 			// fallback fallback show static strings
-            MapTitle = "Download";
-            MapAuthor = "Required";
-            IdealPlayerCount = "";
-        }
-    }
+			MapTitle = "Download";
+			MapAuthor = "Required";
+			IdealPlayerCount = "";
+		}
+	}
 }
 
 function Paint (Canvas C, float MouseX, float MouseY)
@@ -877,7 +928,7 @@ function Paint (Canvas C, float MouseX, float MouseY)
 	Super.Paint(C,MouseX,MouseY);
 	originalNoSmooth = C.bNoSmooth;
 	originalStyle = C.Style;
-	C.bNoSmooth = false; // make screenshot and background smoother
+	C.bNoSmooth = False; // make screenshot and background smoother
 	
 	C.DrawColor = ClientConf.BackgroundColor;
 	DrawStretchedTexture(C,0.00,0.00,WinWidth,WinHeight,Texture'BackgroundTexture');
@@ -885,19 +936,20 @@ function Paint (Canvas C, float MouseX, float MouseY)
 	if (  !bMapAlreadySet && (LogoTexture != "") && (Screenshot == None) )
 	{
 		Screenshot = Texture(DynamicLoadObject(LogoTexture,Class'Texture'));
-		if (Screenshot != None){
+		if ( Screenshot != None )
+		{
 			// make logo transparent!
 			ScreenshotStyle = 3;
 		}
-		bMapAlreadySet=True;
+		bMapAlreadySet = True;
 	}
 	if ( Screenshot != None )
 	{
 		size = 128;
 
-		C.DrawColor.R=255;
-		C.DrawColor.G=255;
-		C.DrawColor.B=255;
+		C.DrawColor.R = 255;
+		C.DrawColor.G = 255;
+		C.DrawColor.B = 255;
 		W = PlayerListwidth;
 
 		// aspect ratio
@@ -906,7 +958,8 @@ function Paint (Canvas C, float MouseX, float MouseY)
 
 		// set height based on aspect ration
 		H = PlayerListwidth * R;
-		if (H > size){
+		if ( H > size )
+		{
 			// downscale to fit height size
 			W *= size / H;
 			H = size;
@@ -925,19 +978,25 @@ function Paint (Canvas C, float MouseX, float MouseY)
 	if ( MapTitle != "" )
 	{
 		lblMaptxt1.SetText(MapTitle);
-	} else {
+	} 
+	else 
+	{
 		lblMaptxt1.SetText("");
 	}
 	if ( MapAuthor != "" )
 	{
 		lblMaptxt2.SetText(MapAuthor);
-	} else {
+	} 
+	else 
+	{
 		lblMaptxt2.SetText("");
 	}
 	if ( IdealPlayerCount != "" )
 	{
-		lblMaptxt3.SetText(IdealPlayerCount @ "Players");
-	} else {
+		lblMaptxt3.SetText(IdealPlayerCount@"Players");
+	} 
+	else 
+	{
 		lblMaptxt3.SetText("");
 	}
 
@@ -957,8 +1016,9 @@ function Close (optional bool bByParent)
 	if ( ClientConf.bLoadScreenShot != cbLoadScreenShot.bChecked )
 	{
 		ClientConf.bLoadScreenShot = cbLoadScreenShot.bChecked;
-		ClientConf.SaveConfig();
+		SaveClientConfigWithDebounce();
 	}
+	SaveClientConfigPendingChanges();
 	Super.Close(bByParent);
 }
 
@@ -972,15 +1032,19 @@ final simulated function MapVoteListBox GetMapListBox( int Idx)
 	return MapListBox[Idx];
 }
  
-simulated function string GetPrefix(int CGNum) {
+simulated function string GetPrefix(int CGNum) 
+{
 	local string ret;
 	local int i, rule;
 	local UMenuRuleVoteList MenuRule;
 	local UMenuGameModeVoteList MenuGame;
 	
-	for ( i = 0; i < ArrayCount(RListBox); i++ ) {
-		for (MenuRule = UMenuRuleVoteList(RListBox[i].Items.Next); MenuRule != None; MenuRule = UMenuRuleVoteList(MenuRule.Next)) {
-			if (MenuRule.listNum == CGNum) {
+	for ( i = 0; i < ArrayCount(RListBox); i ++ ) 
+	{
+		for ( MenuRule = UMenuRuleVoteList(RListBox[i].Items.Next); MenuRule != None; MenuRule = UMenuRuleVoteList(MenuRule.Next) ) 
+		{
+			if ( MenuRule.listNum == CGNum ) 
+			{
 				rule = i;
 				ret = MenuRule.MapName;
 				break;
@@ -988,268 +1052,19 @@ simulated function string GetPrefix(int CGNum) {
 		}
 	}
 	
-	for (MenuGame = UMenuGameModeVoteList(GMListBox.Items.Next); MenuGame != None; MenuGame = UMenuGameModeVoteList(MenuGame.Next)) {
-		if (MenuGame.listNum == rule) {
-			ret = MenuGame.MapName @ "-" @ ret;
+	for ( MenuGame = UMenuGameModeVoteList(GMListBox.Items.Next); MenuGame != None; MenuGame = UMenuGameModeVoteList(MenuGame.Next) ) 
+	{
+		if ( MenuGame.listNum == rule ) 
+		{
+			ret = MenuGame.MapName@"-"@ret;
 			break;
 		}
 	}
 		
-	return "[" $ ret $ "] ";
+	return "["$ret$"] ";
 }
 
 defaultproperties
 {
-      GMListBox=None
-      RListDummy=None
-      RListBox(0)=None
-      RListBox(1)=None
-      RListBox(2)=None
-      RListBox(3)=None
-      RListBox(4)=None
-      RListBox(5)=None
-      RListBox(6)=None
-      RListBox(7)=None
-      RListBox(8)=None
-      RListBox(9)=None
-      RListBox(10)=None
-      RListBox(11)=None
-      RListBox(12)=None
-      RListBox(13)=None
-      RListBox(14)=None
-      RListBox(15)=None
-      RListBox(16)=None
-      RListBox(17)=None
-      RListBox(18)=None
-      RListBox(19)=None
-      RListBox(20)=None
-      RListBox(21)=None
-      RListBox(22)=None
-      RListBox(23)=None
-      RListBox(24)=None
-      RListBox(25)=None
-      RListBox(26)=None
-      RListBox(27)=None
-      RListBox(28)=None
-      RListBox(29)=None
-      RListBox(30)=None
-      RListBox(31)=None
-      RListBox(32)=None
-      RListBox(33)=None
-      RListBox(34)=None
-      RListBox(35)=None
-      RListBox(36)=None
-      RListBox(37)=None
-      RListBox(38)=None
-      RListBox(39)=None
-      RListBox(40)=None
-      RListBox(41)=None
-      RListBox(42)=None
-      RListBox(43)=None
-      RListBox(44)=None
-      RListBox(45)=None
-      RListBox(46)=None
-      RListBox(47)=None
-      RListBox(48)=None
-      RListBox(49)=None
-      RListBox(50)=None
-      RListBox(51)=None
-      RListBox(52)=None
-      RListBox(53)=None
-      RListBox(54)=None
-      RListBox(55)=None
-      RListBox(56)=None
-      RListBox(57)=None
-      RListBox(58)=None
-      RListBox(59)=None
-      RListBox(60)=None
-      RListBox(61)=None
-      RListBox(62)=None
-      RListBox(63)=None
-      RListBox(64)=None
-      RListBox(65)=None
-      RListBox(66)=None
-      RListBox(67)=None
-      RListBox(68)=None
-      RListBox(69)=None
-      RListBox(70)=None
-      RListBox(71)=None
-      RListBox(72)=None
-      RListBox(73)=None
-      RListBox(74)=None
-      RListBox(75)=None
-      RListBox(76)=None
-      RListBox(77)=None
-      RListBox(78)=None
-      RListBox(79)=None
-      RListBox(80)=None
-      RListBox(81)=None
-      RListBox(82)=None
-      RListBox(83)=None
-      RListBox(84)=None
-      RListBox(85)=None
-      RListBox(86)=None
-      RListBox(87)=None
-      RListBox(88)=None
-      RListBox(89)=None
-      RListBox(90)=None
-      RListBox(91)=None
-      RListBox(92)=None
-      RListBox(93)=None
-      RListBox(94)=None
-      RListBox(95)=None
-      RListBox(96)=None
-      RListBox(97)=None
-      RListBox(98)=None
-      RListBox(99)=None
-      MapVoteListDummy=None
-      MapListBox(0)=None
-      MapListBox(1)=None
-      MapListBox(2)=None
-      MapListBox(3)=None
-      MapListBox(4)=None
-      MapListBox(5)=None
-      MapListBox(6)=None
-      MapListBox(7)=None
-      MapListBox(8)=None
-      MapListBox(9)=None
-      MapListBox(10)=None
-      MapListBox(11)=None
-      MapListBox(12)=None
-      MapListBox(13)=None
-      MapListBox(14)=None
-      MapListBox(15)=None
-      MapListBox(16)=None
-      MapListBox(17)=None
-      MapListBox(18)=None
-      MapListBox(19)=None
-      MapListBox(20)=None
-      MapListBox(21)=None
-      MapListBox(22)=None
-      MapListBox(23)=None
-      MapListBox(24)=None
-      MapListBox(25)=None
-      MapListBox(26)=None
-      MapListBox(27)=None
-      MapListBox(28)=None
-      MapListBox(29)=None
-      MapListBox(30)=None
-      MapListBox(31)=None
-      MapListBox(32)=None
-      MapListBox(33)=None
-      MapListBox(34)=None
-      MapListBox(35)=None
-      MapListBox(36)=None
-      MapListBox(37)=None
-      MapListBox(38)=None
-      MapListBox(39)=None
-      MapListBox(40)=None
-      MapListBox(41)=None
-      MapListBox(42)=None
-      MapListBox(43)=None
-      MapListBox(44)=None
-      MapListBox(45)=None
-      MapListBox(46)=None
-      MapListBox(47)=None
-      MapListBox(48)=None
-      MapListBox(49)=None
-      MapListBox(50)=None
-      MapListBox(51)=None
-      MapListBox(52)=None
-      MapListBox(53)=None
-      MapListBox(54)=None
-      MapListBox(55)=None
-      MapListBox(56)=None
-      MapListBox(57)=None
-      MapListBox(58)=None
-      MapListBox(59)=None
-      MapListBox(60)=None
-      MapListBox(61)=None
-      MapListBox(62)=None
-      MapListBox(63)=None
-      MapListBox(64)=None
-      MapListBox(65)=None
-      MapListBox(66)=None
-      MapListBox(67)=None
-      MapListBox(68)=None
-      MapListBox(69)=None
-      MapListBox(70)=None
-      MapListBox(71)=None
-      MapListBox(72)=None
-      MapListBox(73)=None
-      MapListBox(74)=None
-      MapListBox(75)=None
-      MapListBox(76)=None
-      MapListBox(77)=None
-      MapListBox(78)=None
-      MapListBox(79)=None
-      MapListBox(80)=None
-      MapListBox(81)=None
-      MapListBox(82)=None
-      MapListBox(83)=None
-      MapListBox(84)=None
-      MapListBox(85)=None
-      MapListBox(86)=None
-      MapListBox(87)=None
-      MapListBox(88)=None
-      MapListBox(89)=None
-      MapListBox(90)=None
-      MapListBox(91)=None
-      MapListBox(92)=None
-      MapListBox(93)=None
-      MapListBox(94)=None
-      MapListBox(95)=None
-      MapListBox(96)=None
-      MapListBox(97)=None
-      MapListBox(98)=None
-      MapListBox(99)=None
-      CloseButton=None
-      VoteButton=None
-      InfoButton=None
-      PlayerListBox=None
-      KickVoteButton=None
-      lstMapStatus=None
-      lstKickStatus=None
-      cbLoadScreenShot=None
-      lblStatusTitles1=None
-      lblStatusTitles2=None
-      lblStatusTitles3=None
-      lblStatusTitles4=None
-      lblStatusTitles5=None
-      lblKickVote1=None
-      lblKickVote2=None
-      lblTitle1=None
-      lblTitle2=None
-      lblTitle3=None
-      lblTitle4=None
-      lblTitle5=None
-      lblTitle6=None
-      lblTitle=None
-      lblMaptxt1=None
-      lblMaptxt2=None
-      lblMaptxt3=None
-      lblPriority1=None
-      lblPriority2=None
-      lblPriority3=None
-      lblPriority4=None
-      lblMapCount=None
-      txtFind=None
-      SendButton=None
-      txtMessage=None
-      lblMode=None
-      bKickVote=False
-      Screenshot=None
-	  ScreenshotStyle=1
-      MapTitle=""
-      MapAuthor=""
-      IdealPlayerCount=""
-      LastVoteTime=0.000000
-      SelectionTime=0.000000
-      LogoTexture=""
-      MapListwidth=0
-      PlayerListwidth=0
-      ListHeight=0
-      bMapAlreadySet=False
-      PrefixDictionary=""
-      ClientConf=None
+	ScreenshotStyle=1
 }

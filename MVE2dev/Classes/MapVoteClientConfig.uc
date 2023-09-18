@@ -14,6 +14,9 @@ var() config int MapTitleColor;
 var() config int KickVoteTitleColor;
 var() config int PlayerTitleColor;
 var() config int MapVoteTitleColor;
+var() config string SelectedGameMode;
+var() config string SelectedGameRule;
+var() config string SelectedMap;
 
 var config float MsgTimeOut;
 var config bool bUseMsgTimeout;
@@ -25,6 +28,11 @@ static function MapVoteClientConfig GetInstance()
 {
 	// ensures config is read from same ini section regardless of package name
 	return new (class'MVE_ClientConfig', 'MapVoteClientConfig') class'MapVoteClientConfig';
+}
+
+function SaveClientConfig()
+{
+	SaveConfig();
 }
 
 defaultproperties
@@ -119,4 +127,16 @@ function MapVoteClientConfigColors GetColorUtil()
 		Util = new class'MapVoteClientConfigColors';
 	}
 	return Util;
+}
+
+function SetSelectedGameMode(string value){
+	SelectedGameMode = value;
+}
+
+function SetSelectedGameRule(string value){
+	SelectedGameRule = value;
+}
+
+function SetSelectedMap(string value){
+	SelectedMap = value;
 }
