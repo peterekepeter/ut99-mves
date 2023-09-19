@@ -1,6 +1,3 @@
-//================================================================================
-// MapVoteTabWindow.
-//================================================================================
 class MapVoteTabWindow extends UWindowDialogClientWindow;
 
 var UMenuPageControl Pages;
@@ -21,7 +18,8 @@ function Created ()
 	local UWindowPageControlPage PageControl;
 
 	Super.Created();
-	Pages = UMenuPageControl(CreateWindow(Class'MapVotePageControl',-1.5,0.0,WinWidth + 3.0,WinHeight + 4.0));
+	
+	Pages = UMenuPageControl(CreateWindow(Class'MapVotePageControl', -1.5,0.0,WinWidth + 3.0,WinHeight + 4.0));
 	Pages.SetMultiLine(True);
 	PageControl = Pages.AddPage("Maps/Kick",Class'MapVoteClientWindow');
 	MapWindow = MapVoteClientWindow(PageControl.Page);
@@ -29,7 +27,7 @@ function Created ()
 	ConfigWindow = ConfigWindow(PageControl.Page);
 	PageControl = Pages.AddPage("Info",Class'ServerInfoWindow');
 	InfoWindow = ServerInfoWindow(PageControl.Page);
-	
+
 	if ( GetPlayerOwner().PlayerReplicationInfo.bAdmin )
 	{
 		PageControl = Pages.AddPage("Admin",Class'AdminTabWindow');
@@ -43,10 +41,10 @@ function AddMapName (int listNum, string MapName)
 	local MapVoteListBox L;
 
 	L = MapWindow.GetMapVoteList(listNum);
-	L.Count++;
+	L.Count ++ ;
 	i = UMenuMapVoteList(L.Items.Append(Class'UMenuMapVoteList'));
 	i.MapName = MapName;
-	if (listNum < 0)
+	if ( listNum < 0 )
 		i.CGNum = -listNum;
 }
 
@@ -72,6 +70,11 @@ function AddGameRule (int listNum, string MapName, int RuleNum)
 	i.listNum = RuleNum;
 }
 
+function FinishSetRuleListAndVoteList()
+{
+	MapWindow.RestoreSelection();
+}
+
 function ClearList (int listNum)
 {
 	local MapVoteListBox L;
@@ -86,14 +89,14 @@ function AddPlayerName (string PlayerName, bool bHasVoted)
 	local UWindowList Item;
 	local int j;
 
-	for(Item=MapWindow.PlayerListBox.Items;Item != None;Item=Item.Next)
+	for( Item = MapWindow.PlayerListBox.Items;Item != None;Item = Item.Next )
 	{
 		if ( PlayerVoteListItem(Item).PlayerName == PlayerName )
 			return;
 	}
-	i=PlayerVoteListItem(MapWindow.PlayerListBox.Items.Append(Class'PlayerVoteListItem'));
-	i.PlayerName=PlayerName;
-	i.bHasVoted=bHasVoted;
+	i = PlayerVoteListItem(MapWindow.PlayerListBox.Items.Append(Class'PlayerVoteListItem'));
+	i.PlayerName = PlayerName;
+	i.bHasVoted = bHasVoted;
 }
 
 function ClearPlayerList ()
@@ -105,7 +108,7 @@ function RemovePlayerName (string PlayerID)
 {
 	local UWindowList Item;
 
-	for(Item=MapWindow.PlayerListBox.Items;Item != None;Item=Item.Next)
+	for( Item = MapWindow.PlayerListBox.Items;Item != None;Item = Item.Next )
 	{
 		if ( Mid(PlayerVoteListItem(Item).PlayerName,1,3) == PlayerID )
 		{
@@ -119,11 +122,11 @@ function UpdatePlayerVoted (string PlayerID)
 {
 	local UWindowList Item;
 
-    for(Item=MapWindow.PlayerListBox.Items;Item != None;Item=Item.Next)
+	for( Item = MapWindow.PlayerListBox.Items;Item != None;Item = Item.Next )
 	{
 		if ( Mid(PlayerVoteListItem(Item).PlayerName,1,3) == PlayerID )
 		{
-			PlayerVoteListItem(Item).bHasVoted=True;
+			PlayerVoteListItem(Item).bHasVoted = True;
 			return;
 		}
 	}
@@ -131,12 +134,12 @@ function UpdatePlayerVoted (string PlayerID)
 
 function EnableKickWindow ()
 {
-	if(MapWindow.KickVoteButton != None)
+	if( MapWindow.KickVoteButton != None )
 	{
-		MapWindow.KickVoteButton.bDisabled=False;
-		MapWindow.KickVoteButton.Text="Kick";
+		MapWindow.KickVoteButton.bDisabled = False;
+		MapWindow.KickVoteButton.Text = "Kick";
 	}
-	MapWindow.PlayerListBox.bDisabled=False;
+	MapWindow.PlayerListBox.bDisabled = False;
 }
 
 simulated function UpdateMapVoteResults (string Text, int i)
@@ -182,7 +185,7 @@ simulated function UpdateMapVoteResults (string Text, int i)
 	}
 	
 	
-	for(Item=MapWindow.lstMapStatus.Items;Item != None;Item=Item.Next)
+	for( Item = MapWindow.lstMapStatus.Items;Item != None;Item = Item.Next )
 	{
 		if ( (MapStatusListItem(Item).MapName == MapName) && (MapStatusListItem(Item).CGNum == CGNum) )
 		{
@@ -202,7 +205,7 @@ simulated function UpdateMapVoteResults (string Text, int i)
 	MapStatusListItem(Item).CGNum = CGNum;
 	MapStatusListItem(Item).VoteCount = C;
 
-    if ( PrevSelectedMap == MapName )
+	if ( PrevSelectedMap == MapName )
 		MapWindow.lstMapStatus.SelectMap(PrevSelectedMap);
 }
 
@@ -220,47 +223,35 @@ simulated function UpdateKickVoteResults (string Text, int i)
 	if ( Text == "Clear" )
 	{
 		if ( MapWindow.lstKickStatus.SelectedItem != None )
-			PrevSelectedPlayer=KickStatusListItem(MapWindow.lstKickStatus.SelectedItem).PlayerName;
+			PrevSelectedPlayer = KickStatusListItem(MapWindow.lstKickStatus.SelectedItem).PlayerName;
             
 		MapWindow.lstKickStatus.Items.Clear();
 		return;
 	}
-	pos=InStr(Text,",");
+	pos = InStr(Text,",");
 	if ( pos > 0 )
 	{
-		PlayerName=Left(Text,pos);
-		C=int(Mid(Text,pos + 1));
+		PlayerName = Left(Text,pos);
+		C = int(Mid(Text,pos + 1));
 	}
 	if ( MapWindow.lstKickStatus.Items != None )
 	{
-        for(Item=MapWindow.lstKickStatus.Items;Item != None;Item=Item.Next)
+		for( Item = MapWindow.lstKickStatus.Items;Item != None;Item = Item.Next )
 		{
 			if ( KickStatusListItem(Item).PlayerName == PlayerName )
 			{
-				KickStatusListItem(Item).VoteCount=C;
+				KickStatusListItem(Item).VoteCount = C;
 				return;
 			}
 		}
 	}
-	Item=KickStatusListItem(MapWindow.lstKickStatus.Items.Append(Class'KickStatusListItem'));
-	KickStatusListItem(Item).PlayerName=PlayerName;
-	KickStatusListItem(Item).VoteCount=C;
+	Item = KickStatusListItem(MapWindow.lstKickStatus.Items.Append(Class'KickStatusListItem'));
+	KickStatusListItem(Item).PlayerName = PlayerName;
+	KickStatusListItem(Item).VoteCount = C;
 	if ( (PrevSelectedPlayer != "") && (PrevSelectedPlayer == PlayerName) )
 		MapWindow.lstKickStatus.SelectPlayer(PrevSelectedPlayer);
 }
 
 defaultproperties
 {
-      Pages=None
-      MapWindow=None
-      ConfigWindow=None
-      AdminWindow=None
-      InfoWindow=None
-      PrevSelectedMap=""
-      PrevSelectedPlayer=""
-      MapCount=0
-      InfoServerAddress=""
-      InfoServerPort=0
-      InfoFilePath=""
-      ServerInfoFile=""
 }

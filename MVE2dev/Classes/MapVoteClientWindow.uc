@@ -409,6 +409,56 @@ function Created ()
 	SendButton.bDisabled = False;
 }
 
+function RestoreSelection()
+{
+	local int ruleList, mapList, i;
+	local UWindowList item;
+
+	ruleList = -1;
+	mapList = -1;
+
+	if ( ClientConf.SelectedGameMode == "" ) return;
+
+	for ( item = GMListBox.Items; item != None; item = item.Next )
+	{
+		if ( UMenuGameModeVoteList(item).MapName != ClientConf.SelectedGameMode ) 
+			continue;
+	
+		GMListBox.SetSelectedItem(UWindowListBoxItem(item));
+		GMListBox.MakeSelectedVisible();
+		ruleList = UMenuGameModeVoteList(item).listNum;
+		SelectGameModeListItem();
+		break;
+	}
+
+	if ( ruleList < 0 || ClientConf.SelectedGameRule == "" ) return;
+
+	for ( item = RListBox[ruleList].Items; item != None; item = item.Next )
+	{
+		if ( UMenuRuleVoteList(item).MapName != ClientConf.SelectedGameRule )
+			continue;
+		
+		RListBox[ruleList].SetSelectedItem(UWindowListBoxItem(item));
+		RListBox[ruleList].MakeSelectedVisible();
+		mapList = UMenuRuleVoteList(item).listNum;
+		SelectGameRuleListItem(RListBox[ruleList]);
+		break;
+	}
+	
+	if ( mapList < 0 || ClientConf.SelectedMap == "" ) return;
+	
+	for ( item = MapListBox[mapList].Items; item != None; item = item.Next )
+	{
+		if ( UMenuMapVoteList(item).MapName != ClientConf.SelectedMap )
+			continue;
+		
+		MapListBox[mapList].SetSelectedItem(UWindowListBoxItem(item));
+		MapListBox[mapList].MakeSelectedVisible();
+		SelectMapListItem(MapListBox[mapList]);
+		break;
+	}
+}
+
 function DeSelectAllOtherMapListBoxItems (MapVoteListBox selListBox, int listNum)
 {
 	local int i;
@@ -603,8 +653,11 @@ function SelectMapListItem(UWindowDialogControl C)
 	SelectionTime = GetPlayerOwner().Level.TimeSeconds;
 	DeSelectAllOtherMapListBoxItems(MapVoteListBox(C),listNum);
 
-	ClientConf.SetSelectedMap(UMenuMapVoteList(MapVoteListBox(C).SelectedItem).MapName);
-	SaveClientConfigWithDebounce();
+	if ( UMenuMapVoteList(MapVoteListBox(C).SelectedItem).MapName != ClientConf.SelectedMap )
+	{
+		ClientConf.SetSelectedMap(UMenuMapVoteList(MapVoteListBox(C).SelectedItem).MapName);
+		SaveClientConfigWithDebounce();
+	}
 }
 
 function SelectGameRuleListItem(UWindowDialogControl C) 
@@ -640,8 +693,11 @@ function SelectGameRuleListItem(UWindowDialogControl C)
 	}
 	lblTitle3.SetText(s);
 
-	ClientConf.SetSelectedGameRule(UMenuRuleVoteList(RuleListBox(C).SelectedItem).MapName);
-	SaveClientConfigWithDebounce();
+	if ( UMenuRuleVoteList(RuleListBox(C).SelectedItem).MapName != ClientConf.SelectedGameRule )
+	{
+		ClientConf.SetSelectedGameRule(UMenuRuleVoteList(RuleListBox(C).SelectedItem).MapName);
+		SaveClientConfigWithDebounce();
+	}
 }
 
 function SelectGameModeListItem()
@@ -682,8 +738,11 @@ function SelectGameModeListItem()
 	RListBox[listNum].WinHeight = ListHeight / 2;
 	RListBox[listNum].Resized();
 
-	ClientConf.SetSelectedGameMode(UMenuGameModeVoteList(GMListBox.SelectedItem).MapName);
-	SaveClientConfigWithDebounce();
+	if ( UMenuGameModeVoteList(GMListBox.SelectedItem).MapName != ClientConf.SelectedGameMode )
+	{
+		ClientConf.SetSelectedGameMode(UMenuGameModeVoteList(GMListBox.SelectedItem).MapName);
+		SaveClientConfigWithDebounce();
+	}
 }
 
 function SubmitVote()

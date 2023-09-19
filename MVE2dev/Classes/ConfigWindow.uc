@@ -617,8 +617,7 @@ function SaveMapVoteConfig ()
 		Class'RedSayMessagePlus'.Default.Lifetime=Config.MsgTimeOut;
 		Class'TeamSayMessagePlus'.Default.Lifetime=Config.MsgTimeOut;
 		Class'StringMessagePlus'.Default.Lifetime=Config.MsgTimeOut;
-		Class'DeathMessagePlus'.Default.Lifetime=Config.M
-		Log("SaveConfigWithDebounce");sgTimeOut;
+		Class'DeathMessagePlus'.Default.Lifetime=Config.MsgTimeOut;
 	}
 }
 

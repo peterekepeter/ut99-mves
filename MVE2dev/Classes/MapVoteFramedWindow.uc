@@ -1,6 +1,3 @@
-//================================================================================
-// MapVoteFramedWindow.
-//================================================================================
 class MapVoteFramedWindow extends UWindowFramedWindow;
 
 var string TitleStr;
@@ -20,8 +17,8 @@ function ResolutionChanged(float W, float H)
 
 function SetDimensions()
 {
-	WinLeft = ParentWindow.WinWidth/2 - WinWidth/2;
-	WinTop = ParentWindow.WinHeight/2 - WinHeight/2;
+	WinLeft = ParentWindow.WinWidth / 2 - WinWidth / 2;
+	WinTop = ParentWindow.WinHeight / 2 - WinHeight / 2;
 }
 
 function Created ()
@@ -51,5 +48,4 @@ function Close (optional bool bByParent)
 
 defaultproperties
 {
-      TitleStr=""
 }
