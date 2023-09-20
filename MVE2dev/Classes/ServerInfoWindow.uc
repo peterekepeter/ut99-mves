@@ -79,11 +79,11 @@ function ShowAboutPage()
 	local string Core, Dev, Dev2, Support;
 	local string SupportLink;
 	
-	SupportLink = "https://ut99.org/viewtopic.php?p=140965";
+	SupportLink = "http://ut99.org/viewtopic.php?p=140965";
 	Core = "<html><body><center><br><br><h1><font color=\"FFFF00\">Map Vote Extended</font></h1><br><br><b>Core developement: BDB (Bruce Bickar)<br><br>";
 	Dev = "Enhancements by: (Deepu)<br><br>";
 	Dev2 = "Improvements by: (21)<br><br>";
-	Support = "Support: <a href=\""@SupportLink@"\">UT99 Forum</a></b></center></body></html>";
+	Support = "Support: <a href=\""$SupportLink$"\">UT99 Forum</a></b></center></body></html>";
 
 	SetMOTD(Core$Dev$Dev2$Support);
 }

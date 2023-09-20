@@ -326,7 +326,7 @@ function Created ()
 	lblStatusTitles5.SetText("Votes");
 	lblStatusTitles5.SetFont(0);
 	lblStatusTitles5.SetTextColor(TextColor);
-	lstMapStatus = MapStatusListBox(CreateControl(Class'MapStatusListBox',10.0,LowSectionStart + 12,550.0,84.0));
+	lstMapStatus = MapStatusListBox(CreateControl(Class'MapStatusListBox',10.0,LowSectionStart + 12, 640.0, 84.0));
 	lstMapStatus.bAcceptsFocus = False;
 	lstMapStatus.Items.Clear();
 	lstKickStatus = KickStatusListBox(CreateControl(Class'KickStatusListBox',10.0,231.0,MapListwidth * 2 + 10, -192.0 + ListHeight));
