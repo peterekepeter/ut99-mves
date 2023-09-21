@@ -129,7 +129,6 @@ GetCache:
 		if ( NeedsFullCache() )
 		{
 			FullCache:
-			Log("[MVE] Client needs full cache ");
 			// MapListCacheActor.SetPropertyText("bNeedServerMapList","1");
 			// MapListCacheActor.SetPropertyText("HTTPMapListLocation","None");
 			// MapListCacheActor.SetPropertyText("ClientScreenshotPackage", Mutator.ClientScreenshotPackage );
@@ -224,7 +223,7 @@ function bool GetCacheActor()
 	local MapListCache transfer;
 	if ( (Watched == none) || Watched.bDeleteMe || (Mutator.ServerCodeName == '') )
 	{
-		Log("ERROR: GetCacheActor called with incorrect parameters");
+		Log("[MVE] ERROR: GetCacheActor called with incorrect parameters");
 		return false;
 	}
 	if ( MapListCacheActor != none )
@@ -270,7 +269,6 @@ function bool NeedsFullCache()
 
 function RequestFullCache()
 {
-	Log("execute RequestFullCache");
 	MapListCacheActor.SetPropertyText("ClientScreenshotPackage", Mutator.ClientScreenshotPackage );
 	MapListCacheActor.SetPropertyText("ClientLogoTexture", Mutator.ClientLogoTexture );
 	MapListCacheActor.SetPropertyText("ServerInfoURL", Mutator.ServerInfoURL );
@@ -296,8 +294,7 @@ function RequestFullCache()
 
 function FullCacheLoaded()
 {
-	Log("execute FullCacheLoaded"); 
-	// MapListCacheActor.Destroy(); // crash
+	// finished loading full cache
 }
 
 function bool IsModerator()

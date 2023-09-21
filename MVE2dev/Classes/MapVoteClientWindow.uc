@@ -769,7 +769,6 @@ function SayTxtMessage()
 
 function SaveClientConfigWithDebounce() 
 {
-	Log("SaveClientConfigWithDebounce");
 	ConfigChangeTime = GetPlayerOwner().Level.TimeSeconds;
 }
 

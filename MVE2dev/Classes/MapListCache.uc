@@ -136,7 +136,6 @@ final simulated function SaveToMapVoteCache()
 	}
 
 	MVC.SaveConfig();
-	dlog("client: Save!");
 }
 
 simulated function Tick (float F)
@@ -236,7 +235,6 @@ final simulated function HTTPLinkerSetup ()
 	}
 	Link = Spawn(Class'HTTPMapListReceiver',self);
 	Link.BrowseCurrentURI(host,Path,int(Port));
-	dlog("http://" $ host $ ":" $ Port $ Path);
 }
 
 final simulated function bool checksam (string P, string V)
@@ -268,7 +266,6 @@ final simulated function bool LinkerAddValue(string S)
 	{
 		HTTPLastParameter = "";
 		bHTTPReceiving = false;
-		dlog("HTTPReceiving SUCCESS!");
 		return bSuccess;
 	}
 	// End:0x67
@@ -468,30 +465,22 @@ final simulated function ChaceCheck()
 	MVC = new (class'MapVoteCache', class'MapListCacheHelper'.default.ServerCodeN) class'MapVoteCache';
 	bChaceCheck = true;
 
-	Log("bCached "$MVC.bCached$" MVC.LastUpdate "$MVC.LastUpdate);
-
 	if(!MVC.bCached || MVC.LastUpdate != LastUpdate)
 	{
 		bNeedServerMapList = true;
-		Log("bNeedServerMapList set to true");
 
 		if(HTTPMapListLocation ~= "None")
 		{
-			dlog("client: NeedServerMapList!");
 			MVC.CacheClear();
 			NeedServerMapList();
 		}
 		else
 		{
-			dlog("client: NeedServerMapList! (HTTP)");
 			MVC.CacheClear();
 			HTTPLinkerSetup();
 		}
 		return;
 	}
-
-	// no need to transfer, load from ini
-	Log("load from ini");
 
 	for (i = 0; i < ArrayCount(RuleList); ++i)
 	{
@@ -535,8 +524,6 @@ final function NeedServerMapList()
 		return;
 	}
 
-	Log("NeedServerMapList() was called call, Role:"$Role);
-
 	HTTPMapListLocation = "None";
 	bNeedServerMapList = true;
 	ServerCallbacks.RequestFullCache();
@@ -553,7 +540,6 @@ final function FinishServerMapList()
 		return;
 	}
 
-	Log("FinishServerMapList() was called call, Role:"$Role);
 	SetTimer(0.0,False);
 	bNeedServerMapList = false;
 	ServerCallbacks.FullCacheLoaded();
@@ -561,7 +547,6 @@ final function FinishServerMapList()
 
 simulated function Timer ()
 {
-	Log("MapListCache Timer");
 	if ( Owner == None )
 	{
 		Destroy();
@@ -647,7 +632,6 @@ final simulated function MapListCheck ()
 	if ( (NECount == MapCount) && (RLCount == RuleListCount) && (RCount == RuleCount) )
 	{
 		bClientLoadEnd = True;
-		dlog("client: ClientLoadEnd!");
 		if ( bNeedServerMapList )
 		{
 			SaveToMapVoteCache();
@@ -663,11 +647,6 @@ final simulated function int MapCounter (string S)
 		return 0;
 	}
 	return 1;
-}
-
-final function dlog (string S)
-{
-	Log(S,Class.Name);
 }
 
 final simulated function float GetVotePriority( int Idx)
