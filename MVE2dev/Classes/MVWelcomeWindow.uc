@@ -83,8 +83,8 @@ function Tick (float DeltaTime)
 
 defaultproperties
 {
-      StartTime=0.000000
-      bHasStartWindow=False
-      ClientClass=Class'ServerInfoWindow'
-      WindowTitle="Map Vote Welcome Window"
+	StartTime=0.000000
+	bHasStartWindow=False
+	ClientClass=Class'ServerInfoWindow'
+	WindowTitle="Welcome!"
 }

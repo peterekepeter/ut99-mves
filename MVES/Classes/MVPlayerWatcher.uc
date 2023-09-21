@@ -102,8 +102,10 @@ Begin:
 PostID:
 	PlayerIP = class'MV_MainExtension'.static.ByDelimiter( Watched.GetPlayerNetworkAddress(), ":"); //Remove port
 	bInitialized = true;
-	if ( Mutator.bWelcomeWindow )
+	if ( Mutator.bWelcomeWindow && Mutator.ServerInfoURL != "")
+	{
 		Mutator.Extension.WelcomeWindowTo( Watched);
+	}
 	PlayerID = class'MV_MainExtension'.static.NumberToByte( Watched.PlayerReplicationInfo.PlayerID);
 	PlayerID = class'MV_MainExtension'.static.PreFill( PlayerID, "0", 3);
 	Mutator.Extension.AddPlayerToWindows( self);

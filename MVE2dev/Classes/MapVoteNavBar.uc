@@ -10,7 +10,8 @@ var UWindowSmallButton ReportButton2;
 var UWindowSmallButton TipsButton;
 var UWindowSmallButton AboutButton;
 var UWindowSmallButton CloseButton;
-var bool bShowWelcomeWindow;
+var bool bWelcomeWindowWasShown;
+var bool bWelcomeKeybinderCheck;
 
 var Color BackgroundColor;
 
@@ -117,13 +118,8 @@ function Paint (Canvas C, float X, float Y)
 	C.DrawColor = BackgroundColor;
 	DrawStretchedTexture(C,0.00,0.00,WinWidth,WinHeight,Texture'BackgroundTexture');
 }
+
 function Close (bool ByParent)
 {
-	Class'MapVoteNavBar'.Default.bShowWelcomeWindow=False;
 	Super.Close(ByParent);
-}
-
-defaultproperties
-{
-	bShowWelcomeWindow=True
 }

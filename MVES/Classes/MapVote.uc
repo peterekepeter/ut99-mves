@@ -1828,7 +1828,6 @@ defaultproperties
       MapCostMaxAllow=0
       PlayerIDType=PID_Default
       bShutdownServerOnTravel=False
-      bWelcomeWindow=False
       bSpecsAllowed=False
       bAutoOpen=True
       ScoreBoardTime=0

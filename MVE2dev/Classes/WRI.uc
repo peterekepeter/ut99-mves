@@ -44,9 +44,17 @@ simulated function OpenIfNecessary ()
 		P=PlayerPawn(Owner);
 		if ( (P != None) && (P.Player != None) && (P.Player.Console != None) )
 		{
-			OpenWindow();
+			if ( IsOpenNecessary() )
+			{
+				OpenWindow();
+			}
 		}
 	}
+}
+
+simulated function bool IsOpenNecessary()
+{
+	return True;
 }
 
 simulated function bool OpenWindow()
