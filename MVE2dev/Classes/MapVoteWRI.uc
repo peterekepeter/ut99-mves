@@ -591,7 +591,6 @@ simulated function Timer()
 		CWindow.MapWindow.LogoTexture = ClientCache.ClientLogoTexture;
 	}
 	CWindow.MapWindow.ClientScreenshotPackage = ClientCache.ClientScreenshotPackage;
-	Log("ServerInfoURL is "$ClientCache.ServerInfoURL);
 	if(ClientCache.ServerInfoURL != "")
 	{
 		Log("Set ServerInfoURL to window "$CWindow.InfoWindow);

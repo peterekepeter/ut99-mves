@@ -748,13 +748,14 @@ function SelectGameModeListItem()
 function SubmitVote()
 {
 	local int listNum; 
+	local UMenuMapVoteList selected;
 
 	if ( GetPlayerOwner().Level.TimeSeconds < LastVoteTime + 0.625 ) return;
-	if ( getSelectedItem(listNum) == None ) return;
-	if ( (Left(UMenuMapVoteList(getSelectedItem()).MapName,3) == "[X]") && !GetPlayerOwner().PlayerReplicationInfo.bAdmin ) return;
-	if ( UMenuMapVoteList(getSelectedItem()).MapName != "" ) return;
+	selected = UMenuMapVoteList(getSelectedItem(listNum));
+	if ( selected == None || selected.MapName == "" ) return;
+	if ( (Left(selected.MapName,3) == "[X]") && !GetPlayerOwner().PlayerReplicationInfo.bAdmin ) return;
 
-	GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE MAP "$UMenuMapVoteList(getSelectedItem()).MapName$":"$string(listNum));
+	GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE MAP "$selected.MapName$":"$string(listNum));
 	LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
 }
 
