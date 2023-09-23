@@ -1,3 +1,69 @@
+# `MVE2h` 23 September 2023
+
+- Map list transfer control has been optimized so that clients no longer need 
+  to load the map list every time a new match starts. This eliminates unwanted
+  lag at be beginning of the match or every time a player rejoins. This also
+  eliminates unwanted lag when spectating players. Special thanks goes to 
+  ProAsm here who allowed me to pick his brain on complicated subjects and 
+  patiently answered all my questions.
+
+- Fixed a bug where random map has always chosen the same map. There is 
+  also a new random map algorithm which will prefer choosing a map where
+  the player count is within the `IdealPlayerCount` as defined by the mapper.
+  At it's core the choice is still random, and the data in maps is not 
+  reliable but in practice this avoid switching to a 16 player map when there 
+  are only 2 players and it will also avoid switching to a 2 player map when
+  the server has 16 players.
+
+- The `bAvoidRandom` configuration property has been removed as since `MVE2g`
+  MVE will only ever choose a random map from the current gametype.
+
+- When browsing throught the list of maps, the selected game mode, rule
+  and map is saved to disk and restored next time when the map vote client 
+  opens. On servers with a lot of game modes and maps this will helps players
+  to be able to quickly re-vote their last vote or to continue the search for 
+  the map they want.
+
+- Improved the welcome experience. If a `ServerInfoURL` is configured then
+  `bWelcomeWindow` can be enabled. This will cause the web page located at
+  `ServerInfoURL` to be shown to newly joining players. If this is enabled then
+  on second join a map vote key-binder window will also be shown to players 
+  who do not have a keybind for map vote.
+
+- Map vote status titles and map list status list box have been adjusted
+  to stretch across the whole screen. Thank you Deepu for this contribution.
+
+- MVE now includes protection against lag spikes caused by queries when 
+  .int files are missing or are misconfigured. This is enabled by default
+  but can be disabled with setting `bFixMutatorsQueryLagSpikes` to false.
+  I'm hoping that this will save headaches for server admins, as I have spent 
+  the last December and January testing and debugging this issue. Special
+  thanks goes to Buggie who made me fully understand the problem.
+
+- The `bFirstRun` configuration property has been removed and can be deleted
+  safely from config files.
+
+- The `ClientPackage` configuration value has been deprecated and will be
+  removed. This means you no longer have to manually update it. As long as
+  `bOverrideServerPackages` is enabled MVE will also automatically inject
+  the correct version of the package to ServerPackages.
+
+- MVE will now log every time it performs a map switch. If the sever switches
+  maps and you don't know why it happened you will now know if it was MVE
+  or something else responsible.
+
+- Optimized tagged map list reload to use less jump instructions. We've hit a 
+  limit at around ~700 tagged maps where the map list reload will trigger the 
+  infinite loop detection when using map tags. When this happens the maps 
+  reload will crash. The problem is not fully fixed yet but the optimization
+  does help.
+
+- Fix merge multiple map tag entries for same map. Previosly the entries
+  overwrote each other, but from now on they will be merged instead.
+
+- Fixed broken support link in the information page.
+
+
 # `2g-v1` May 27, 2023
  
 - **NEW FEATURE**: Idle time tracking and idle map switch. MVE will keep
