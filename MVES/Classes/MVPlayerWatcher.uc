@@ -251,8 +251,12 @@ function bool GetCacheActor()
 	{
 		MapListCacheActor.SetPropertyText("HTTPMapListLocation","None");
 	}
-	MapListCacheActor.SetPropertyText( "ServerCode", string(Mutator.ServerCodeName) );
-	MapListCacheActor.SetPropertyText( "LastUpdate", Mutator.MapList.LastUpdate);
+	MapListCacheActor.SetPropertyText("ServerCode", string(Mutator.ServerCodeName) );
+	MapListCacheActor.SetPropertyText("LastUpdate", Mutator.MapList.LastUpdate);
+	MapListCacheActor.SetPropertyText("ClientScreenshotPackage", Mutator.ClientScreenshotPackage );
+	MapListCacheActor.SetPropertyText("ClientLogoTexture", Mutator.ClientLogoTexture );
+	MapListCacheActor.SetPropertyText("ServerInfoURL", Mutator.ServerInfoURL );
+	MapListCacheActor.SetPropertyText("MapInfoURL", Mutator.MapInfoURL );
 	return true;
 }
 
