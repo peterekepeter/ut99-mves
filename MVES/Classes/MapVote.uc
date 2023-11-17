@@ -207,26 +207,6 @@ state DelayedTravel
 	ExecuteTravel();
 }
 
-function ExecuteSetting (string Setting, bool bIsDefaultSetting)
-{
-	local string Property;
-	local string Value;
-	local string Prev;
-	local string Next;
-
-	Property=Left(Setting,InStr(Setting,"="));
-	Value=Mid(Setting,InStr(Setting,"=") + 1);
-/* 	if ( bIsDefaultSetting )
-	{
-		Log("[MVE] Execute default Setting:" @ Setting);
-	} else {
-		Log("[MVE] Execute Setting:" @ Setting);
-	} */
-	Prev=Level.Game.GetPropertyText(Property);
-	Level.Game.SetPropertyText(Property,Value);
-	Next=Level.Game.GetPropertyText(Property);
-}
-
 event PostBeginPlay()
 {
 	local class<MV_MainExtension> ExtensionC;
@@ -291,24 +271,7 @@ event PostBeginPlay()
 	
 	if ( DefaultSettings != "" )
 	{
-		Settings=DefaultSettings;
-	
-		while ( Len(Settings) > 0 )
-		{
-			pos=InStr(Settings,";");
-			if ( pos < 0 )
-			{
-				pos=InStr(Settings,",");
-			}
-			if ( pos < 0 )
-			{
-				ExecuteSetting(Settings,True);
-				Settings="";
-			} else {
-				ExecuteSetting(Left(Settings,pos),True);
-				Settings=Mid(Settings,pos + 1);
-			}
-		}
+		ExecuteSettings(DefaultSettings);
 	}
 
 	bNeedToRestorePackages = false;
@@ -412,13 +375,7 @@ event PostBeginPlay()
 		DEFAULT_MODE:
 		Cmd = CurrentGame.Settings;
 		//Log("[MVE] Loading settings:",'MapVote');
-		while ( Cmd != "" )
-		{
-			NextParm = Extension.NextParameter( Cmd, ",");
-			Log("[MVE] Execute Setting: "$NextParm,'MapVote');
-			if ( InStr(NextParm,"=") > 0 )
-				Level.Game.SetPropertyText( Extension.NextParameter(NextParm,"=") , NextParm );
-		}
+		ExecuteSettings(Cmd);
 		
 		Cmd = ParseAliases(CurrentGame.ServerActors);
 		if ( Cmd != "" )
@@ -503,6 +460,73 @@ event PostBeginPlay()
 	
 	// finally done!
 	Log("[MVE] Successfully loaded map: `"$TravelMap$"` idx: "$TravelInfo.TravelIdx$" mode: "$CurrentMode);
+}
+
+function ExecuteSettings(string Settings) {
+
+	while ( Len(Settings) > 0 )
+	{
+		pos=InStr(Settings,";");
+		if ( pos < 0 )
+		{
+			pos=InStr(Settings,",");
+		}
+		if ( pos < 0 )
+		{
+			ExecuteSetting(Settings);
+			Settings="";
+		} else {
+			ExecuteSetting(Left(Settings,pos));
+			Settings=Mid(Settings,pos + 1);
+		}
+	}
+}
+
+function ExecuteSetting (string Setting)
+{
+	local string className, packageName;
+	local string Property;
+	local string Value;
+	local string Prev;
+	local string Next;
+	local string cmd, result;
+	local int pos;
+
+	Log("[MVE] Set "$Setting);
+
+	Property=Left(Setting,InStr(Setting,"="));
+	Value=Mid(Setting,InStr(Setting,"=") + 1);
+	pos = InStr(Property, ".");
+	if (pos != -1) {
+		Log("[MVE] [ERROR] Not supported");
+		return;
+
+		// className = Left(Property, pos);
+		// Property = Mid(Property, pos + 1);
+		
+		// pos = InStr(Property, ".");
+		// if (pos != -1) {
+		// 	packageName = className;
+		// 	className = Left(Property, pos);
+		// 	Property = Mid(Property, pos + 1);
+		// }
+		
+		// if (packageName == "") {
+		// 	Log("[MVE] Cannot execute setting: "$Setting);
+		// }
+		// else {
+		// 	cmd = "Set"@packageName$"."$className@Property@Value;
+		// 	result = ConsoleCommand(cmd);
+		// 	if (result != "") {
+		// 		Log("[MVE] [ERROR] "$result);
+		// 	}
+		// }
+	}
+	else {
+		Prev=Level.Game.GetPropertyText(Property);
+		Level.Game.SetPropertyText(Property,Value);
+		Next=Level.Game.GetPropertyText(Property);
+	}
 }
 
 function EvalCustomGame(int idx)
