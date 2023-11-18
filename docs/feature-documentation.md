@@ -7,6 +7,39 @@
  - **MAX** gametypes: 100
 
 
+## Premade lists
+
+For coop campagins or for any other gametype where the order of maps needs
+to be manually set up, premade lists can be used. When you make a premade
+the number and order of the maps will be exactly as you set them up in the
+configuration file. 
+
+You will first need a gametype, let's call it Coop, but it can be anything else
+and create a new FilterCode. The filter code can be customized but it must
+start with `premade`, so for example `premadeRTNP` or `premadeDK` are fine,
+in this example we'll go with `premadeA`.
+
+```ini
+CustomGame[33]=(GameName="Coop",FilterCode="premadeA",bHasRandom=False,...)
+```
+
+Next, in the map filters, you will need to list the maps you want in the premade
+list.
+
+```ini
+MapFilters[20]=
+MapFilters[21]=premadeA DM-Malevolence
+MapFilters[22]=premadeA DM-Liandri
+MapFilters[23]=premadeA DM-StalwartXL
+MapFilters[24]=
+MapFilters[25]=
+```
+
+As long as the convention above is respected, they will be picked up by the 
+special premade filter in the order given in the config file, and will not
+be sorted alphabetically.
+
+
 ## Green background for players that voted
 
 Players that vote recieve a green background. This was a broken feature. 
