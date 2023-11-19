@@ -223,6 +223,14 @@ event PostBeginPlay()
 
 	Log("[MVE] Map Vote Extended version: "$ClientPackageInternal);
 
+	if (IsOtherInstanceRunning()) {
+		Err("Detected multiple instances of MapVote");
+		Err("Please use Mapvote either as ServerActor or Mutator");
+		Err("Never add it as both ServerActor and Mutator at the same time");
+		Destroy();
+		return;
+	}
+
 	TravelInfo = Spawn(class'MV_TravelInfo');
 	Spawn(class'MapVoteDelayedInit').InitializeDelayedInit(self);
 	Spawn(class'MV_IdleTimer').Initialize(self, TravelInfo.bIsIdle, TravelInfo.EmptyMinutes);
@@ -427,7 +435,7 @@ event PostBeginPlay()
 			TravelInfo.TravelIdx = DefaultGameTypeIdx;
 			Goto DEFAULT_MODE;
 		}
-//		Log( Level.Game.Class @ CustomGame[DefaultGameTypeIdx].GameClass @ MapIdx @ NextParm @ MapList.TwoDigits(DefaultGameTypeIdx));
+ 		// Log( Level.Game.Class @ CustomGame[DefaultGameTypeIdx].GameClass @ MapIdx @ NextParm @ MapList.TwoDigits(DefaultGameTypeIdx));
 		if ( MapIdx >= 0 )
 		{
 			MapIdx = MapList.FindMap( Cmd, MapIdx+1);
@@ -460,6 +468,21 @@ event PostBeginPlay()
 	
 	// finally done!
 	Log("[MVE] Successfully loaded map: `"$TravelMap$"` idx: "$TravelInfo.TravelIdx$" mode: "$CurrentMode);
+}
+
+function bool IsOtherInstanceRunning() 
+{
+	local Mutator M;
+	local bool bIsThisRegistered, bIsAnotherRegistered;
+
+	// Check if mutator was added to GameInfo
+	for ( M = Level.Game.BaseMutator; M != None; M = M.NextMutator )
+	{
+		if (M.IsA('MapVote'))
+		{
+			return True;
+		}
+	}
 }
 
 function ExecuteSettings(string Settings) {

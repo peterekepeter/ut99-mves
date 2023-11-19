@@ -16,15 +16,21 @@
             "problemMatcher": []
         },
         {
-            "label": "build client, build and run server",
-            "type": "shell",
-            "command": "ucx build MVE2dev && ucx build MVES && ucx ucc server",
-            "problemMatcher": []
-        },
-        {
             "label": "build and run server",
             "type": "shell",
             "command": "ucx build MVES && ucx ucc server",
+            "problemMatcher": []
+        },
+        {
+            "label": "build and run server as mutator",
+            "type": "shell",
+            "command": "ucx build MVES && ucx ucc server DM-Deck16][?Mutator=MVES.MapVote",
+            "problemMatcher": []
+        },
+        {
+            "label": "build client, build and run server",
+            "type": "shell",
+            "command": "ucx build MVE2dev && ucx build MVES && ucx ucc server",
             "problemMatcher": []
         },
         {

@@ -11,38 +11,24 @@ event InitializeDelayedInit(MapVote mutator)
 
 event Timer()
 {
-	EnsureSingleMapVoteMutatorIsActive();
+	EnsureMutatorRegistered();
 	EnsureScoreboardUpdated();
 	Destroy();
 }
 
-function EnsureSingleMapVoteMutatorIsActive()
+function EnsureMutatorRegistered()
 {
 	local Mutator M;
-	local bool bIsThisRegistered, bIsAnotherRegistered;
 
-	// Check if mutator was added to GameInfo
 	for ( M = Level.Game.BaseMutator; M != None; M = M.NextMutator )
 	{
-		if (M == MapVote) 
+		if ( M == MapVote ) 
 		{
-			bIsThisRegistered = True;
-		}
-		else if (M.IsA('MapVote'))
-		{
-			bIsAnotherRegistered = True;
+			return; // MapVote already registered
 		}
 	}
-	if (bIsAnotherRegistered)
-	{
-		Err("Detected multiple instances of MapVote");
-		Err("Please use Mapvote either as ServerActor or Mutator");
-		Err("Never add it as both ServerActor and Mutator at the same time");
-	}
-	else
-	{
-		Level.Game.BaseMutator.AddMutator(MapVote);
-	}
+	
+	Level.Game.BaseMutator.AddMutator(MapVote);
 }
 
 function EnsureScoreboardUpdated()
