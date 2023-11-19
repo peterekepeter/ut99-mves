@@ -4,7 +4,7 @@
 class MapVote expands Mutator config(MVE_Config);
 
 const ClientPackageDeprecatedValue = "automatic (will be removed)";
-const ClientPackageInternal = "MVE2dev";
+const ClientPackageInternal = "MVE2h";
 
 var() config string ClientPackage;		// Load this package
 
