@@ -1,14 +1,14 @@
  - RELOAD can fail, write state to config before reload to prevent infinite crash loop
 
- - populate/patch server mutators string
  - inject CLIENT_VERSION and SERVER_VERSION
  - test the release package with a clean UT99 to see if it works
 
-## Map Groups
+## Map Groups???
 
-In the map list have the maps groupped by section.
-For example BT maps groupped by difficulty.
-Tournament maps groupped by size.
+ - would complicate the UI :(
+ - In the map list have the maps groupped by section.
+ - For example BT maps groupped by difficulty.
+ - Tournament maps groupped by size.
 
 ## Idle Switch
 
@@ -17,8 +17,6 @@ Tournament maps groupped by size.
     bSwitchToDefaultMapOnIdle=False
     ServerIdleAfterMinutes=60
 ```
-
-accept !vote as command, more explicit
 
 ## Priority List
 

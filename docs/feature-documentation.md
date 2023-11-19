@@ -6,6 +6,34 @@
  - **MAX** maps: 4096
  - **MAX** gametypes: 100
 
+## Configuration reuse via aliases
+
+When configuring a lot of gametypes you'll notice that you're repeating the 
+same configuration over and over again. You can reduce the repetition by 
+reusing parts of configuration. This can be done using aliases.
+
+Aliases are basically shorthands that get replaced with a longer definition.
+You can reference an alias from the MutatorList.
+
+When the configuration is loaded, the alias will be substituted based on the 
+alias definition. Please note that this is basic text substitution and you 
+will have to ensure that the commas are in the right place after substitution.
+
+```ini
+CustomGame[7]=(GameName="CTF",MutatorList="<lgsniper>",...)
+CustomGame[8]=(GameName="DM",MutatorList="<lgsniper>",...)
+Aliases[0]=<lgsniper>=Botpack.LowGrav,BotPack.SniperArena
+```
+
+The configuration above is same as manually typing out all the mutators as 
+seen in the configuration below:
+
+```ini
+CustomGame[7]=(GameName="CTF",MutatorList="Botpack.LowGrav,BotPack.SniperArena",...)
+CustomGame[8]=(GameName="DM",MutatorList="Botpack.LowGrav,BotPack.SniperArena",...)
+```
+
+Note: not all properties support aliases, but mutators do.
 
 ## Premade lists
 
