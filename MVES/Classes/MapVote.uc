@@ -279,7 +279,10 @@ event PostBeginPlay()
 	
 	if ( DefaultSettings != "" )
 	{
-		ExecuteSettings(DefaultSettings);
+		Cmd = DefaultSettings;
+		if ( InStr( Cmd, "<") >= 0 )
+			Cmd = ParseAliases( Cmd);
+		ExecuteSettings(Cmd);
 	}
 
 	bNeedToRestorePackages = false;
@@ -382,7 +385,8 @@ event PostBeginPlay()
 		}
 		DEFAULT_MODE:
 		Cmd = CurrentGame.Settings;
-		//Log("[MVE] Loading settings:",'MapVote');
+		if ( InStr( Cmd, "<") >= 0 )
+			Cmd = ParseAliases( Cmd);
 		ExecuteSettings(Cmd);
 		
 		Cmd = ParseAliases(CurrentGame.ServerActors);
@@ -1584,15 +1588,15 @@ final function bool SetupTravelString( string mapStringWithIdx )
 			spk = ParseAliases( spk);
 		}
 		Nfo("-> ServerPackages: `"$spk$"`");
-		ConsoleCommand( "set ini:Engine.Engine.GameEngine ServerPackages "$spk);
+		ConsoleCommand("set ini:Engine.Engine.GameEngine ServerPackages "$spk);
 	}
 	TickRate = DefaultTickRate;
 	if (CustomGame[idx].TickRate != 0)
 		TickRate = CustomGame[idx].TickRate;
 	if (TickRate > 0)
 	{
-		ConsoleCommand( "set ini:Engine.Engine.NetworkDevice NetServerMaxTickRate "$CustomGame[idx].TickRate);
-		ConsoleCommand( "set ini:Engine.Engine.NetworkDevice LanServerMaxTickRate "$CustomGame[idx].TickRate);
+		ConsoleCommand("set ini:Engine.Engine.NetworkDevice NetServerMaxTickRate "$CustomGame[idx].TickRate);
+		ConsoleCommand("set ini:Engine.Engine.NetworkDevice LanServerMaxTickRate "$CustomGame[idx].TickRate);
 		Nfo("-> TickRate: `"$TickRate$"`");
 	}
 	return true; // SUCCESS!!!
