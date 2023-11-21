@@ -33,14 +33,14 @@ function TestMain()
 function AssertTagged(string map, string tags) 
 {
 	AssertEquals(
-		m.TestTagMatch(map, tags), True, map$" is tagged with "$ tags
+		m.TestTagMatch(map, tags), True, map$" is tagged with "$tags
 	);
 }
 
 function AssertNotTagged(string map, string tags) 
 {
 	AssertEquals(
-		m.TestTagMatch(map, tags), False, map$" is not tagged with "$ tags
+		m.TestTagMatch(map, tags), False, map$" is not tagged with "$tags
 	);
 }
 

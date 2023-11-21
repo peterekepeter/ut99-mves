@@ -55,7 +55,7 @@ function GlobalLoad(bool bFullscan)
 	local MV_MapTags MapTags;
 	local MV_Sort sorter;
 
-	if (Mutator.bEnableMapTags)
+	if ( Mutator.bEnableMapTags )
 	{
 		MapTags = GetMapTagsObject();
 	}
@@ -87,6 +87,8 @@ function GlobalLoad(bool bFullscan)
 		iMapList ++ ;
 		PrevRules = CurRules;
 	}
+
+	DetectAliasErrors();
 	
 	Log("[MVE] Reloading map list, this may take a while!");
 	Reader.Reset();
@@ -96,9 +98,9 @@ function GlobalLoad(bool bFullscan)
 	{
 		CurMap = Reader.GetMap();
 		
-		if (bFullscan)
+		if ( bFullscan )
 		{
-			if (TestIfMapCanBeLoaded(CurMap) == False)
+			if ( TestIfMapCanBeLoaded(CurMap) == False )
 			{
 				Log("[MVE] Scan `"$CurMap$"`: FAILED TO LOAD!!!!!! < check map/packages for errors");
 			}
@@ -110,7 +112,7 @@ function GlobalLoad(bool bFullscan)
 
 		sorter.AddItem(CurMap);
             
-		if (sorter.ItemCount >= 4095)
+		if ( sorter.ItemCount >= 4095 )
 		{
 			Log("[MVE] Map limit reached with `"$CurMap$"`");
 			break;
@@ -118,13 +120,13 @@ function GlobalLoad(bool bFullscan)
 	}
 	until (Reader.MoveNext());
       
-	if (Mutator.bSortAndDeduplicateMaps)
+	if ( Mutator.bSortAndDeduplicateMaps )
 	{
 		Log("[MVE] Sorting and removing duplicate maps");
 
 		sorter.SortAndDeduplicate();
 
-		if (sorter.DuplicatesRemoved > 0)
+		if ( sorter.DuplicatesRemoved > 0 )
 		{
 			Log("[MVE] "$sorter.DuplicatesRemoved$" duplicates found and removed");
 		}
@@ -132,7 +134,7 @@ function GlobalLoad(bool bFullscan)
 	
 
 	Log("[MVE] Matching maps with filters");
-	for (k = 0; k < sorter.ItemCount; k += 1)
+	for ( k = 0; k < sorter.ItemCount; k += 1 )
 	{
 		CurMap = sorter.Items[k];
             // Log("[MVE] processing map "$CurMap);
@@ -146,7 +148,7 @@ function GlobalLoad(bool bFullscan)
 			iLen = Len( TmpCodes[i]);
 			for ( j = FStart[i] ; j < FEnd[i] ; j ++ )
 			{
-				if (! (Left( Mutator.GetMapFilter(j), iLen) ~= TmpCodes[i]) ) //Check that this IS a filter for this gamemode
+				if ( ! (Left( Mutator.GetMapFilter(j), iLen) ~= TmpCodes[i]) ) //Check that this IS a filter for this gamemode
 					continue;
 				sTest = Mid( Mutator.GetMapFilter(j), iLen);
 				if ( Mutator.bEnableMapTags && InStr(sTest, ":") == 0 ) //Tag match
@@ -175,7 +177,7 @@ function GlobalLoad(bool bFullscan)
 						sTest = Left( sTest, Len(sTest) -1);
 						bAddTag = ! (sTest ~= Left(CurMap, Len(sTest)));
 					}
-					if (!bAddTag )
+					if ( !bAddTag )
 						break;
 				}
 			}
@@ -188,7 +190,7 @@ function GlobalLoad(bool bFullscan)
 			// add map to maplist
 			ClearMap = CurMapWithoutExtension;
 			Maps[ iMaps ++ ] = ClearMap;
-			if (CurRules == PrevRules)
+			if ( CurRules == PrevRules )
 			{
 				MapList[ iMapList ] = ClearMap$";";
 			}
@@ -203,26 +205,26 @@ function GlobalLoad(bool bFullscan)
 		
 	Log("[MVE] Remove old + add new maps...");
 	NewMaps = ":";
-	for (i = 0; i < iMaps; i ++ )
+	for ( i = 0; i < iMaps; i ++ )
 		NewMaps = NewMaps$Maps[i]$":";	
 
 	ClearMap = ":";
 	j = 0;
-	for (i = 0; i < iM; i ++ ) 
+	for ( i = 0; i < iM; i ++ ) 
 	{
-		if (InStr(NewMaps, ":"$M[i]$":") != -1) 
+		if ( InStr(NewMaps, ":"$M[i]$":") != -1 ) 
 		{
 			ClearMap = ClearMap$M[i]$":";
-			if (i != j)
+			if ( i != j )
 				M[j] = M[i];
 			j ++ ;
 		}			
 	}
 	NewMaps = "";
 	
-	for (i = 0; i < iMaps; i ++ ) 
+	for ( i = 0; i < iMaps; i ++ ) 
 	{
-		if (InStr(ClearMap, ":"$Maps[i]$":") == -1)
+		if ( InStr(ClearMap, ":"$Maps[i]$":") == -1 )
 			M[j ++ ] = Maps[i];
 	}
 	iM = j;
@@ -230,14 +232,14 @@ function GlobalLoad(bool bFullscan)
 		M[i] = "";
 		
 	ClearMap = ":";
-	for (i = 0; i < iMapList; i ++ )
+	for ( i = 0; i < iMapList; i ++ )
 		ClearMap = ClearMap$Left(MapList[i], InStr(MapList[i], ":"))$":"$i$":";	
 	
-	for (j = 0; j < ArrayCount(iNewMaps) && iM - j > 0; j ++ ) 
+	for ( j = 0; j < ArrayCount(iNewMaps) && iM - j > 0; j ++ ) 
 	{
 		NewMaps = M[iM - j - 1];
 		k = InStr(ClearMap, ":"$NewMaps$":");
-		if (k == -1) 
+		if ( k == -1 ) 
 		{
 			iNewMaps[j] = 0;
 			sNewMaps[j] = "";
@@ -258,7 +260,7 @@ function GlobalLoad(bool bFullscan)
 			for ( j = FStart[i] ; j < FEnd[i] ; j ++ )
 			{
 				//Check that this IS a filter for this gamemode
-				if (! (Left( Mutator.GetMapFilter(j), iLen) ~= TmpCodes[i]) ) 
+				if ( ! (Left( Mutator.GetMapFilter(j), iLen) ~= TmpCodes[i]) ) 
 				{
 					continue;
 				}
@@ -276,12 +278,12 @@ function GlobalLoad(bool bFullscan)
 
 	// reload report 
 	Log("[MVE] Reloaded "$iMaps$" maps matched to "$iTmpC$" gametypes from "$(Reader.GetMapCount())$" scanned maps.");
-	if (iMaps == 0) 
+	if ( iMaps == 0 ) 
 	{
 		Log("[MVE]");
 		Log("[MVE] [ERROR] No maps were loaded!");
 		Log("[MVE]");
-		if (iTmpC <= 0)
+		if ( iTmpC <= 0 )
 		{
 			Log("[MVE] [ERROR] No gametypes were detected!");
 			Log("[MVE]");
@@ -303,7 +305,7 @@ function GlobalLoad(bool bFullscan)
 		}
 		// CustomGame[i].bEnabled && (CustomGame[i].GameClass != "") && (CustomGame[i].GameName != "") && (CustomGame[i].RuleName != "") && (CustomGame[i].VotePriority > 0) 
 	}
-	if (Reader.GetMapCount() <= 10)
+	if ( Reader.GetMapCount() <= 10 )
 	{
 		Log("[MVE]");
 		Log("[MVE] [WARNING] Unusually low number of maps were found on filesystem!");
@@ -319,6 +321,17 @@ function GlobalLoad(bool bFullscan)
 	Mutator.UpdateMapListCaches();
 	SaveConfig();
 	Mutator.BroadcastMessage("[MVE] Map list has been reloaded, wait 5 seconds to reopen the vote window.",True);
+}
+
+function DetectAliasErrors()
+{
+	local string errorMessage;
+
+	Mutator.LoadAliases();
+	while ( Mutator.AliasesLogic.DetectConfigurationError(errorMessage) ) 
+	{
+		Err(errorMessage);
+	}
 }
 
 //Returns a chunk of the fingerprint
@@ -422,7 +435,7 @@ function EnumerateGames()
 					found = True;
 				}
 			}
-			if (!found)
+			if ( !found )
 			{
 				// add new entry into RuleList
 				TmpGameName[iRules] = gameName;
@@ -458,7 +471,7 @@ function bool IsValidMap( out string MapString, out string reason )
 	}
 	MapName = Left( MapString, iLen);
 
-	if (History.IsExcluded(MapName))
+	if ( History.IsExcluded(MapName) )
 	{
 		reason = "map is on cooldown";
 		return False;
@@ -476,7 +489,7 @@ function bool IsValidMap( out string MapString, out string reason )
 		}
 		
 		// TODO ensure map name match is exact (map name that starts with another might match)
-		if ( Left(MapList[i], iLen) ~= MapName)
+		if ( Left(MapList[i], iLen) ~= MapName )
 		{
 			bMapFound = True;
 			if ( InStr( targetIdxList, GameIdx ) > 0 )
@@ -494,7 +507,7 @@ function bool IsValidMap( out string MapString, out string reason )
 	}
 
 	// map string not valid but return a relevant reason
-	if (bMapFound)
+	if ( bMapFound )
 	{
 		reason = "map found but it did not have the requested gametype";
 		return False;
@@ -610,7 +623,7 @@ function string GetStringSection( string StartsFrom)
 	while ( (Len(Result) > 0) && (Right( Result,1) != chr(13)) )
 		Result = Left( Result, Len(Result) -1);
 
-	if (!bNext )
+	if ( !bNext )
 		return "[START]"$chr(13)$Result$"[END]"$chr(13)$"[NEXT]"$chr(13);
 	//Notify END of list, add the "[X]" on individual map entries!
 	return "[START]"$chr(13)$Result$"[NEXT]"$chr(13)$"[END]"$chr(13);
@@ -683,13 +696,14 @@ final function string RandomMap( int gameIdx, int forPlayerCount )
 	decoder = new class'MapListDecoder';
 	count = 0;
 
-	for (i = 0; i < iMapList; i+=1)
+	for ( i = 0; i < iMapList; i+=1 )
 	{
 		decoder.L[i] = MapList[i];
-		while (decoder.ReadEntry(result)) 
+		while ( decoder.ReadEntry(result) ) 
 		{
-			while (decoder.ReadCode(code)) {
-				if (code == gameIdx ) 
+			while ( decoder.ReadCode(code) ) 
+	{
+				if ( code == gameIdx ) 
 				{
 					options[count] = result;
 					count += 1;
@@ -702,12 +716,12 @@ final function string RandomMap( int gameIdx, int forPlayerCount )
 	levelString = ""$decoder;
 	decoder.Parse(levelString, ".", levelString);
 	bestScore = -1000;
-	for (i = 0; i < 10; i += 1) 
+	for ( i = 0; i < 10; i += 1 ) 
 	{
 		result = options[(Rand(count) + gameIdx * 7 + count * 13) % count];
 		resultScore = 0;
 		map = class'MV_Result'.static.Create(result, gameIdx);
-		if (result ~= "Random") 
+		if ( result ~= "Random" ) 
 		{
 			resultScore -= 100;
 		}
@@ -718,18 +732,18 @@ final function string RandomMap( int gameIdx, int forPlayerCount )
 		else if (forPlayerCount >= 0)
 		{
 			idealPlayers = map.GetAvgIdealPlayerCount();
-			if (idealPlayers >= 0) 
+			if ( idealPlayers >= 0 ) 
 			{
 				delta = forPlayerCount - idealPlayers;
-				if (delta < 0)
+				if ( delta < 0 )
 				{
 					delta = -delta;
 				}
 				resultScore += 32 - delta;
 			}
 		}
-		if (result ~= levelString) resultScore -= 10;
-		if (bestScore <= resultScore) 
+		if ( result ~= levelString ) resultScore -= 10;
+		if ( bestScore <= resultScore ) 
 		{
 			bestResult = result;
 			bestScore = resultScore;

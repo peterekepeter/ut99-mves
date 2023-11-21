@@ -91,8 +91,7 @@ var int iGames;
 
 
 var() config string Aliases[32];
-var string PreAlias[32], PostAlias[32];
-var int iAlias;
+var MV_Aliases AliasesLogic;
 var() config string MapFilters[1024], ExcludeFilters[32];
 var int iFilter, iExclF;
 
@@ -1602,6 +1601,10 @@ final function bool SetupTravelString( string mapStringWithIdx )
 	return true; // SUCCESS!!!
 }
 
+function string ParseAliases(string input) {
+	return AliasesLogic.Resolve(input);
+}
+
 function ProcessMapOverrides(MV_Result map)
 {
 	local MapOverridesConfig MapOverridesConfig;
@@ -1701,58 +1704,13 @@ final function ResetCurrentGametypeBeforeTravel(){
 final function LoadAliases()
 {
 	local int i, j;
+	local string error;
 	
+	AliasesLogic = new class'MV_Aliases'();
 	For ( i=0 ; i<32 ; i++ )
 	{
-		if ( Left(Aliases[i],1) == "<" )
-		{
-			j = InStr( Aliases[i], ">");
-			if ( j < 0 )
-				continue;
-			if ( (Mid(Aliases[i],j,2) != ">=") || (Mid(Aliases[i], j+2) == "") )
-				continue;
-			PreAlias[iAlias] = Caps(Left( Aliases[i], j+1));
-			PostAlias[iAlias++] = Mid( Aliases[i], j+2);
-		}
+		AliasesLogic.AddAliasLine(Aliases[i]);
 	}
-	//Single pass multi alias post processing
-	For ( i=0 ; i<iAlias ; i++ )
-		if ( InStr(PostAlias[i], "<") >= 0 )
-			PostAlias[i] = ParseAliases( PostAlias[i]);
-}
-
-final function string ParseAliases( string Command)
-{
-	local string preStr, aStr;
-	local int i;
-	
-	i = InStr( Command, "<");
-	While ( i >= 0 )
-	{
-		preStr = Left( Command, i); //Split command in two
-		Command = Mid( Command, i);
-		i = InStr( Command, ">");
-		if ( i < 0 ) //Badly written alias, remove all text for safety
-			Command = preStr;
-		else
-		{
-			aStr = Caps(Left( Command, i+1)); //Now remove the alias text from command
-			Command = Mid( Command, i+1); //aStr is the alias, let's find it
-			For ( i=0 ; i<iAlias ; i++ )
-			{
-				if ( PreAlias[i] == aStr )
-				{
-					aStr = PostAlias[i];
-					Goto SUCCESS;
-				}
-			}
-			aStr = "";
-			SUCCESS:
-			Command = preStr $ aStr $ Command;
-			i = InStr( Command, "<");
-		}
-	}
-	return Command;
 }
 
 function ApplyFixForMutatorsQueryLagSpikes() {
