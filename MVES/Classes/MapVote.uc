@@ -121,7 +121,7 @@ var MV_TravelInfo TravelInfo;
 var MV_PlayerDetector PlayerDetector;
 var int CurrentID;
 
-var MapVoteResult CurrentMap;
+var MV_Result CurrentMap;
 var Music SongOverride;
 
 //XC_GameEngine and Unreal 227 interface
@@ -362,7 +362,7 @@ event PostBeginPlay()
 		TravelInfo.SaveConfig();
 	}
 
-	CurrentMap = class'MapVoteResult'.static.Create(Cmd, TravelInfo.TravelIdx);
+	CurrentMap = class'MV_Result'.static.Create(Cmd, TravelInfo.TravelIdx);
 	CurrentMap.OriginalSong = ""$Level.Song;
 	
 	if (bEnableMapOverrides)
@@ -1450,10 +1450,10 @@ final function bool CanVote(PlayerPawn Sender)
 	return True;
 }
 
-final function MapVoteResult GenerateMapResult(string map, int idx)
+final function MV_Result GenerateMapResult(string map, int idx)
 {
-	local MapVoteResult r;
-	r = class'MapVoteResult'.static.Create();
+	local MV_Result r;
+	r = class'MV_Result'.static.Create();
 	r.Map = map;
 	r.GameIndex = idx;
 	PopulateResultWithRule(r, idx);
@@ -1461,7 +1461,7 @@ final function MapVoteResult GenerateMapResult(string map, int idx)
 	return r;
 }
 
-function PopulateResultWithRule(MapVoteResult r, int idx)
+function PopulateResultWithRule(MV_Result r, int idx)
 {
 	local string mutator, extends, extendsIdx;
 	extends = CustomGame[idx].Extends;
@@ -1492,7 +1492,7 @@ function PopulateResultWithRule(MapVoteResult r, int idx)
 	r.AddPackages(CustomGame[idx].Packages);
 }
 
-function PrintCircularExtendsError(MapVoteResult r, int idx){
+function PrintCircularExtendsError(MV_Result r, int idx){
 
 	local string list;
 	local int i, parentIdx;
@@ -1512,7 +1512,7 @@ final function bool SetupTravelString( string mapStringWithIdx )
 	local string spk, GameClassName, LogoTexturePackage, mapFileName, idxString;
 	local int idx, TickRate, playerCount;
 	local MV_MapOverrides MapOverrides;
-	local MapVoteResult Result;
+	local MV_Result Result;
 	local LevelInfo info;
 
 	if (!class'MV_Parser'.static.TrySplit(mapStringWithIdx, ":", mapFileName, idxString)) 
@@ -1602,7 +1602,7 @@ final function bool SetupTravelString( string mapStringWithIdx )
 	return true; // SUCCESS!!!
 }
 
-function ProcessMapOverrides(MapVoteResult map)
+function ProcessMapOverrides(MV_Result map)
 {
 	local MapOverridesConfig MapOverridesConfig;
 	local MV_MapOverrides MapOverrides;

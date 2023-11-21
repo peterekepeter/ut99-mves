@@ -1,6 +1,6 @@
 class TestMapVoteResult extends TestClass;
 
-var MapVoteResult s;
+var MV_Result s;
 
 function TestMain()
 {
@@ -15,7 +15,7 @@ function TestMain()
 
 function TestPackages()
 {
-	Describe("MapVoteResult packages");
+	Describe("MV_Result packages");
 	s.AddPackages("Package1,Package2");
 	AssertEquals(s.ServerPackageCount, 2, "has 2 packages");
 	s.AddPackages("Package1");
@@ -115,5 +115,5 @@ function TestSettings(){
 function Describe(string subject)
 {
 	super.Describe(subject);
-	s = new class'MapVoteResult';
+	s = new class'MV_Result';
 }

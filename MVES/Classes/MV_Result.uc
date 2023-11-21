@@ -1,4 +1,4 @@
-class MapVoteResult expands MV_Util;
+class MV_Result expands MV_Util;
 
 var string OriginalSong;
 var string Map;
@@ -37,10 +37,10 @@ var bool LevelInfoCached;
 var LevelSummary LevelSummary;
 var bool LevelSummaryCached;
 
-static function MapVoteResult Create(optional string map, optional int gameIdx)
+static function MV_Result Create(optional string map, optional int gameIdx)
 {
-	local MapVoteResult object;
-	object = new class'MapVoteResult';
+	local MV_Result object;
+	object = new class'MV_Result';
 	object.Map = map;
 	object.GameIndex = gameIdx;
 	return object;

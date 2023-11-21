@@ -676,7 +676,7 @@ final function string RandomMap( int gameIdx, int forPlayerCount )
 	local string options[4096];
 	local string bestResult;
 	local string levelString;
-	local MapVoteResult map;
+	local MV_Result map;
 	local int bestScore, resultScore;
 	local int count, idealPlayers, delta;
 
@@ -706,7 +706,7 @@ final function string RandomMap( int gameIdx, int forPlayerCount )
 	{
 		result = options[(Rand(count) + gameIdx * 7 + count * 13) % count];
 		resultScore = 0;
-		map = class'MapVoteResult'.static.Create(result, gameIdx);
+		map = class'MV_Result'.static.Create(result, gameIdx);
 		if (result ~= "Random") 
 		{
 			resultScore -= 100;
@@ -750,6 +750,6 @@ function MV_MapTags GetMapTagsObject()
 
 function bool TestIfMapCanBeLoaded(string mapName) 
 {
-	return class'MapVoteResult'.static.Create(mapName).CanMapBeLoaded();
+	return class'MV_Result'.static.Create(mapName).CanMapBeLoaded();
 }
 

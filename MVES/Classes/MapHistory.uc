@@ -19,7 +19,7 @@ var() config int ElementCount;
 
 //Validation checks already passed
 //Map indexes are ALWAYS sorted
-function NewMapPlayed(MapVoteResult r)
+function NewMapPlayed(MV_Result r)
 {
 	local int i;
 	local int costAdd;
