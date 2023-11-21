@@ -702,7 +702,7 @@ final function string RandomMap( int gameIdx, int forPlayerCount )
 		while ( decoder.ReadEntry(result) ) 
 		{
 			while ( decoder.ReadCode(code) ) 
-	{
+			{
 				if ( code == gameIdx ) 
 				{
 					options[count] = result;

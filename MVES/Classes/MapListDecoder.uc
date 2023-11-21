@@ -32,7 +32,7 @@ function ResetReader()
 	ReadLine = EMPTY_STRING;
 	ReadMapEntry = EMPTY_STRING;
 	PrevReadCodesAt = 0;
-	for (i = 0; i < ArrayCount(PrevCodes); i+=1)
+	for ( i = 0; i < ArrayCount(PrevCodes); i+=1 )
 	{
 		PrevCodes[i] = EMPTY_STRING;
 	}
@@ -42,9 +42,9 @@ function bool ReadEntry(out string resultMap)
 {
 	local bool trimLegacySemicolon; 
 
-	if (ReadLine == "")
+	if ( ReadLine == "" )
 	{
-		if (L[R] != "")
+		if ( L[R] != "" )
 		{
 			ReadLine = L[R];
 			R += 1;
@@ -59,17 +59,17 @@ function bool ReadEntry(out string resultMap)
 	// workaround implemented on 2023-08-23
 	trimLegacySemicolon = InStr(ReadMapEntry, "|") == -1;
 	
-	if (Parse(ReadMapEntry, "|", ReadLine))
+	if ( Parse(ReadMapEntry, "|", ReadLine) )
 	{
-		if (Parse(ReadMapName, ":", ReadMapEntry))
+		if ( Parse(ReadMapName, ":", ReadMapEntry) )
 		{
 			resultMap = ReadMapName;
-			if (ReadMapEntry == EMPTY_STRING) 
+			if ( ReadMapEntry == EMPTY_STRING ) 
 			{
-				if (trimLegacySemicolon) 
+				if ( trimLegacySemicolon ) 
 				{
 					// map list is from  version of mve which has suffixed semicolons
-					if (Right(resultMap, 1) == ";") 
+					if ( Right(resultMap, 1) == ";" ) 
 					{
 						resultMap = Left(resultMap, Len(resultMap) -1);
 					}
@@ -104,7 +104,7 @@ function bool ReadEntry(out string resultMap)
 function bool ReadCode(out int code)
 {
 	local string str;
-	if (Parse(str, ":", ReadMapEntry)) 
+	if ( Parse(str, ":", ReadMapEntry) ) 
 	{
 		code = int(str);
 		return True;

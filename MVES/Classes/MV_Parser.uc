@@ -6,7 +6,7 @@ static function bool TrySplit(string input, string separator, out string first, 
 {
 	local int pos;
 
-	if (input == EMPTY_STRING) 
+	if ( input == EMPTY_STRING ) 
 	{
 		first = EMPTY_STRING;
 		rest = EMPTY_STRING;
@@ -15,7 +15,7 @@ static function bool TrySplit(string input, string separator, out string first, 
 
 	pos = InStr(input, separator);
 
-	if (pos >= 0) 
+	if ( pos >= 0 ) 
 	{
 		first = Left(input, pos);
 		rest = Mid(input, pos + Len(separator));

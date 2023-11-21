@@ -26,30 +26,30 @@ function NewMapPlayed(MV_Result r)
 
 	costAdd = MapList.Mutator.MapCostAddPerLoad;
 
-	For ( i=0 ; i<ElementCount ; i++ )
+	for ( i = 0 ; i < ElementCount ; i ++ )
 	{
-		if ( --Elements[i].Acc <= 0 )
+		if ( -- Elements[i].Acc <= 0 )
 		{
 			ClearElement( i);
 		}
 	}
-	i=0;
-	While ( i<ElementCount )
+	i = 0;
+	while ( i < ElementCount )
 	{
 		if ( Elements[i].Map == r.Map ) //FOUND EXISTING ENTRY!
 		{
 			Elements[i].Acc += costAdd + 1;
-			Goto END;
+			goto END;
 		}
 		if ( Elements[i].Map > r.Map ) //This one is one slot after, perform push and use this slot instead
 		{
 			PushList( i);
-			Goto SET;
+			goto SET;
 		}
-		i++;
+		i ++ ;
 	}
 	//This happens if we went through all list and see we're last
-	ElementCount++;	
+	ElementCount ++ ;	
 	SET:	
 	Elements[i].Map = r.Map;
 	Elements[i].Acc = costAdd;
@@ -63,24 +63,24 @@ function NewMapPlayed(MV_Result r)
 function ClearElement( int idx)
 {
 	local int i;
-	i = idx+1;
-	While ( (i < ElementCount) && (i < ArrayCount(Elements)) )
+	i = idx + 1;
+	while ( (i < ElementCount) && (i < ArrayCount(Elements)) )
 	{
-		Elements[i-1] = Elements[i];
-		i++;
+		Elements[i - 1] = Elements[i];
+		i ++ ;
 	}
-	ElementCount--;
+	ElementCount -- ;
 }
 
 //Push list one place up, let idx slot ready to replace
 function PushList( int idx)
 {
 	local int i;
-	i = ElementCount++;
-	While ( i > idx )
+	i = ElementCount ++ ;
+	while ( i > idx )
 	{
-		Elements[i] = Elements[i-1];
-		i--;
+		Elements[i] = Elements[i - 1];
+		i -- ;
 	}
 }
 
@@ -89,7 +89,7 @@ function bool IsExcluded( string map )
 	local int i;
 	for ( i = 0; i < ElementCount; i += 1 )
 	{
-		if (Elements[i].Map == map)
+		if ( Elements[i].Map == map )
 		{
 			return Elements[i].Acc > MapList.Mutator.MapCostMaxAllow; 
 		}

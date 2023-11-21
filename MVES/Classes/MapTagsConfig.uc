@@ -15,16 +15,16 @@ function MV_MapTags GetConfiguredMapTags()
 
 function private RunMigration()
 {
-	if (MapTagsVersion == CurrentVersion)
+	if ( MapTagsVersion == CurrentVersion )
 	{
 		return; // we're good to go!
 	}
-	if (MapTagsVersion > CurrentVersion)
+	if ( MapTagsVersion > CurrentVersion )
 	{
 		Err("unknown MapTags version, MapTags may not function correctly");
 		return;
 	}
-	if (MapTagsVersion <= 0)
+	if ( MapTagsVersion <= 0 )
 	{
 		Nfo("initializing MapTags with examples, check and modify if necesary");
 		MapTagsVersion = 1;
@@ -41,7 +41,7 @@ function private MV_MapTags CreateMapTags()
 	local MV_MapTags result;
 	local int i;
 	result = new class'MV_MapTags';
-	for (i = 0; i < Self.MapTagsCount; i += 1)
+	for ( i = 0; i < Self.MapTagsCount; i += 1 )
 	{
 		result.AddConfigLine(Self.MapTags[i]);
 	}

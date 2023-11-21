@@ -22,7 +22,7 @@ event Query(WebRequest Request, WebResponse Response)
 
 	aStr = Mid(Request.URI, 1);
 
-	if ( MapList == none )
+	if ( MapList == None )
 	{
 		Error503(Response);
 		return;
@@ -32,7 +32,7 @@ event Query(WebRequest Request, WebResponse Response)
 		Error501(Response);
 		return;
 	}
-	if ( !(Left(aStr, Len(string(MapList.Mutator.ServerCodeName)) ) ~= string(MapList.Mutator.ServerCodeName)) )
+	if ( ! (Left(aStr, Len(string(MapList.Mutator.ServerCodeName)) ) ~= string(MapList.Mutator.ServerCodeName)) )
 	{
 		Error400(Response);
 		return;
@@ -41,7 +41,7 @@ event Query(WebRequest Request, WebResponse Response)
 	aStr = Response.Connection.IpAddrToString(Response.Connection.RemoteAddr);
 	Log( "HTTP query from "$aStr, 'MapVote' ); //Safe to log?
 	W = ValidPlayerWithIP( RemovePort(aStr) );
-	if ( W == none )
+	if ( W == None )
 	{
 		Error401( Response);
 		return;
@@ -57,22 +57,22 @@ event Query(WebRequest Request, WebResponse Response)
 	//We can send up to 1kb, so the maplist will split it starting by the specified "$val=" property
 	//Each query is done every 0.5 second (scaled down to server speed) until list is finished
 	aStr = MapList.GetStringSection( aStr);
-	Response.SendText( aStr, true ); 
+	Response.SendText( aStr, True ); 
 	if ( InStr(aStr,chr(13)$"[END]") < InStr(aStr,chr(13)$"[NEXT]") )
 	{
 		W.TicksLeft = 1;
-		W.bHTTPLoading = false;
+		W.bHTTPLoading = False;
 	}
 	else
 	{
-		W.TicksLeft++;
-		W.bHTTPLoading = true;
+		W.TicksLeft ++ ;
+		W.bHTTPLoading = True;
 	}
 }
 
 function CleanUp()
 {
-	MapList = none;
+	MapList = None;
 }
 
 function Error503( WebResponse Response)
@@ -110,12 +110,11 @@ function MVPlayerWatcher ValidPlayerWithIP( string IP)
 {
 	local MVPlayerWatcher W;
 	
-	For ( W=MapList.Mutator.WatcherList ; W!=none ; W=W.nextWatcher )
+	for ( W = MapList.Mutator.WatcherList ; W != None ; W = W.nextWatcher )
 		if ( W.PlayerIP == IP )
 			return W;
 }
 
 defaultproperties
 {
-      MapList=None
-}
+	}

@@ -19,7 +19,7 @@ function Timer()
 function DetectPlayers()
 {
 	local Pawn P;
-	for ( P=Level.PawnList ; P!=None ; P=P.nextPawn )
+	for ( P = Level.PawnList ; P != None ; P = P.nextPawn )
 	{
 		DetectPlayer(P);
 	}
@@ -28,12 +28,12 @@ function DetectPlayers()
 function DetectPlayer(Pawn P)
 {
 	local PlayerPawn PP;
-	if (!P.bIsPlayer)
+	if ( !P.bIsPlayer )
 	{
 		return;
 	}
 	PP = PlayerPawn(P);
-	if (ShouldJoinMapVote(PP))
+	if ( ShouldJoinMapVote(PP) )
 	{
 		MapVote.PlayerJoined(PP);
 	}
@@ -42,7 +42,7 @@ function DetectPlayer(Pawn P)
 
 function bool ShouldJoinMapVote(PlayerPawn PP)
 {
-	if (PP == None ||
+	if ( PP == None ||  
 		PP.PlayerReplicationInfo == None ||
 		PP.PlayerReplicationInfo.PlayerName == "" ||
 		MapVote.GetWatcherFor(PP) != None)
@@ -54,5 +54,4 @@ function bool ShouldJoinMapVote(PlayerPawn PP)
 
 defaultproperties
 {
-      MapVote=None
 }

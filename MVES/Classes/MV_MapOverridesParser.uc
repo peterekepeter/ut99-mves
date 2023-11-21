@@ -4,10 +4,10 @@ function ParseConfiguration(MV_MapOverrides target, MapOverridesConfig config)
 {
 	local int i, errorCount;
 	target.RuleCount = 0;
-	for (i=0; i<config.MapOverridesCount; i++)
+	for ( i = 0; i < config.MapOverridesCount; i ++ )
 	{
 		errorCount = TryAddConfigLine(target, config.MapOverrides[i]);
-		if (errorCount > 0)
+		if ( errorCount > 0 )
 		{
 			Err(errorCount$" errors in MapOverrides["$i$"]");
 		}
@@ -19,21 +19,21 @@ function private int TryAddConfigLine(MV_MapOverrides target, string line)
 	local string rule, filter, properties;
 	local int errors;
 	errors = 0;
-	while (TrySplit(line, ";", rule, line))
+	while ( TrySplit(line, ";", rule, line) )
 	{
-		if (target.RuleCount >= target.RuleMaxCount)
+		if ( target.RuleCount >= target.RuleMaxCount )
 		{
-			errors++;
+			errors ++ ;
 			Err("max rule count "$target.RuleMaxCount$" was reached");
 			return errors;
 		}
-		if (TryAddRule(target, rule))
+		if ( TryAddRule(target, rule) )
 		{
-			target.RuleCount++;
+			target.RuleCount ++ ;
 		}
 		else
 		{
-			errors++;
+			errors ++ ;
 			Err("error in rule `"$rule$"`");
 			ResetRuleIndex(target, target.RuleCount);
 		}
@@ -44,14 +44,14 @@ function private int TryAddConfigLine(MV_MapOverrides target, string line)
 function private bool TryAddRule(MV_MapOverrides target, string rule)
 {
 	local string filter, properties, property;
-	if (!TrySplit(rule, "?", filter, properties))
+	if ( !TrySplit(rule, "?", filter, properties) )
 	{
 		Err("missing properties for rule, expected `?`");
 		return False;
 	}
-	while (TrySplit(properties, "?", property, properties))
+	while ( TrySplit(properties, "?", property, properties) )
 	{
-		if (TryAddRuleProperty(target, property))
+		if ( TryAddRuleProperty(target, property) )
 		{
 			target.Filter[target.RuleCount] = filter;
 		}
@@ -68,15 +68,15 @@ function private bool TryAddRuleProperty(MV_MapOverrides target, string property
 {
 	local string key, K, value, keyUpper, package;
     
-	if (!TrySplit(property, "=", key, value))
+	if ( !TrySplit(property, "=", key, value) )
 	{
 		Err("expected `=`");
 		return False;
 	}
 	K = Caps(key);
-	if (K == "SONG")
+	if ( K == "SONG" )
 	{   
-		if (!TrySplit(value, ".", package, value))
+		if ( !TrySplit(value, ".", package, value) )
 		{
 			Err("Song requires `Package.Name` format"); 
 		}

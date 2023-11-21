@@ -22,7 +22,7 @@ function AddItem(string item)
 
 function Sort()
 {
-	if (ItemCount < 2)
+	if ( ItemCount < 2 )
 	{
 		return;
 	}
@@ -35,12 +35,12 @@ function SortStep(int start, int end)
 	local int length, mid, i, j, p;
 	local string temp;
 	length = end - start;
-	if (length < 1) 
+	if ( length < 1 ) 
 	{
 	}
 	else if (length == 1) 
 	{
-		if (CompareLessThan(end, start))
+		if ( CompareLessThan(end, start) )
 		{
 			Swap(start, end);
 		}
@@ -52,17 +52,17 @@ function SortStep(int start, int end)
 		Copy(mid, p);
 		i = start; 
 		j = end;
-		while (i < j) 
+		while ( i < j ) 
 		{
-			while (i < j && CompareLessThan(i, p))
+			while ( i < j && CompareLessThan(i, p) )
 			{
 				i += 1;
 			}
-			while (i < j && CompareLessThan(p, j))
+			while ( i < j && CompareLessThan(p, j) )
 			{
 				j -= 1;
 			}
-			if (i < j)
+			if ( i < j )
 			{
 				Swap(i, j);
 				i += 1;
@@ -80,17 +80,17 @@ function SortAndDeduplicate()
 
 	Sort();
 
-	for (i = 1; i < ItemCount; i += 1)
+	for ( i = 1; i < ItemCount; i += 1 )
 	{
-		if (!CompareLessThan(i - 1, i))
+		if ( !CompareLessThan(i - 1, i) )
 		{
 			break;
 		}
 	}
 
-	for (j = i + 1; j < ItemCount; j += 1)
+	for ( j = i + 1; j < ItemCount; j += 1 )
 	{
-		if (CompareLessThan(j - 1, j))
+		if ( CompareLessThan(j - 1, j) )
 		{
 			Copy(j, i);
 			i += 1;
@@ -127,7 +127,7 @@ function DebugPrint()
 {
 	local string s;
 	local int i;
-	for (i = 0; i < ItemCount; i += 1)
+	for ( i = 0; i < ItemCount; i += 1 )
 	{
 		s = s$Items[i]$" ";
 	}

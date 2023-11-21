@@ -10,7 +10,7 @@ function Initialize(MapVote MapVote, bool isIdle, int EmptyMinutes)
 	Self.MapVote = MapVote;
 	Self.EmptyMinutes = EmptyMinutes;
 	Self.bIsIdle = isIdle;
-	if (isIdle)
+	if ( isIdle )
 	{
 		time = GetRelativeTime(EmptyMinutes);
 		Log("[MVE] Currently idle, has been empty for at least "$time);
@@ -27,19 +27,19 @@ function Timer()
 
 	// TODO: idea improve watch and handle player count changes
 	// so each class is notified of change rather than each class tracking
-	for (P = Level.PawnList; P != None; P = P.NextPawn)
+	for ( P = Level.PawnList; P != None; P = P.NextPawn )
 	{
-		if (P.bIsPlayer && PlayerPawn(P) != None)
+		if ( P.bIsPlayer && PlayerPawn(P) != None )
 		{
 			count += 1;
 		}
 	}
 
-	if (count > 0)
+	if ( count > 0 )
 	{
 		EmptyMinutes = 0;   
 		
-		if (bIsIdle)
+		if ( bIsIdle )
 		{
 			// state transition -> not idle
 			Log("[MVE] Server not in idle mode any longer");
@@ -53,13 +53,13 @@ function Timer()
 		LogIdleMessage(EmptyMinutes);
 	}
 
-	if (!bIsIdle && MapVote.ServerIdleAfterMinutes != 0 && EmptyMinutes >= MapVote.ServerIdleAfterMinutes)
+	if ( !bIsIdle && MapVote.ServerIdleAfterMinutes != 0 && EmptyMinutes >= MapVote.ServerIdleAfterMinutes )
 	{   
 		// state transition -> idle
 		Log("[MVE] Server is switching to idle mode");
 		bIsIdle = True; 
 		SaveIdleState();
-		if (MapVote.bSwitchToDefaultMapOnIdle)
+		if ( MapVote.bSwitchToDefaultMapOnIdle )
 		{
 			MapVote.SwitchToDefaultMap();
 		}
@@ -74,7 +74,7 @@ function LogIdleMessage(int m)
 {
 	local string time;
 	time = GetIdleMessage(m);
-	if (time == "")
+	if ( time == "" )
 	{
 		// noop
 	}
@@ -98,7 +98,7 @@ static function string GetIdleMessage(int m)
 	modulo = 0;
 	message = "";
 
-	if (m <= 15)  
+	if ( m <= 15 )  
 	{
 		modulo = 5; // log every 5 minutes
 	}
@@ -122,7 +122,7 @@ static function string GetIdleMessage(int m)
 	}
 
 	// execute
-	if (modulo > 0 && m % modulo == 0) 
+	if ( modulo > 0 && m % modulo == 0 ) 
 	{
 		message = GetRelativeTime(m);
 	}
@@ -132,7 +132,7 @@ static function string GetIdleMessage(int m)
 
 static function string GetRelativeTime(int m)
 {
-	if (m <= 60)
+	if ( m <= 60 )
 	{
 		return m$" minutes";
 	}
