@@ -1,10 +1,5 @@
-//================================================================================
-// MapHistory.
-//================================================================================
 class MapHistory expands Object
 	config(MVE_MapHistory);
-
-var MV_MapList MapList;
 
 struct MapElement
 {
@@ -13,86 +8,91 @@ struct MapElement
 	var() config string RuleName;
 	var() config int Acc; //Accumulated points
 };
-
+	
 var() config MapElement Elements[512];
 var() config int ElementCount;
 
-//Validation checks already passed
-//Map indexes are ALWAYS sorted
-function NewMapPlayed(MV_Result r)
+var MapElement DefaultMapElement;
+
+function NewMapPlayed(MV_Result r, int MapCostAddPerLoad)
 {
-	local int i;
-	local int costAdd;
+	local int i, lastSmaller;
+	lastSmaller = -1;
 
-	costAdd = MapList.Mutator.MapCostAddPerLoad;
-
-	for ( i = 0 ; i < ElementCount ; i ++ )
+	for ( i = 0 ; i < ElementCount ; i += 1 )
 	{
-		if ( -- Elements[i].Acc <= 0 )
+		while ( --Elements[i].Acc <= 0 )
 		{
-			ClearElement( i);
+			PopList(i);
+		}
+		if ( Elements[i].Map < r.Map ) 
+		{
+			lastSmaller = i;
 		}
 	}
-	i = 0;
-	while ( i < ElementCount )
+
+	i = lastSmaller + 1;
+
+	if ( i < ElementCount && Elements[i].Map == r.Map ) 
 	{
-		if ( Elements[i].Map == r.Map ) //FOUND EXISTING ENTRY!
-		{
-			Elements[i].Acc += costAdd + 1;
-			goto END;
-		}
-		if ( Elements[i].Map > r.Map ) //This one is one slot after, perform push and use this slot instead
-		{
-			PushList( i);
-			goto SET;
-		}
-		i ++ ;
+		// update existing
+		Elements[i].Acc += MapCostAddPerLoad + 1;
 	}
-	//This happens if we went through all list and see we're last
-	ElementCount ++ ;	
-	SET:	
-	Elements[i].Map = r.Map;
-	Elements[i].Acc = costAdd;
-	END:
+	else 
+	{
+		// insert new
+		PushList(i);
+		Elements[i].Map = r.Map;
+		Elements[i].Acc = MapCostAddPerLoad;
+	}
+
 	Elements[i].GameName = r.GameName;
 	Elements[i].RuleName = r.RuleName;
-	SaveConfig();
 }
 
-//Delete element and keep order
-function ClearElement( int idx)
+function PopList( int idx )
 {
 	local int i;
-	i = idx + 1;
-	while ( (i < ElementCount) && (i < ArrayCount(Elements)) )
+	ElementCount -= 1;
+	for ( i = idx; i < ElementCount; i += 1 )
 	{
-		Elements[i - 1] = Elements[i];
-		i ++ ;
+		Elements[i] = Elements[i + 1];
 	}
-	ElementCount -- ;
+	Elements[ElementCount] = DefaultMapElement;
 }
 
-//Push list one place up, let idx slot ready to replace
-function PushList( int idx)
+function PushList( int idx )
 {
 	local int i;
-	i = ElementCount ++ ;
-	while ( i > idx )
+	for ( i = ElementCount;  i > idx; i -= 1 )
 	{
 		Elements[i] = Elements[i - 1];
 		i -- ;
 	}
+	ElementCount += 1;
 }
 
-function bool IsExcluded( string map )
+function bool IsExcluded( string map, int MapCostMaxAllow )
 {
 	local int i;
 	for ( i = 0; i < ElementCount; i += 1 )
 	{
 		if ( Elements[i].Map == map )
 		{
-			return Elements[i].Acc > MapList.Mutator.MapCostMaxAllow; 
+			return Elements[i].Acc > MapCostMaxAllow; 
 		}
 	}
 	return False; // not found
+}
+
+function DebugPrintHistory() 
+{
+	local int i, acc;
+	local string name;
+	for ( i = 0; i < ElementCount; i+=1 )
+	{
+		name = Elements[i].Map;
+		acc = Elements[i].Acc;
+		Log(i$" : "$name$" "$acc);
+	}
 }

@@ -36,10 +36,9 @@ var string MapListString; //Send this over the net!
 var MapHistory History;
 var FsMapsReader Reader;
 
-event PostBeginPlay()
+function Configure() 
 {
 	History = new(Self) class'MapHistory';	
-	History.MapList = Self;
 }
 
 //We scan all maps, check if they match our filters
@@ -357,7 +356,7 @@ function CacheCodes()
 			GameTags[k] = ":"$TwoDigits(i);
 			TmpCodes[k ++ ] = tmpCode;
 		}
-		END_LOOP:
+	END_LOOP:
 	}
 
 	iTmpC = k;
@@ -471,7 +470,7 @@ function bool IsValidMap( out string MapString, out string reason )
 	}
 	MapName = Left( MapString, iLen);
 
-	if ( History.IsExcluded(MapName) )
+	if ( History.IsExcluded(MapName, Mutator.MapCostMaxAllow) )
 	{
 		reason = "map is on cooldown";
 		return False;

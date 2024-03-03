@@ -7,4 +7,5 @@ function TestMain()
 	TestChild(class'TestMapTags');
 	TestChild(class'TestMapListEncoder');
 	TestChild(class'TestMvAliases');
+	TestChild(class'TestMapHistory');
 }

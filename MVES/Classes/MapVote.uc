@@ -134,7 +134,7 @@ state Voting
 		VotingStagePreBeginWait = 0;
 		CountMapVotes(); //Call again if mid game, now we do check the maps
 	}
-	PreBegin:
+PreBegin:
 	Sleep( 5);
 	while (!IsThereAtLeastOneVote() && VotingStagePreBeginWait < VoteTimeLimit)
 	{
@@ -143,7 +143,7 @@ state Voting
 		Sleep(1);
 		VotingStagePreBeginWait += 1;
 	}
-	Begin:
+Begin:
 	if ( VoteTimeLimit < 5 )
 		goto('Vote_5');
 	if ( VoteTimeLimit < 10 )
@@ -162,13 +162,13 @@ state Voting
 		goto('Vote_30');
 	}
 	Sleep( VoteTimeLimit - 60);
-	Vote_60:
+Vote_60:
 	Extension.TimedMessage( 12);
 	Sleep(30 * Level.TimeDilation);
-	Vote_30:
+Vote_30:
 	Extension.TimedMessage( 11);
 	Sleep(20 * Level.TimeDilation);
-	Vote_10:
+Vote_10:
 	Extension.TimedMessage( 10);
 	Sleep(1 * Level.TimeDilation);
 	Extension.TimedMessage( 9);
@@ -179,7 +179,7 @@ state Voting
 	Sleep(1 * Level.TimeDilation);
 	Extension.TimedMessage( 6);
 	Sleep(1 * Level.TimeDilation);
-	Vote_5:
+Vote_5:
 	Extension.TimedMessage( 5);
 	Sleep(1 * Level.TimeDilation);
 	Extension.TimedMessage( 4);
@@ -190,7 +190,7 @@ state Voting
 	Sleep(1 * Level.TimeDilation);
 	Extension.TimedMessage( 1);
 	Sleep(1 * Level.TimeDilation);
-	Vote_End:
+Vote_End:
 	Sleep(0.0);
 	CountMapVotes(True);
 }
@@ -201,7 +201,7 @@ state DelayedTravel
 	{
 		bLevelSwitchPending = True;
 	}
-	Begin:
+Begin:
 	Sleep(4);
 	bMapChangeIssued = True;
 	ExecuteTravel();
@@ -268,7 +268,7 @@ event PostBeginPlay()
 	}
 	MapList = new class'MV_MapList';
 	MapList.Reader = Spawn(class'FsMapsReader');
-	MapList.Mutator = Self;
+	MapList.Configure();
 	if ( ExtensionClass != "" )
 		ExtensionC = class < MV_MainExtension > ( DynamicLoadObject(ExtensionClass,class'class') );
 	if ( ExtensionC == None )
@@ -380,13 +380,14 @@ event PostBeginPlay()
 
 	if ( Cmd ~= Left(TravelInfo.TravelString, Len(Cmd) ) )  //CRASH DIDN'T HAPPEN, SETUP GAME
 	{
-		MapList.History.NewMapPlayed( CurrentMap );
+		MapList.History.NewMapPlayed( CurrentMap, MapCostAddPerLoad );
+		MapList.History.SaveConfig();
 		CurrentMode = CurrentGame.GameName@"-"@CurrentGame.RuleName;
 		if ( bAutoSetGameName ) 
 		{
 			Level.Game.GameName = CurrentGame.RuleName@CurrentGame.GameName;
 		}
-		DEFAULT_MODE:
+	DEFAULT_MODE:
 		Cmd = CurrentGame.Settings;
 		if ( InStr( Cmd, "<") >= 0 )
 			Cmd = ParseAliases( Cmd);
@@ -434,7 +435,7 @@ event PostBeginPlay()
 	else
 	{
 		MapIdx = MapList.FindMap( Cmd);
-		NEXT_MATCHING_MAP:
+	NEXT_MATCHING_MAP:
 		if ( MapIdx >= 0 )
 			NextParm = MapList.MapGames( MapIdx);
 		if ( (string(Level.Game.Class) ~= ParseAliases(CustomGame[DefaultGameTypeIdx].GameClass)) && (InStr(NextParm, MapList.TwoDigits(DefaultGameTypeIdx)) >= 0) ) //Map is in default game mode list and matches gametype
@@ -795,7 +796,7 @@ function GenerateMapList(bool bFullscan)
 	{
 		MapList = new class'MV_MapList';
 		MapList.Reader = Spawn(class'FsMapsReader');
-		MapList.Mutator = Self;
+		MapList.Configure();
 	}
 	MapList.GlobalLoad(bFullscan);
 }
@@ -923,7 +924,7 @@ function CountKickVotes( optional bool bNoKick)
 			StrKickVotes[iKickVotes] = W.KickVoteCode;
 			KickVoteCount[iKickVotes ++ ] = 1;
 		}
-		DO_CONTINUE:
+	DO_CONTINUE:
 	}
 	i = 0;
 	while ( i < iKickVotes )
@@ -1249,7 +1250,7 @@ function CountMapVotes( optional bool bForceTravel)
 			}
 			UniqueVotes[iU] = W;
 			UniqueCount[iU ++ ] += VotePriority( int(Extension.ByDelimiter(W.PlayerVote,":",1)) );
-			NEXT_PLAYER:
+		NEXT_PLAYER:
 		}
 	}
 
@@ -1757,7 +1758,7 @@ function bool MutatorTeamMessage( Actor Sender, Pawn Receiver, PlayerReplication
 	LastMsg = S;
 	CommonCommands( Sender, S);
 
-	END:
+END:
 
 	if ( DontPass( S) )
 		return True;

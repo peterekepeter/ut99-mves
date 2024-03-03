@@ -10,7 +10,7 @@ function MV_MapTags GetConfiguredMapTags()
 {
 	RunMigration();
 	return CreateMapTags();	
-}
+} 
 
 
 function private RunMigration()
