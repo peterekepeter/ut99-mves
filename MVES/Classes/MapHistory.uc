@@ -21,7 +21,7 @@ function NewMapPlayed(MV_Result r, int MapCostAddPerLoad)
 
 	for ( i = 0 ; i < ElementCount ; i += 1 )
 	{
-		while ( --Elements[i].Acc <= 0 )
+		while ( --Elements[i].Acc <= 0 && i < ElementCount )
 		{
 			PopList(i);
 		}
@@ -36,7 +36,7 @@ function NewMapPlayed(MV_Result r, int MapCostAddPerLoad)
 	if ( i < ElementCount && Elements[i].Map == r.Map ) 
 	{
 		// update existing
-		Elements[i].Acc += MapCostAddPerLoad + 1;
+		Elements[i].Acc += MapCostAddPerLoad;
 	}
 	else 
 	{
@@ -58,6 +58,10 @@ function PopList( int idx )
 	{
 		Elements[i] = Elements[i + 1];
 	}
+	if ( ElementCount < 0 ) 
+	{
+		ElementCount = 0;
+	}
 	Elements[ElementCount] = DefaultMapElement;
 }
 
@@ -67,7 +71,7 @@ function PushList( int idx )
 	for ( i = ElementCount;  i > idx; i -= 1 )
 	{
 		Elements[i] = Elements[i - 1];
-		i -- ;
+		i--;
 	}
 	ElementCount += 1;
 }

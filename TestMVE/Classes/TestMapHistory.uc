@@ -38,6 +38,15 @@ function TestMain()
 	AssertNotExcluded("DM-Deck16][", "can still be played");
 	MapPlayed("DM-Deck16][");
 	AssertExcluded("DM-Deck16][", "cannot be played anymore");
+
+	Describe("Does not fail when CostAdd is 0");
+	CostAdd = 0;
+	MaxCost = 3; 
+	MapPlayed("DM-Deck16][");
+	MapPlayed("DM-Fractal");
+	AssertNotExcluded("DM-Deck16][", "both maps can still be played");
+	AssertNotExcluded("DM-Fractal", "both maps can still be played");
+
 }
 
 function MapPlayed(optional string map, optional string game, optional string rule) 
