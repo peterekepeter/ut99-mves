@@ -5,12 +5,12 @@ Quickstart
 
 2) Add this line to server startup mutator list or add it to server actor list.
 
-ucc server MVES.MapVote
+    ucc server MVES.MapVote
 
 3) Whenever you want the map list to be updated you need to run the reload command
 the reload command will re-scan paths for maps and will match them against filters
 
-mutate bdbmapvote reload
+    mutate bdbmapvote reload
 
 
 Support
@@ -20,6 +20,66 @@ The official forum post with latest updates goes here. You can report bugs or
 ask for help in the thread:
 
 https://ut99.org/viewtopic.php?t=15657
+
+
+Configuration
+=============
+
+To make good use of this mapvote you need to edit `MVE_Config.ini`
+You will need to learn how to use the config file.
+This can only be done through experiment and practice.
+Always make small changes and test it.
+Once you got a good config, make a backup of it.
+
+
+Adding More Maps
+================
+
+New maps you add to the game are not automatically detected. 
+
+If you add a new map then you need to reload the map list.
+If you do not reload, the same old map list is sent to the players.
+The classic way is running the `mutate bdbmapvote reload` command.
+To run it you need to be logged in as admin.
+
+    adminlogin yoursecretpassword
+    mutate bdbmapvote reload
+
+Alternatively a reload can be triggered from the config file MVE_Config.ini 
+This is useful so that you can reload the map list without entering the game.
+
+    bReloadOnNextRun=True
+
+
+Adding Custom Gametypes
+=======================
+
+New game types are not automatically detected.
+You need to edit MVE_Config and define the new gametypes. 
+The easiest way is to copy paste an existing one and edit it.
+
+To set up a different gametype you need to set the correct GameClass.
+For CTF4 this could be GameClass="CTF4.CTF4Game" but depends on which CTF4 you're using
+
+Here is the modified gametype below
+
+    CustomGame[4]=(bEnabled=True,GameClass="CTF4.CTF4Game",...)
+
+If you make a change then again you need to reload the map list.
+If you do not reload then the same old games list is sent to players.
+
+
+Useful Keybinds
+===============
+
+You can set up some keybinds so that you can quickly reload in game.
+With keybinding you can run any command.
+To reload the map list from keybind you will need 2 commands on keybind.
+
+    set input f9 adminlogin yoursecretpassword
+    set input f10 mutate bdbmapvote reload
+
+With these set up you can log in by pressing f9 then f10 to reload.
 
 
 Advanced Installation
@@ -60,3 +120,5 @@ you feel lost or misconfigured something, you can use it as a reference to
 set things back to good defaults. If you already have a configuration file 
 make sure you don't override it when installing updates. It's also a good 
 practice to keep backups of this file or to put it under version control.
+
+Good luck!
