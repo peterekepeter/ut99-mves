@@ -324,7 +324,7 @@ event PostBeginPlay()
 		}
 		if ( bNeedToRestorePackages )
 		{
-			Nfo("Mapvote will reload the map to update the required ServerPackages.");
+			Nfo("Mapvote will restart the map to update the required ServerPackages.");
 		}
 	}
 
@@ -477,7 +477,7 @@ event PostBeginPlay()
 	}
 	
 	// finally done!
-	Log("[MVE] Successfully loaded map: `"$TravelMap$"` idx: "$TravelInfo.TravelIdx$" mode: "$CurrentMode);
+	Log("[MVE] Finished loading map: `"$TravelMap$"` idx: "$TravelInfo.TravelIdx$" mode: "$CurrentMode);
 }
 
 function bool IsOtherInstanceRunning() 
@@ -573,41 +573,44 @@ function EvalCustomGame(int idx)
 	CurrentGameIdx = idx;
 }
 
-function Mutate( string MutateString, PlayerPawn Sender)
+function Mutate(string Str, PlayerPawn Sender)
 {
-	if ( Left(MutateString,10) ~= "BDBMAPVOTE" )
+	if ( Left(Str,10) ~= "BDBMAPVOTE" )
 	{
-		if ( Mid(MutateString,11,8) ~= "FULLSCAN" )
+		if ( Mid(Str,11,8) ~= "FULLSCAN" )
 		{
 			if ( Sender.bAdmin ) 
 				MapList.GlobalLoad(True);
 			else				
-				Sender.ClientMessage("You cannot reload the map list");
+				Sender.ClientMessage("Please log in as administrator to run a fullscan");
 		}
-		else if ( Mid(MutateString,11,6) ~= "RELOAD" )
+		else if ( Mid(Str,11,6) ~= "RELOAD" )
 		{
 			if ( Sender.bAdmin ) 
 				MapList.GlobalLoad(False);
 			else				
-				Sender.ClientMessage("You cannot reload the map list");
+				Sender.ClientMessage("Please log in as administrator to reload the map list");
 		}
-		else if ( Mid(MutateString,11,8) ~= "VOTEMENU" )
+		else if ( Mid(Str,11,8) ~= "VOTEMENU" )
 		{
 			OpenWindowFor(Sender);
 		}
-		else if ( Mid(MutateString,11,3) ~= "MAP" )
-			PlayerVoted( Sender, Mid(MutateString,15) );
-		else if ( Mid(MutateString,11,5) ~= "KICK " )
-			PlayerKickVote( Sender, Mid(MutateString, 17, 3));
+		else if ( Mid(Str,11,3) ~= "MAP" )
+		{
+			PlayerVoted( Sender, Mid(Str,15) );
+		}
+		else if ( Mid(Str,11,5) ~= "KICK " )
+		{
+			PlayerKickVote( Sender, Mid(Str, 17, 3));
+		}
 		else 
 		{
-			Sender.ClientMessage("Unknown mapvote command");
-			return;
+			Sender.ClientMessage("Unknown mapvote mutate command");
 		}
 	}
 
 	if ( NextMutator != None )
-		NextMutator.Mutate( MutateString, Sender);
+		NextMutator.Mutate( Str, Sender);
 }
 
 function bool HandleEndGame ()
@@ -1845,13 +1848,17 @@ defaultproperties
 	DefaultMap="DM-Deck16]["
 	bSwitchToRandomMapOnIdle=True
 	ServerIdleAfterMinutes=60
-	ServerCodeName="UT-Server"
+	ServerCodeName="MyUt99Server"
 	MidGameVotePercent=51
 	KickPercent=51
 	PlayerIDType=PID_Default
 	bAutoOpen=True
 	ScoreBoardDelay=5
 	bKickVote=True
+	ExtensionClass="MVES.MV_SubExtension"
+	bSaveConfigOnNextRun=True
+	bOverrideServerPackages=True
+	EmptyGame=(bEnabled=False,GameName="",RuleName="",GameClass="",FilterCode="",bHasRandom=True,VotePriority=1.000000,MutatorList="",Settings="",Packages="",TickRate=0,ServerActors="")
 	CustomGame(0)=(bEnabled=False,GameName="",RuleName="",GameClass="",FilterCode="",bHasRandom=True,VotePriority=1.000000,MutatorList="",Settings="",Packages="",TickRate=0,ServerActors="")
 	CustomGame(1)=(bEnabled=False,GameName="",RuleName="",GameClass="",FilterCode="",bHasRandom=True,VotePriority=1.000000,MutatorList="",Settings="",Packages="",TickRate=0,ServerActors="")
 	CustomGame(2)=(bEnabled=False,GameName="",RuleName="",GameClass="",FilterCode="",bHasRandom=True,VotePriority=1.000000,MutatorList="",Settings="",Packages="",TickRate=0,ServerActors="")
@@ -1952,7 +1959,4 @@ defaultproperties
 	CustomGame(97)=(bEnabled=False,GameName="",RuleName="",GameClass="",FilterCode="",bHasRandom=True,VotePriority=1.000000,MutatorList="",Settings="",Packages="",TickRate=0,ServerActors="")
 	CustomGame(98)=(bEnabled=False,GameName="",RuleName="",GameClass="",FilterCode="",bHasRandom=True,VotePriority=1.000000,MutatorList="",Settings="",Packages="",TickRate=0,ServerActors="")
 	CustomGame(99)=(bEnabled=False,GameName="",RuleName="",GameClass="",FilterCode="",bHasRandom=True,VotePriority=1.000000,MutatorList="",Settings="",Packages="",TickRate=0,ServerActors="")
-	EmptyGame=(bEnabled=False,GameName="",RuleName="",GameClass="",FilterCode="",bHasRandom=True,VotePriority=1.000000,MutatorList="",Settings="",Packages="",TickRate=0,ServerActors="")
-	ExtensionClass="MVES.MV_SubExtension"
-	bSaveConfigOnNextRun=True
 }
