@@ -121,4 +121,13 @@ set things back to good defaults. If you already have a configuration file
 make sure you don't override it when installing updates. It's also a good 
 practice to keep backups of this file or to put it under version control.
 
+
+- If you use Notepad++ to edit your configuration files then we have a 
+user defined language configuration for MVE_Config.ini which has better 
+delimitation of key-values, brackets and parenthesis and it also identifies 
+known mapvote configuration properties. To install it, go to the menu
+Language > User Defined Language > Define your language... and then
+import `Map Vote Extended Notepad++.xml`
+
+
 Good luck!
