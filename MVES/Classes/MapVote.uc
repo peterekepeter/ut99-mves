@@ -670,7 +670,7 @@ function ResetAssaultGame()
 		Log("[MVE] Resetting assault game!");
 		a.bDefenseSet = False;
 		a.NumDefenses = 0;
-		a.CurrentDefender = 0;
+		a.CurrentDefender = 1;
 		a.SavedTime = 0;
 		a.GameCode = "";
 		a.Part = 1;
