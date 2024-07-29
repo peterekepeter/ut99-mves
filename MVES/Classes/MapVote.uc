@@ -267,6 +267,7 @@ event PostBeginPlay()
 		}
 	}
 	MapList = new class'MV_MapList';
+	MapList.Mutator = Self;
 	MapList.Reader = Spawn(class'FsMapsReader');
 	MapList.Configure();
 	if ( ExtensionClass != "" )
@@ -520,12 +521,7 @@ function ExecuteSettings(string Settings)
 
 function ExecuteSetting (string Setting)
 {
-	local string className, packageName;
-	local string Property;
-	local string Value;
-	local string Prev;
-	local string Next;
-	local string cmd, result;
+	local string Property, Value, Prev, Next;
 	local int pos;
 
 	Log("[MVE] Set "$Setting);
@@ -535,7 +531,7 @@ function ExecuteSetting (string Setting)
 	pos = InStr(Property, ".");
 	if ( pos != -1 ) 
 	{
-		Log("[MVE] [ERROR] Not supported");
+		Log("[MVE] ^^^ [ERROR] Not supported");
 		return;
 
 		// className = Left(Property, pos);
