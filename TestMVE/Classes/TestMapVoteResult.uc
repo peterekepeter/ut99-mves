@@ -11,6 +11,7 @@ function TestMain()
 	TestIntProperties();
 	TestActors();
 	TestSettings();
+	TestWrappedPackages();
 }
 
 function TestPackages()
@@ -22,6 +23,16 @@ function TestPackages()
 	AssertEquals(s.ServerPackageCount, 2, "cannot add same package mutiple times");
 	s.AddPackages("Package3");
 	AssertEquals(s.GetPackagesStringList(), "Package1,Package2,Package3", "can get string list");
+}
+
+function TestWrappedPackages() 
+{
+	Describe("MV_Result accepts packages wrapped in paren");
+	s.AddPackages("(\"SoldierSkins\",\"CommandoSkins\")");
+	AssertEquals(s.GetPackagesStringList(), "SoldierSkins,CommandoSkins", "can get string list");
+	s.AddPackages("(\"MVE2h\",\"CommandoSkins\")");
+	AssertEquals(s.GetPackagesStringList(), "SoldierSkins,CommandoSkins,MVE2h", "appends additional");
+	AssertEquals(s.GetWrappedPackages(), "(\"SoldierSkins\",\"CommandoSkins\",\"MVE2h\")", "can wrap packages");
 }
 
 function TestMapLoading()
@@ -85,7 +96,8 @@ function TestStringProperties()
 	AssertEquals(s.FilterCode, "dmlist", "empty string does not change FilterCode");
 }
 
-function TestIntProperties(){
+function TestIntProperties()
+{
 	Describe("int properties");
 	s.SetTickRate(75);
 	AssertEquals(s.TickRate, 75, "sets tickrate");
@@ -93,7 +105,8 @@ function TestIntProperties(){
 	AssertEquals(s.TickRate, 75, "previous tickrate is kept when settikng to 0");
 }
 
-function TestSettings(){
+function TestSettings()
+{
 	Describe("game settings");
 	s.AddGameSettings("FragLimit=30,TimeLimit=0,GameSpeed=1.00,MinPlayers=2,bUseTranslocator=False,GameName=Instagib Deathmatch");
 	AssertEquals(s.SettingsCount, 6, "parses settings correctly");
@@ -114,6 +127,6 @@ function TestSettings(){
 
 function Describe(string subject)
 {
-	super.Describe(subject);
+	Super.Describe(subject);
 	s = new class'MV_Result';
 }

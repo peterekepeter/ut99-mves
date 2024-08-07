@@ -160,21 +160,6 @@ function TimedMessage( int ID)
 	}
 }
 
-function string GenerateSPList( string NewPacks)
-{
-	local string Result;
-	local int i;
-
-	if ( (MapVote(Outer) == None) || (MapVote(Outer).MainServerPackages == "") )
-		return "";
-
-	Result = MapVote(Outer).MainServerPackages;
-	Result = Left( Result, Len(Result) -1 );
-	while ( NewPacks != "" )
-		Result = Result$","$chr(34)$static.NextParameter(NewPacks,",")$chr(34);
-	return Result$")";
-}
-
 function MLC_Rules( Info MapListCacheActor)
 {
 	local MV_MapList MapList;

@@ -1593,11 +1593,8 @@ final function bool SetupTravelString( string mapStringWithIdx )
 		// add gametype packages
 		Result.AddPackages(CustomGame[Result.GameIndex].Packages);
 		// concats main packages
-		spk = Extension.GenerateSPList(Result.GetPackagesStringList()); 
-		if ( spk == "" )			
-		{	
-			spk = MainServerPackages;
-		}
+		Result.AddPackages(MainServerPackages);
+		spk = Result.GetWrappedPackages();
 		if ( InStr( spk, "<") >= 0 )
 		{
 			spk = ParseAliases( spk);

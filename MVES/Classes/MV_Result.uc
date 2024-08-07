@@ -46,9 +46,16 @@ static function MV_Result Create(optional string map, optional int gameIdx)
 	return object;
 }
 
-function bool AddPackages(string packageNameList)
+function AddPackages(string packageNameList)
 {
 	local string packageName;
+
+	// unwrap decorations
+	if ( InStr(packageNameList, "(") == 0 ) 
+	{
+		packageNameList = Mid(packageNameList, 1, Len(packageNameList) - 2);
+	}
+
 	while ( class'MV_Parser'.static.TrySplit(packageNameList, ",", packageName, packageNameList) )
 	{
 		AddPackage(packageName);
@@ -58,12 +65,19 @@ function bool AddPackages(string packageNameList)
 function bool AddPackage(string packageName)
 {
 	local int i;
+
+	// unwrap decorations
+	if ( InStr(packageName, "\"") == 0 ) 
+	{
+		packageName = Mid(packageName, 1, Len(packageName) - 2);
+	}
+
 	if ( i >= ServerPackageMaxCount )
 	{
 		Err("Cannot add `"$packageName$"`, max server package count reached!");
 		return False;
 	}
-	for ( i = 0; i < ServerPackageCount; i ++ )
+	for ( i = 0; i < ServerPackageCount; i++ )
 	{
 		if ( ServerPackages[i] == packageName )
 		{
@@ -71,7 +85,7 @@ function bool AddPackage(string packageName)
 		}
 	}
 	ServerPackages[ServerPackageCount] = packageName;
-	ServerPackageCount ++ ;
+	ServerPackageCount++;
 	return True;
 }
 
@@ -80,13 +94,27 @@ function string GetPackagesStringList()
 	local string separator, result;
 	local int i;
 	separator = "";
-	for ( i = 0; i < ServerPackageCount; i ++ )
+	for ( i = 0; i < ServerPackageCount; i++ )
 	{
 		result = result$separator$ServerPackages[i];
 		separator = ",";
 	}
 	return result;
 }
+
+function string GetWrappedPackages()
+{
+	local string separator, result;
+	local int i;
+	separator = "(\"";
+	for ( i = 0; i < ServerPackageCount; i++ )
+	{
+		result = result$separator$ServerPackages[i];
+		separator = "\",\"";
+	}
+	return result$"\")";
+}
+
 
 function bool AddMutators(string list)
 {
@@ -106,7 +134,7 @@ function bool AddMutator(string mutator)
 		Err("Cannot add `"$mutator$"`, max mutator count reached!");
 		return False;
 	}
-	for ( i = 0; i < MutatorCount; i ++ )
+	for ( i = 0; i < MutatorCount; i++ )
 	{
 		if ( Mutators[i] == mutator )
 		{
@@ -114,7 +142,7 @@ function bool AddMutator(string mutator)
 		}
 	}
 	Mutators[MutatorCount] = mutator;
-	MutatorCount ++ ;
+	MutatorCount++;
 	return True;
 }
 
@@ -136,7 +164,7 @@ function bool AddActor(string actor)
 		Err("Cannot add `"$actor$"`, max server actor count reached!");
 		return False;
 	}
-	for ( i = 0; i < ActorCount; i ++ )
+	for ( i = 0; i < ActorCount; i++ )
 	{
 		if ( Actors[i] == actor )
 		{
@@ -144,7 +172,7 @@ function bool AddActor(string actor)
 		}
 	}
 	Actors[ActorCount] = actor;
-	ActorCount ++ ;
+	ActorCount++;
 	return True;
 }
 
@@ -186,7 +214,7 @@ function bool UpdateSingleGameSetting(string key, string value)
 	}
 	SettingsKey[SettingsCount] = key;
 	SettingsValue[SettingsCount] = value;
-	SettingsCount ++ ;
+	SettingsCount++;
 	return True;
 }
 
