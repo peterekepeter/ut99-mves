@@ -124,7 +124,7 @@ var MV_Result CurrentMap;
 var Music SongOverride;
 
 //XC_GameEngine and Unreal 227 interface
-native(1718) final function bool AddToPackageMap( optional string PkgName);
+//native(1718) final function bool AddToPackageMap( optional string PkgName);
 
 state Voting
 {
@@ -210,7 +210,7 @@ Begin:
 event PostBeginPlay()
 {
 	local class<MV_MainExtension> ExtensionC;
-	local string Cmd, NextParm, aStr, Settings;
+	local string Cmd, NextParm, Settings;
 	local Actor A;
 	local class<Actor> ActorClass;
 	local int MapIdx;
@@ -219,7 +219,6 @@ event PostBeginPlay()
 	local string CurrentPackages;
 	local bool bGotoSuccess;
 	local bool bNeedToRestorePackages, bNeedToRestoreMap;
-	local MV_IdleTimer MV_IdleTimer;
 
 	Log("[MVE] Map Vote Extended version: "$ClientPackageInternal);
 
@@ -472,10 +471,6 @@ event PostBeginPlay()
 	PlayerDetector = Spawn(class'MV_PlayerDetector');
 	PlayerDetector.Initialize(Self);
 
-	if ( bFixMutatorsQueryLagSpikes )
-	{
-		ApplyFixForMutatorsQueryLagSpikes();
-	}
 	
 	// finally done!
 	Log("[MVE] Finished loading map: `"$TravelMap$"` idx: "$TravelInfo.TravelIdx$" mode: "$CurrentMode);
@@ -1726,17 +1721,6 @@ final function LoadAliases()
 	for ( i = 0 ; i < 32 ; i ++ )
 	{
 		AliasesLogic.AddAliasLine(Aliases[i]);
-	}
-}
-
-function ApplyFixForMutatorsQueryLagSpikes() 
-{
-	// fixes common issue of server query DDOS-ing the game engine
-	// https://ut99.org/viewtopic.php?p=142091
-	Level.Game.GetRules();
-	if ( Level.Game.EnabledMutators == "" ) 
-	{
-		Level.Game.EnabledMutators = "MapVote "$ClientPackageInternal;
 	}
 }
 

@@ -11,6 +11,7 @@ event InitializeDelayedInit(MapVote mutator)
 
 event Timer()
 {
+	ApplyFixForMutatorsQueryLagSpikes();
 	EnsureMutatorRegistered();
 	EnsureScoreboardUpdated();
 	Destroy();
@@ -34,6 +35,21 @@ function EnsureMutatorRegistered()
 function EnsureScoreboardUpdated()
 {
 	Level.Game.InitGameReplicationInfo();
+}
+
+function ApplyFixForMutatorsQueryLagSpikes() 
+{
+	if ( !MapVote.bFixMutatorsQueryLagSpikes ) 
+	{
+		return; // fix is disabled
+	}
+	// fixes common issue of server query DDOS-ing the game engine
+	// https://ut99.org/viewtopic.php?p=142091
+	Level.Game.GetRules();
+	if ( Level.Game.EnabledMutators == "" ) 
+	{
+		Level.Game.EnabledMutators = "MapVote "$MapVote.ClientPackageInternal;
+	}
 }
 
 static function Err(coerce string message)
