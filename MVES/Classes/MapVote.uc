@@ -220,16 +220,14 @@ event PostBeginPlay()
 	local bool bGotoSuccess;
 	local bool bNeedToRestorePackages, bNeedToRestoreMap;
 
-	Log("[MVE] Map Vote Extended version: "$ClientPackageInternal);
-
 	if ( IsOtherInstanceRunning() ) 
 	{
-		Err("Detected multiple instances of MapVote");
-		Err("Please use Mapvote either as ServerActor or Mutator");
-		Err("Never add it as both ServerActor and Mutator at the same time");
+		Nfo("Detected multiple MapVotes, only first mapvote will work.");
 		Destroy();
 		return;
 	}
+
+	Log("[MVE] Map Vote Extended version: "$ClientPackageInternal);
 
 	TravelInfo = Spawn(class'MV_TravelInfo');
 	Spawn(class'MapVoteDelayedInit').InitializeDelayedInit(Self);
@@ -479,7 +477,6 @@ event PostBeginPlay()
 function bool IsOtherInstanceRunning() 
 {
 	local Mutator M;
-	local bool bIsThisRegistered, bIsAnotherRegistered;
 
 	// Check if mutator was added to GameInfo
 	for ( M = Level.Game.BaseMutator; M != None; M = M.NextMutator )
