@@ -37,7 +37,7 @@ function Timer()
 
 	if ( count > 0 )
 	{
-		EmptyMinutes = 0;   
+		EmptyMinutes = 0;
 		
 		if ( bIsIdle )
 		{

@@ -18,7 +18,7 @@ function string GetMap()
 
 function bool MoveNext()
 {
-	CurMap = GetMapName("", FirstMap, iSeek ++ );
+	CurMap = GetMapName("", FirstMap, iSeek++);
 	return CurMap == FirstMap || CurMap == "" ;
 }
 

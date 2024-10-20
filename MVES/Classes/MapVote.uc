@@ -210,7 +210,7 @@ Begin:
 event PostBeginPlay()
 {
 	local class<MV_MainExtension> ExtensionC;
-	local string Cmd, NextParm, Settings;
+	local string Cmd, NextParm;
 	local Actor A;
 	local class<Actor> ActorClass;
 	local int MapIdx;
@@ -513,7 +513,7 @@ function ExecuteSettings(string Settings)
 
 function ExecuteSetting (string Setting)
 {
-	local string Property, Value, Prev, Next;
+	local string Property, Value;
 	local int pos;
 
 	Log("[MVE] Set "$Setting);
@@ -549,9 +549,7 @@ function ExecuteSetting (string Setting)
 	}
 	else 
 	{
-		Prev = Level.Game.GetPropertyText(Property);
 		Level.Game.SetPropertyText(Property,Value);
-		Next = Level.Game.GetPropertyText(Property);
 	}
 }
 
@@ -673,16 +671,15 @@ function bool CheckForTie ()
 	local int i;
 	local Pawn P;
 	local Pawn BestP;
-	local PlayerPawn Player;
 
 	if ( Level.Game.IsA('Assault') || Level.Game.IsA('Domination') )
 		return False;
 	if ( Level.Game.IsA('TeamGamePlus') )
 	{
-		for ( i = 0 ; i < TeamGamePlus(Level.Game).MaxTeams ; i ++ )
+		for ( i = 0 ; i < TeamGamePlus(Level.Game).MaxTeams ; i++ )
 			if ( (Best == None) || (Best.Score < TeamGamePlus(Level.Game).Teams[i].Score) )
 				Best = TeamGamePlus(Level.Game).Teams[i];
-		for ( i = 0 ; i < TeamGamePlus(Level.Game).MaxTeams ; i ++ )
+		for ( i = 0 ; i < TeamGamePlus(Level.Game).MaxTeams ; i++ )
 			if ( (Best.TeamIndex != i) && (Best.Score == TeamGamePlus(Level.Game).Teams[i].Score) )
 				return True;
 	}
@@ -735,7 +732,7 @@ event Timer()
 {
 	if ( ScoreBoardTime > 0 )
 	{
-		ScoreBoardTime -- ;
+		ScoreBoardTime--;
 		if ( ScoreBoardTime == 0 )
 		{
 			EndGameTime = Level.TimeSeconds;
@@ -903,17 +900,17 @@ function CountKickVotes( optional bool bNoKick)
 	for ( W = WatcherList ; W != None ; W = W.NextWatcher )
 	{
 		if ( Spectator(W.Watched) == None )
-			pCount ++ ;
+			pCount++;
 		if ( W.KickVoteCode != "" )
 		{
-			for ( i = 0 ; i < iKickVotes ; i ++ )
+			for ( i = 0 ; i < iKickVotes ; i++ )
 				if ( StrKickVotes[i] == W.KickVoteCode )
 				{
-					KickVoteCount[i] ++ ;
+					KickVoteCount[i]++;
 					goto DO_CONTINUE;
 				}
 			StrKickVotes[iKickVotes] = W.KickVoteCode;
-			KickVoteCount[iKickVotes ++ ] = 1;
+			KickVoteCount[iKickVotes++] = 1;
 		}
 	DO_CONTINUE:
 	}
@@ -939,12 +936,12 @@ function CountKickVotes( optional bool bNoKick)
 		}
 		if ( W == None )
 		{
-			StrKickVotes[i] = StrKickVotes[ -- iKickVotes];
+			StrKickVotes[i] = StrKickVotes[--iKickVotes];
 			KickVoteCount[i] = KickVoteCount[iKickVotes];
 			continue;
 		}
 		StrKickVotes[i] = W.PlayerID$W.Watched.PlayerReplicationInfo.PlayerName$","$KickVoteCount[i];
-		i ++ ;
+		i++;
 	}
 	Extension.UpdateKickVotes( WatcherList);
 }
@@ -955,7 +952,7 @@ function PlayerKickVoted( MVPlayerWatcher Kicked, optional string OverrideReason
 	local MVPlayerWatcher W;
 	local int i;
 	local Info NexgenRPCI;
-	local string Reason, LastPlayer;
+	local string Reason;
 
 	if ( Kicked.Watched == None || Kicked.Watched.bDeleteMe )
 		return;
@@ -978,7 +975,7 @@ function PlayerKickVoted( MVPlayerWatcher Kicked, optional string OverrideReason
 	}
 
 	while ( (i < 32) && (BanList[i] != "") )
-		i ++ ;
+		i++;
 	if ( i == 32 )	i = Rand(32);
 	BanList[i] = Kicked.PlayerCode;
 	Log("[MVE] Added "$Kicked.PlayerCode@"to banlist ID"@i,'MapVote');
@@ -988,7 +985,7 @@ function PlayerKickVoted( MVPlayerWatcher Kicked, optional string OverrideReason
 function bool IpBanned( string Address)
 {
 	local int i;
-	for ( i = 0 ; i < 32 ; i ++ )
+	for ( i = 0 ; i < 32 ; i++ )
 	{
 		if ( BanList[i] == "" )
 			return False;
@@ -1009,19 +1006,19 @@ function CleanRules()
 		bSave = True;
 	}
 	
-	for ( j = 0 ; j < ArrayCount(CustomGame) ; j ++ )
+	for ( j = 0 ; j < ArrayCount(CustomGame) ; j++ )
 	{
 		if ( j != i )
 		{
 			if ( CustomGame[j].GameClass != "" && CustomGame[j].RuleName != "" )
 			{
-				CustomGame[i ++ ] = CustomGame[j];
+				CustomGame[i++] = CustomGame[j];
 				CustomGame[j] = EmptyGame;
 				bSave = True;
 			}
 		}
 		else if ( CustomGame[j].GameClass != "" && CustomGame[j].RuleName != "" )
-			i ++ ;
+			i++;
 	}
 	iGames = i;
 
@@ -1035,7 +1032,7 @@ function CountFilters()
 	
 	if ( MapFilters[512] != "" ) //Optimization
 		lastE = 513;
-	for ( i = lastE ; i < 1024 ; i ++ )
+	for ( i = lastE ; i < 1024 ; i++ )
 	{
 		if ( MapFilters[i] != "" )
 			lastE = i + 1;
@@ -1043,7 +1040,7 @@ function CountFilters()
 	iFilter = lastE;
 	
 	lastE = 0;
-	for ( i = 0 ; i < 32 ; i ++ )
+	for ( i = 0 ; i < 32 ; i++ )
 		if ( ExcludeFilters[i] != "" )
 			lastE = i + 1;
 	iExclF = lastE;
@@ -1231,7 +1228,7 @@ function CountMapVotes( optional bool bForceTravel)
 			Total += 1;
 		if ( W.PlayerVote != "" )
 		{
-			for ( i = 0 ; i < iU ; i ++ )
+			for ( i = 0 ; i < iU ; i++ )
 			{
 				if ( UniqueVotes[i].PlayerVote == W.PlayerVote )
 				{
@@ -1240,7 +1237,7 @@ function CountMapVotes( optional bool bForceTravel)
 				}
 			}
 			UniqueVotes[iU] = W;
-			UniqueCount[iU ++ ] += VotePriority( int(Extension.ByDelimiter(W.PlayerVote,":",1)) );
+			UniqueCount[iU++] += VotePriority( int(Extension.ByDelimiter(W.PlayerVote,":",1)) );
 		NEXT_PLAYER:
 		}
 	}
@@ -1253,7 +1250,7 @@ function CountMapVotes( optional bool bForceTravel)
 		FMapVotes[0] = UniqueCount[0];
 		StrMapVotes[0] = string(j)$","$Extension.ByDelimiter( UniqueVotes[0].PlayerVote,":")$","$GameName(j)$","$RuleName(j)$","$string(UniqueCount[0]);
 	}
-	for ( i = 1 ; i < iU ; i ++ )
+	for ( i = 1 ; i < iU ; i++ )
 	{
 		j = int(Extension.ByDelimiter( UniqueVotes[i].PlayerVote,":",1));
 		FMapVotes[i] = UniqueCount[i];
@@ -1290,7 +1287,7 @@ function CountMapVotes( optional bool bForceTravel)
 	{
             // Choose tiebreaker at random
 		Current = 1;
-		for ( i = iBest + 1 ; i < iU ; i ++ )
+		for ( i = iBest + 1 ; i < iU ; i++ )
 		{
 			if ( UniqueCount[i] == UniqueCount[iBest] )
 			{
@@ -1347,14 +1344,14 @@ function CountMapVotes( optional bool bForceTravel)
 				StrMapVotes[i - 1] = StrMapVotes[i];
 				FMapVotes[i] = FMapVotes[31];
 				StrMapVotes[i] = StrMapVotes[31];
-				if ( i == 1 )			i ++ ;
-				else					i -- ;
+				if ( i == 1 )			i++;
+				else					i--;
 			}
 			else
-				i ++ ;
+				i++;
 		}
 		RankMapVotes[0] = 0;
-		for ( i = 1 ; i < iMapVotes ; i ++ )
+		for ( i = 1 ; i < iMapVotes ; i++ )
 		{
 			if ( FMapVotes[i] == FMapVotes[i - 1] )
 				RankMapVotes[i] = RankMapVotes[i - 1];
@@ -1467,7 +1464,7 @@ final function MV_Result GenerateMapResult(string map, int idx)
 
 function PopulateResultWithRule(MV_Result r, int idx)
 {
-	local string mutator, extends, extendsIdx;
+	local string extends, extendsIdx;
 	extends = CustomGame[idx].Extends;
 
 	if ( r.IsDerivedFrom(idx) )
@@ -1713,15 +1710,8 @@ final function LoadAliases()
 			AliasesLogic.AddAliasLine(Aliases[i]);
 }
 
-//***************************************
-//*************** TRIGGERS *************
-//***************************************
-
 function bool MutatorTeamMessage( Actor Sender, Pawn Receiver, PlayerReplicationInfo PRI, coerce string S, name Type, optional bool bBeep )
 {
-	local int i;
-	local playerpawn P;
-
 	if ( S == LastMsg )
 		goto END;
 	LastMsg = S;
@@ -1739,8 +1729,6 @@ END:
 
 function bool MutatorBroadcastMessage( Actor Sender, Pawn Receiver, out coerce string Msg, optional bool bBeep, out optional name Type )
 {
-	local int i;
-	local PlayerPawn P;
 	local string orgMsg;
 
 	if ( Msg != LastMsg )
@@ -1772,6 +1760,7 @@ function bool DontPass( string Msg)
 {
 	if ( (Msg ~= "!v") || (Msg ~= "!vote") || (Msg ~= "!mapvote") || (Msg ~= "!kickvote") )
 		return True;
+
 }
 
 function CommonCommands( Actor Sender, String S)

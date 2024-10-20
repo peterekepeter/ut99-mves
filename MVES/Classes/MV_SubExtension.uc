@@ -65,9 +65,10 @@ function MLC_Rules( Info MapListCacheActor)
 		// Log("copy MapList.RuleList[i"$i$"] "$MapList.RuleList[i]);
 	}
 
-	for ( i = 0 ; i < ArrayCount(MapList.iNewMaps) ; i ++ )
+	for ( i = 0; i < ArrayCount(MLC.iNewMaps); i++ )
 	{
-		MLC.iNewMaps[i] = MapList.iNewMaps[i];
+		// FEATURE IS DISABLED
+		MLC.iNewMaps[i] = "";
 		// Log("copy MapList.iNewMaps["$i$"] "$MapList.iNewMaps[i]);
 	}
 }
