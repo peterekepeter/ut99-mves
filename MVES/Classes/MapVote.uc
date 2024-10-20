@@ -1511,14 +1511,11 @@ function PrintCircularExtendsError(MV_Result r, int idx)
 	Err("Detected circular extends: "$list);
 }
 
-//Validity assumed
+// Validity assumed
 final function bool SetupTravelString( string mapStringWithIdx )
 {
 	local string spk, GameClassName, LogoTexturePackage, mapFileName, idxString;
-	local int idx, TickRate, playerCount;
-	local MV_MapOverrides MapOverrides;
 	local MV_Result Result;
-	local LevelInfo info;
 
 	if ( !class'MV_Parser'.static.TrySplit(mapStringWithIdx, ":", mapFileName, idxString) ) 
 	{
@@ -1530,8 +1527,7 @@ final function bool SetupTravelString( string mapStringWithIdx )
 
 	if ( Result.Map ~= "Random" )
 	{
-		PlayerCount = GetPlayerCount();
-		Result.Map = MapList.RandomMap(Result.GameIndex, PlayerCount);
+		Result.Map = MapList.RandomMap(Result.GameIndex, GetPlayerCount());
 	}
 
 	if ( Result.CanMapBeLoaded() == False )
@@ -1594,14 +1590,11 @@ final function bool SetupTravelString( string mapStringWithIdx )
 		Nfo("-> ServerPackages: `"$spk$"`");
 		ConsoleCommand("set ini:Engine.Engine.GameEngine ServerPackages "$spk);
 	}
-	TickRate = DefaultTickRate;
-	if ( CustomGame[idx].TickRate != 0 )
-		TickRate = CustomGame[idx].TickRate;
-	if ( TickRate > 0 )
+	if ( Result.TickRate > 0 )
 	{
-		ConsoleCommand("set ini:Engine.Engine.NetworkDevice NetServerMaxTickRate "$CustomGame[idx].TickRate);
-		ConsoleCommand("set ini:Engine.Engine.NetworkDevice LanServerMaxTickRate "$CustomGame[idx].TickRate);
-		Nfo("-> TickRate: `"$TickRate$"`");
+		ConsoleCommand("set ini:Engine.Engine.NetworkDevice NetServerMaxTickRate "$Result.TickRate);
+		ConsoleCommand("set ini:Engine.Engine.NetworkDevice LanServerMaxTickRate "$Result.TickRate);
+		Nfo("-> TickRate: `"$Result.TickRate$"`");
 	}
 	return True; // SUCCESS!!!
 }
