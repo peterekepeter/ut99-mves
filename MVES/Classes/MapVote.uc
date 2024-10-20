@@ -1711,14 +1711,13 @@ final function ResetCurrentGametypeBeforeTravel()
 
 final function LoadAliases()
 {
-	local int i, j;
-	local string error;
+	local int i;
 	
 	AliasesLogic = new class'MV_Aliases'();
-	for ( i = 0 ; i < 32 ; i ++ )
-	{
-		AliasesLogic.AddAliasLine(Aliases[i]);
-	}
+
+	for ( i = 0 ; i < 32 ; i++ )
+		if ( Aliases[i] != "" ) 
+			AliasesLogic.AddAliasLine(Aliases[i]);
 }
 
 //***************************************
