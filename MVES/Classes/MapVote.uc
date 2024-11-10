@@ -235,6 +235,7 @@ event PostBeginPlay()
 
 	if ( bReloadOnEveryRun )
 	{
+		Log("[MVE] [WARNING] bReloadOnEveryRun is enabled, disable it to improve server performance");
 		bReloadOnNextRun = True;
 	}
 
@@ -290,6 +291,7 @@ event PostBeginPlay()
 	      // check that current packages contains all packages specified by mapvote
 		CurrentPackages = ConsoleCommand("Get ini:Engine.Engine.GameEngine ServerPackages");
 		Log("[MVE] CurrentPackages is "$CurrentPackages);
+		Log("[MVE] Current TickRate is "$ConsoleCommand("get ini:Engine.Engine.NetworkDevice NetServerMaxTickRate"));
 		LogoTexturePackage = GetPackageNameFromString(ClientLogoTexture);
 		if ( LogoTexturePackage != "" && InStr(CurrentPackages, "\""$LogoTexturePackage$"\"") < 0 )
 		{
@@ -1457,9 +1459,15 @@ final function MV_Result GenerateMapResult(string map, int idx)
 	r = class'MV_Result'.static.Create();
 	r.Map = map;
 	r.GameIndex = idx;
+	PopulateResultWithDefaults(r);
 	PopulateResultWithRule(r, idx);
 
 	return r;
+}
+
+function PopulateResultWithDefaults(MV_Result r) 
+{
+	r.SetTickRate(DefaultTickRate);
 }
 
 function PopulateResultWithRule(MV_Result r, int idx)
@@ -1584,14 +1592,14 @@ final function bool SetupTravelString( string mapStringWithIdx )
 		{
 			spk = ParseAliases( spk);
 		}
-		Nfo("-> ServerPackages: `"$spk$"`");
 		ConsoleCommand("set ini:Engine.Engine.GameEngine ServerPackages "$spk);
+		Nfo("-> ServerPackages: `"$ConsoleCommand("get ini:Engine.Engine.GameEngine ServerPackages")$"`");
 	}
 	if ( Result.TickRate > 0 )
 	{
 		ConsoleCommand("set ini:Engine.Engine.NetworkDevice NetServerMaxTickRate "$Result.TickRate);
 		ConsoleCommand("set ini:Engine.Engine.NetworkDevice LanServerMaxTickRate "$Result.TickRate);
-		Nfo("-> TickRate: `"$Result.TickRate$"`");
+		Nfo("-> TickRate: `"$ConsoleCommand("get ini:Engine.Engine.NetworkDevice NetServerMaxTickRate")$"`");
 	}
 	return True; // SUCCESS!!!
 }

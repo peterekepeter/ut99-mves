@@ -139,11 +139,6 @@ function ApplyFilterLists(MV_Sort sorter)
 		}
 	}
 
-	for ( i = 0; i < iMapList; i+=1 ) 
-	{
-		Log(i$" "$MapList[i]);
-	}
-
 	// clear the rest
 	for ( i = iMapList ; i < ArrayCount(MapList) ; i++ )
 	{
