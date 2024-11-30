@@ -787,7 +787,7 @@ function GenerateMapList(bool bFullscan)
 
 	if ( bReloadConfigDuringReload )
 	{
-		Log("[MVE] Reload config result: "@ConsoleCommand("RELOADCFG "$Self));
+		Log("[MVE] Reload config result: "@ConsoleCommand("RELOADCFG"));
 	}
 
 	if ( MapList == None )
@@ -796,6 +796,11 @@ function GenerateMapList(bool bFullscan)
 		MapList.Reader = Spawn(class'FsMapsReader');
 		MapList.Configure();
 	}
+
+	CleanRules();
+	CountFilters();
+	if ( ServerCodeName == '' )
+		SetPropertyText("ServerCodeName", string(rand(MaxInt))$string(rand(MaxInt)));
 
 	MapList.GlobalLoad(bFullscan);
 }

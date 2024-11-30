@@ -35,15 +35,11 @@ function Configure()
 //Else add to list and find rules that use it
 function GlobalLoad(bool bFullscan)
 {
-	local string CurMap, ClearMap, NewMaps;
-	local int i, j, k;
+	local string CurMap;
+	local int i;
 	local MV_MapFilter MapFilter;
 	local MV_Sort sorter;
 
-	Mutator.CleanRules();
-	Mutator.CountFilters();
-	if ( Mutator.ServerCodeName == '' )
-		Mutator.SetPropertyText("ServerCodeName",string(rand(MaxInt))$string(rand(MaxInt))  );
 	
 	MapFilter = new class'MV_MapFilter';
 	MapFilter.bEnableMapTags = Mutator.bEnableMapTags;
