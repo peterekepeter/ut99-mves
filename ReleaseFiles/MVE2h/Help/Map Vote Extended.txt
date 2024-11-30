@@ -1,15 +1,26 @@
 Quickstart
 ==========
 
-1) copy the .u, .int and .ini files to the UT/System folder
+1) Copy necessary files
 
-2) Add this line to server startup mutator list or add it to server actor list.
+    - copy the `.u` files into to the `System/` folder
 
-    ucc server MVES.MapVote
+    - copy the `.int` file:
+        - on 436 into the `System/`
+        - on 469 into the `SystemLocalized/int/`
+
+    - copy the configuration `.ini` file:
+        - on Windows this is the `System/` folder
+        - on Linux `~/.utpg/System` unless `-nohomedir` is specified
+
+2) Start your server with mapvote enabled:
+
+    ucc server DM-Deck16][?Mutator=MVES.MapVote
 
 3) Whenever you want the map list to be updated you need to run the reload command
 the reload command will re-scan paths for maps and will match them against filters
 
+    adminlogin yoursecretpassword
     mutate bdbmapvote reload
 
 
@@ -20,6 +31,8 @@ The official forum post with latest updates goes here. You can report bugs or
 ask for help in the thread:
 
 https://ut99.org/viewtopic.php?t=15657
+
+Or if you prefer with discord, inside the #ut-server-help
 
 
 Configuration
