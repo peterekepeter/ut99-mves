@@ -34,6 +34,7 @@ enum EIDType
 
 var() config EIDType PlayerIDType;
 
+var() config bool bReloadConfigDuringReload;
 var() config bool bSaveConfigOnNextRun, bReloadOnNextRun, bReloadOnEveryRun, bFullscanOnNextRun;
 var() config bool bShutdownServerOnTravel;
 var() config bool bWelcomeWindow;
@@ -269,7 +270,7 @@ event PostBeginPlay()
 	MapList.Reader = Spawn(class'FsMapsReader');
 	MapList.Configure();
 	if ( ExtensionClass != "" )
-		ExtensionC = class < MV_MainExtension > ( DynamicLoadObject(ExtensionClass,class'class') );
+		ExtensionC = class<MV_MainExtension>( DynamicLoadObject(ExtensionClass,class'class') );
 	if ( ExtensionC == None )
 		ExtensionC = class'MV_MainExtension';
 	Extension = new ExtensionC;
@@ -401,7 +402,7 @@ event PostBeginPlay()
 			NextParm = Extension.NextParameter( Cmd, ",");
 			if ( InStr(NextParm,".") < 0 )
 				NextParm = "Botpack."$NextParm;
-			ActorClass = class < Actor > (DynamicLoadObject(NextParm, class'Class'));	
+			ActorClass = class<Actor>(DynamicLoadObject(NextParm, class'Class'));	
 			A = Spawn(ActorClass);
 			Log("[MVE] ===> "$string(ActorClass));
 		}
@@ -414,7 +415,7 @@ event PostBeginPlay()
 			NextParm = Extension.NextParameter( Cmd, ",");
 			if ( InStr(NextParm,".") < 0 )
 				NextParm = "Botpack."$NextParm;
-			ActorClass = class < Actor > (DynamicLoadObject(NextParm, class'Class'));	
+			ActorClass = class<Actor>(DynamicLoadObject(NextParm, class'Class'));	
 			A = Spawn(ActorClass);
 			Level.Game.BaseMutator.AddMutator(Mutator(A));
 			Log("[MVE]  ===> "$string(ActorClass));
@@ -471,7 +472,6 @@ event PostBeginPlay()
 	PlayerDetector = Spawn(class'MV_PlayerDetector');
 	PlayerDetector.Initialize(Self);
 
-	
 	// finally done!
 	Log("[MVE] Finished loading map: `"$TravelMap$"` idx: "$TravelInfo.TravelIdx$" mode: "$CurrentMode);
 }
@@ -568,14 +568,14 @@ function Mutate(string Str, PlayerPawn Sender)
 		if ( Mid(Str,11,8) ~= "FULLSCAN" )
 		{
 			if ( Sender.bAdmin ) 
-				MapList.GlobalLoad(True);
+				GenerateMapList(True);
 			else				
 				Sender.ClientMessage("Please log in as administrator to run a fullscan");
 		}
 		else if ( Mid(Str,11,6) ~= "RELOAD" )
 		{
 			if ( Sender.bAdmin ) 
-				MapList.GlobalLoad(False);
+				GenerateMapList(False);
 			else				
 				Sender.ClientMessage("Please log in as administrator to reload the map list");
 		}
@@ -782,15 +782,23 @@ event Tick( float DeltaTime)
 
 function GenerateMapList(bool bFullscan)
 {
+	BroadcastMessage("Server is reloading map lists...");
+	Log("[MVE] Reloading map list, this may take a while!");
+
+	if ( bReloadConfigDuringReload )
+	{
+		Log("[MVE] Reload config result: "@ConsoleCommand("RELOADCFG "$Self));
+	}
+
 	if ( MapList == None )
 	{
 		MapList = new class'MV_MapList';
 		MapList.Reader = Spawn(class'FsMapsReader');
 		MapList.Configure();
 	}
+
 	MapList.GlobalLoad(bFullscan);
 }
-
 
 //Never happens in local games
 function MapChangeIssued()
@@ -1804,6 +1812,7 @@ static function Nfo(coerce string message)
 
 defaultproperties
 {
+	bReloadConfigDuringReload=True
 	bAutoSetGameName=True
 	bSortAndDeduplicateMaps=True
 	bFixMutatorsQueryLagSpikes=True

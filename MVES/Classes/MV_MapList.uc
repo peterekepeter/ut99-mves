@@ -66,7 +66,6 @@ function GlobalLoad(bool bFullscan)
 
 	DetectAliasErrors();
 	
-	Log("[MVE] Reloading map list, this may take a while!");
 	Reader.Reset();
 	sorter = new class'MV_Sort';
 
