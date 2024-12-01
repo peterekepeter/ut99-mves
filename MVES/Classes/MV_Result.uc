@@ -31,6 +31,10 @@ var int SettingsCount;
 var string SettingsKey[256];
 var string SettingsValue[256];
 
+const MaxUrlParameters = 256;
+var int UrlParametersCount;
+var string UrlParametersKey[256], UrlParametersValue[256];
+
 var LevelInfo LevelInfo;
 var bool LevelInfoCached;
 
@@ -119,11 +123,14 @@ function string GetWrappedPackages()
 function bool AddMutators(string list)
 {
 	local string mutator;
+	local bool success;
+	success = True;
 	
 	while ( class'MV_Parser'.static.TrySplit(list, ",", mutator, list) )
-	{
-		AddMutator(mutator);
-	}
+		if ( !AddMutator(mutator) ) 
+			success = False;
+	
+	return success;
 }
 
 function bool AddMutator(string mutator)
@@ -149,11 +156,14 @@ function bool AddMutator(string mutator)
 function bool AddActors(string list)
 {
 	local string actor;
+	local bool success;
+	success = True;
 	
 	while ( class'MV_Parser'.static.TrySplit(list, ",", actor, list) )
-	{
-		AddActor(actor);
-	}
+		if ( !AddActor(actor) ) 
+			success = False;
+
+	return success;
 }
 
 function bool AddActor(string actor)
@@ -181,19 +191,74 @@ function bool AddGameSettings(string settingsList)
 	local string keyvalue;
 	local string key;
 	local string value;
-	local bool found;
+	local bool success;
+	success = True;
 	
 	while ( class'MV_Parser'.static.TrySplit(settingsList, ",", keyvalue, settingsList) )
 	{
 		if ( class'MV_Parser'.static.TrySplit(keyvalue, "=", key, value) )
 		{
-			UpdateSingleGameSetting(key, value);
+			if ( !UpdateSingleGameSetting(key, value) ) 
+			{
+				success = False;
+			}
 		}
 		else 
 		{
 			Err("Ignoring invalid setting `"$keyvalue$"` from `"$settingsList$"`");
+			success = False;
 		}
 	}
+
+	return success;
+}
+
+function bool AddUrlParameters(string params) 
+{
+	local string param, key, value;
+	local int i;
+	local bool success;
+	success = False;
+
+	while ( class'MV_Parser'.static.TrySplit(params, "?", param, params) )
+	{
+		if ( class'MV_Parser'.static.TrySplit(param, "=", key, value) ) 
+		{
+			for ( i = 0;i < UrlParametersCount;i+=1 ) 
+			{
+				if ( UrlParametersKey[i] ~= key )
+				{
+					UrlParametersValue[i] = value;
+					goto NEXT_PARAM;
+				}
+			}
+			if ( UrlParametersCount < MaxUrlParameters )
+			{
+				UrlParametersKey[UrlParametersCount] = key;
+				UrlParametersValue[UrlParametersCount] = value;
+				UrlParametersCount += 1;
+			}
+			else 
+			{
+				Err("Cannot add `"$param$"`, max server actor count reached!");
+				return False;
+			}
+		}
+	NEXT_PARAM:
+	}
+	return success;
+}
+
+function string GetUrlParametersString() 
+{
+	local string result;
+	local int i;
+
+	for ( i = 0; i < UrlParametersCount; i+=1 )
+	{
+		result = result$"?"$UrlParametersKey[i]$"="$UrlParametersValue[i];
+	}
+	return result;
 }
 
 function bool UpdateSingleGameSetting(string key, string value)

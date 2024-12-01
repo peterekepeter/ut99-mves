@@ -156,7 +156,7 @@
         {
             "label": "join server",
             "type": "shell",
-            "command": "ucx ut unreal://127.0.0.1:7777 -log",
+            "command": "ucx ut unreal://127.0.0.1:7777",
             "problemMatcher": [],
             "presentation": {
                 "echo": true,

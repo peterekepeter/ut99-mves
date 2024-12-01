@@ -12,6 +12,7 @@ function TestMain()
 	TestActors();
 	TestSettings();
 	TestWrappedPackages();
+	TestUrlParameters();
 }
 
 function TestPackages()
@@ -123,6 +124,29 @@ function TestSettings()
 	AssertEquals(s.GetGameSettingByKey("TimeLimit"), "0", "other property value is kept");
 	s.AddGameSettings("MaxTeamSize=16");
 	AssertEquals(s.SettingsCount, 7, "new property can be added");
+}
+
+function TestUrlParameters()
+{
+	Describe("url parameters are appended and concatenated");
+	AssertEquals(s.UrlParametersCount, 0, "starts with 0 params");
+	AssertEquals(s.GetUrlParametersString(), "", "returns empty string");
+	s.AddUrlParameters("?Key=Value");
+	AssertEquals(s.UrlParametersCount, 1, "added one param");
+	s.AddUrlParameters("?ProfileX=1?ProfileY=2");
+	AssertEquals(s.UrlParametersCount, 3, "added more params");
+	AssertEquals(s.GetUrlParametersString(), "?Key=Value?ProfileX=1?ProfileY=2", "returns merged params");
+	
+	Describe("adding same url parameters overwrite each other");
+	s.AddUrlParameters("?Key=Value");
+	s.AddUrlParameters("?Key=AnotherValue");
+	s.AddUrlParameters("?Key=LastValue");
+	AssertEquals(s.GetUrlParametersString(), "?Key=LastValue", "returns merged params");
+
+	Describe("adding same url parameter without value overwrite each other");
+	s.AddUrlParameters("?Dummy=0");
+	s.AddUrlParameters("?Dummy?Dummy??");
+	AssertEquals(s.GetUrlParametersString(), "?Dummy=", "returns single param");
 }
 
 function Describe(string subject)

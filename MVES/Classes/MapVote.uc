@@ -67,7 +67,7 @@ var bool bXCGE_DynLoader;
 struct GameType
 {
 	var() config bool bEnabled;
-	var() config string GameName; //For displayable rule
+	var() config string GameName;
 	var() config string RuleName;
 	var() config string GameClass;
 	var() config string FilterCode;
@@ -79,10 +79,12 @@ struct GameType
 	var() config int TickRate;
 	var() config string ServerActors;
 	var() config string Extends;
+	var() config string UrlParameters;
 };
 
 var() config string DefaultSettings;
 var() config int DefaultTickRate;
+var() config string DefaultUrlParameters;
 var int pos;
 var() config GameType CustomGame[100];
 var GameType EmptyGame;
@@ -1481,6 +1483,7 @@ final function MV_Result GenerateMapResult(string map, int idx)
 function PopulateResultWithDefaults(MV_Result r) 
 {
 	r.SetTickRate(DefaultTickRate);
+	r.AddUrlParameters(DefaultUrlParameters);
 }
 
 function PopulateResultWithRule(MV_Result r, int idx)
@@ -1512,6 +1515,7 @@ function PopulateResultWithRule(MV_Result r, int idx)
 	r.AddActors(CustomGame[idx].ServerActors);
 	r.AddMutators(CustomGame[idx].MutatorList);
 	r.AddPackages(CustomGame[idx].Packages);
+	r.AddUrlParameters(CustomGame[idx].UrlParameters);
 }
 
 function PrintCircularExtendsError(MV_Result r, int idx)
@@ -1564,7 +1568,7 @@ final function bool SetupTravelString( string mapStringWithIdx )
 		return False;
 	}
 
-	TravelInfo.TravelString = Result.Map$"?Game="$ParseAliases(GameClassName);
+	TravelInfo.TravelString = Result.Map$"?Game="$ParseAliases(GameClassName)$Result.GetUrlParametersString();
 	TravelInfo.TravelIdx = Result.GameIndex;
 	Nfo("-> TravelString: `"$TravelInfo.TravelString$"`");
 	Nfo("-> GameIdx: `"$TravelInfo.TravelIdx$"`");
