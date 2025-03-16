@@ -1838,7 +1838,7 @@ defaultproperties
 	bKickVote=True
 	ExtensionClass="MVES.MV_SubExtension"
 	bSaveConfigOnNextRun=True
-	bOverrideServerPackages=True
+	bResetServerPackages=True
 	EmptyGame=(bEnabled=False,GameName="",RuleName="",GameClass="",FilterCode="",bHasRandom=True,VotePriority=1.000000,MutatorList="",Settings="",Packages="",TickRate=0,ServerActors="")
 	CustomGame(0)=(bEnabled=False,GameName="",RuleName="",GameClass="",FilterCode="",bHasRandom=True,VotePriority=1.000000,MutatorList="",Settings="",Packages="",TickRate=0,ServerActors="")
 	CustomGame(1)=(bEnabled=False,GameName="",RuleName="",GameClass="",FilterCode="",bHasRandom=True,VotePriority=1.000000,MutatorList="",Settings="",Packages="",TickRate=0,ServerActors="")

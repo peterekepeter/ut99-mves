@@ -1,4 +1,6 @@
  
+ - bug, if 1 player votes and the other players leave, vote does not pass, it says already voted
+
  - reload config possible since 469d https://github.com/OldUnreal/UnrealTournamentPatches/issues/480
 
  - RELOAD can fail, write state to config before reload to prevent infinite crash loop

@@ -1,7 +1,7 @@
 Quickstart
 ==========
 
-1) Copy necessary files
+1. Copy necessary files
 
     - copy the `.u` files into to the `System/` folder
 
@@ -13,26 +13,74 @@ Quickstart
         - on Windows this is the `System/` folder
         - on Linux `~/.utpg/System` unless `-nohomedir` is specified
 
-2) Start your server with mapvote enabled:
+2. Add the client package to ServerPackages inside UnrealTournament.ini:
+
+    ServerPackages=MVE2h
+
+3. Start your server with mapvote enabled:
 
     ucc server DM-Deck16][?Mutator=MVES.MapVote
 
-3) Whenever you want the map list to be updated you need to run the reload command
-the reload command will re-scan paths for maps and will match them against filters
+4. Whenever you want the map list to be updated you need to run the reload 
+command the reload command will re-scan paths for maps and will match them 
+against filters
 
     adminlogin yoursecretpassword
     mutate bdbmapvote reload
+
+After these steps are done, in game you should be able to make the vote window
+show up by either typing `!v` in chat or `mutate bdbmapvote votemenu` in console.
+
+
+Troubleshooting
+===============
+
+
+1. Map vote window does not show up:
+
+    A. Check for `[MVE] Map Vote Extended version:` in the server log. If you do
+    not see this log then the server component of mapvote did not start. Check 
+    your server startup script and make sure it contains `?Mutator=MVES.MapVote`
+
+    B. Check that ServerPackages from UnrealTournament.ini contains MVE2h.
+    This package contains the vote window. If it's missing then clients will 
+    not download and are not able to display the mapvote window in game.
+
+    C. Do or did you have another mapvote? It's possible that some part of it
+    is still active and that it's blocking some functionality of this mapvote. 
+    Make sure that the other mapvote doesn't start. 
+    Try installing MVE to a clean version of UT99 
+
+
+2. Map vote window shows up but it's empty:
+
+    A. Did you copy the `MVE_Config.ini`? If you did not then you'll start
+    with an empty config without any map filters. This also an okay way to start
+    you can copy parts from the `MVE_Config.ini` provided in the zip.
+
+    B. Is `MVE_Config.ini` is in the right place? It's possible that it's not
+    getting loaded. Try setting `bReloadOnNextRun=True` and run the server again
+    The next run should set `bReloadOnNextRun` back to `False` if it doesn't then
+    you're editing the wrong configuration file.
+
+    C. Double check your map filters. Use the example config file from the zip
+    file should at least match all maps starting with DM-* and those should be 
+    visible. Run `mutate bdbmapvote reload` this will re-scan your disk and it 
+    also print any errors to the server log. Check the server log for errors
+    MVE will print out configuration problems found during map list reload.
 
 
 Support
 =======
 
-The official forum post with latest updates goes here. You can report bugs or
-ask for help in the thread:
+If the above did not work ytou can reach out to the communityt. 
+You can report bugs or ask for help in the thread:
 
 https://ut99.org/viewtopic.php?t=15657
 
-Or if you prefer with discord, inside the #ut-server-help
+Or ask in the ut99.org discord inside the #ut-server-help channel
+
+https://discord.com/invite/6CP2UjZ
 
 
 Configuration
@@ -85,14 +133,22 @@ If you do not reload then the same old games list is sent to players.
 Useful Keybinds
 ===============
 
-You can set up some keybinds so that you can quickly reload in game.
-With keybinding you can run any command.
-To reload the map list from keybind you will need 2 commands on keybind.
+I recommend setting up 3 keybinds. These are optional you can do everything
+without them, but it speeds things up a bit.
 
+    set input f8 mutate bdbmapvote votemenu
     set input f9 adminlogin yoursecretpassword
     set input f10 mutate bdbmapvote reload
 
-With these set up you can log in by pressing f9 then f10 to reload.
+Now press the f9 key and then press f10 key to quickly reload the map list 
+when you install or remove maps.
+
+You can also press f8 to bring up the vote menu in game at any moment without
+having to wait for the match to end.
+
+You can ofcourse choose different keys to bind to.
+
+Note: if you logged in as admin, you can force a map swicth!
 
 
 Advanced Installation
@@ -109,7 +165,7 @@ ServerPackages=MVE2h
 
 
 - MapVote can be installed both in mutator or server actor mode. This will 
-affect the initialization order a bit. This may influence initialization of 
+affect the initialization order a bit. This will influence initialization of 
 other mutators. Ultimately this is a choice for you to use whichever mode is
 more comfortable working with. Here are some ways you can run MapVote:
 
