@@ -13,6 +13,7 @@ function TestMain()
 	TestSettings();
 	TestWrappedPackages();
 	TestUrlParameters();
+	TestRemove();
 }
 
 function TestPackages()
@@ -149,8 +150,28 @@ function TestUrlParameters()
 	AssertEquals(s.GetUrlParametersString(), "?Dummy=", "returns single param");
 }
 
+function TestRemove()
+{
+	Describe("mutators can be removed");
+	s.AddMutators("A,B,C");
+	AssertEquals(s.RemoveMutator("B"), True, "remove single mutator");
+	AssertEquals(s.RemoveMutator("B"), False, "cannot remove twice");
+	AssertEquals(s.MutatorCount, 2, "has 2 mutators");
+	AssertEquals(s.RemoveMutators("A,C"), True, "remove multiple");
+	AssertEquals(s.MutatorCount, 0, "has 0 mutators");
+
+	Describe("actors can be removed");
+	s.AddActors("A,B,C");
+	AssertEquals(s.RemoveActor("B"), True, "remove single actor");
+	AssertEquals(s.RemoveActor("B"), False, "cannot remove twice");
+	AssertEquals(s.ActorCount, 2, "has 2 actors");
+	AssertEquals(s.RemoveActors("A,C"), True, "remove multiple");
+	AssertEquals(s.ActorCount, 0, "has 0 actors");
+}
+
 function Describe(string subject)
 {
 	Super.Describe(subject);
 	s = new class'MV_Result';
+	s.bQuiet = True;
 }

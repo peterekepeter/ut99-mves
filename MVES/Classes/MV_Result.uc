@@ -41,12 +41,15 @@ var bool LevelInfoCached;
 var LevelSummary LevelSummary;
 var bool LevelSummaryCached;
 
+var bool bQuiet;
+
 static function MV_Result Create(optional string map, optional int gameIdx)
 {
 	local MV_Result object;
 	object = new class'MV_Result';
 	object.Map = map;
 	object.GameIndex = gameIdx;
+	object.bQuiet = False;
 	return object;
 }
 
@@ -153,6 +156,42 @@ function bool AddMutator(string mutator)
 	return True;
 }
 
+function bool RemoveMutators(string list)
+{
+	local string mutator;
+	local bool success;
+	success = True;
+	
+	while ( class'MV_Parser'.static.TrySplit(list, ",", mutator, list) )
+		if ( !RemoveMutator(mutator) ) 
+			success = False;
+	
+	return success;
+}
+
+function bool RemoveMutator(string mutator)
+{
+	local int i,j;
+	for ( i = MutatorCount - 1; i >= 0; i-=1 )
+	{
+		if ( Mutators[i] ~= mutator )
+		{
+			for ( j = i; j < MutatorCount && j < MaxMutatorCount - 1; j = j + 1 )
+				Mutators[j] = Mutators[j + 1];
+			if ( MutatorCount == MaxMutatorCount ) 
+				Mutators[MaxMutatorCount - 1] = "";
+			if ( MutatorCount > 0 )
+				MutatorCount -= 1;
+			return True;
+		}
+	}
+	if ( !bQuiet ) 
+	{
+		Err("Failed to remove mutator `"$mutator$"`");
+	}
+	return False;
+}
+
 function bool AddActors(string list)
 {
 	local string actor;
@@ -184,6 +223,42 @@ function bool AddActor(string actor)
 	Actors[ActorCount] = actor;
 	ActorCount++;
 	return True;
+}
+
+function bool RemoveActors(string list) 
+{
+	local string actorstr;
+	local bool success;
+	success = True;
+	
+	while ( class'MV_Parser'.static.TrySplit(list, ",", actorstr, list) )
+		if ( !RemoveActor(actorstr) ) 
+			success = False;
+	
+	return success;
+}
+
+function bool RemoveActor(string actor) 
+{
+	local int i,j;
+	for ( i = ActorCount - 1; i >= 0; i-=1 )
+	{
+		if ( Actors[i] ~= actor )
+		{
+			for ( j = i; j < ActorCount && j < MaxActors - 1; j = j + 1 )
+				Actors[j] = Actors[j + 1];
+			if ( ActorCount == MaxActors ) 
+				Actors[MaxActors - 1] = "";
+			if ( ActorCount > 0 )
+				ActorCount -= 1;
+			return True;
+		}
+	}
+	if ( !bQuiet ) 
+	{
+		Err("Failed to remove actor `"$actor$"`");
+	}
+	return False;
 }
 
 function bool AddGameSettings(string settingsList)

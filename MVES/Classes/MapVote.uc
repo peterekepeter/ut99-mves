@@ -52,6 +52,9 @@ var() config bool bFixMutatorsQueryLagSpikes;
 var() config bool bOverrideServerPackages;
 var() config bool bResetServerPackages;
 var() config string MainServerPackages;
+var() config string MainMutatorList;
+var() config string MainServerActors;
+
 
 var int ScoreBoardTime;
 var float EndGameTime;
@@ -80,6 +83,8 @@ struct GameType
 	var() config string ServerActors;
 	var() config string Extends;
 	var() config string UrlParameters;
+	var() config string ExcludeMutators;
+	var() config string ExcludeActors;
 };
 
 var() config string DefaultSettings;
@@ -367,9 +372,9 @@ event PostBeginPlay()
 		TravelInfo.SaveConfig();
 	}
 
-	CurrentMap = class'MV_Result'.static.Create(Cmd, TravelInfo.TravelIdx);
+	CurrentMap = GenerateMapResult(Cmd, TravelInfo.TravelIdx);
 	CurrentMap.OriginalSong = ""$Level.Song;
-	
+
 	if ( bEnableMapOverrides )
 	{
 		ProcessMapOverrides(CurrentMap);
@@ -396,12 +401,11 @@ event PostBeginPlay()
 			Cmd = ParseAliases( Cmd);
 		ExecuteSettings(Cmd);
 		
-		Cmd = ParseAliases(CurrentGame.ServerActors);
-		if ( Cmd != "" )
+		if ( 0 < CurrentMap.ActorCount )
 			Log("[MVE] Spawning ServerActors",'MapVote');
-		while ( Cmd != "" )
+		for ( i = 0; i < CurrentMap.ActorCount; i+=1 )
 		{
-			NextParm = Extension.NextParameter( Cmd, ",");
+			NextParm = ParseAliases(CurrentMap.Actors[i]);
 			if ( InStr(NextParm,".") < 0 )
 				NextParm = "Botpack."$NextParm;
 			ActorClass = class<Actor>(DynamicLoadObject(NextParm, class'Class'));	
@@ -409,12 +413,11 @@ event PostBeginPlay()
 			Log("[MVE] ===> "$string(ActorClass));
 		}
 
-		Cmd = ParseAliases(CurrentGame.MutatorList);
-		if ( Cmd != "" )
+		if ( 0 < CurrentMap.MutatorCount )
 			Log("[MVE] Spawning Mutators",'MapVote');
-		while ( Cmd != "" )
+		for( i = 0; i < CurrentMap.MutatorCount; i+=1 )
 		{
-			NextParm = Extension.NextParameter( Cmd, ",");
+			NextParm = ParseAliases(CurrentMap.Mutators[i]);
 			if ( InStr(NextParm,".") < 0 )
 				NextParm = "Botpack."$NextParm;
 			ActorClass = class<Actor>(DynamicLoadObject(NextParm, class'Class'));	
@@ -422,6 +425,7 @@ event PostBeginPlay()
 			Level.Game.BaseMutator.AddMutator(Mutator(A));
 			Log("[MVE]  ===> "$string(ActorClass));
 		}
+
 		if ( bXCGE_DynLoader )
 		{
 			Cmd = CurrentGame.Packages;
@@ -1484,6 +1488,8 @@ function PopulateResultWithDefaults(MV_Result r)
 {
 	r.SetTickRate(DefaultTickRate);
 	r.AddUrlParameters(DefaultUrlParameters);
+	r.AddMutators(MainMutatorList);
+	r.AddActors(MainServerActors);
 }
 
 function PopulateResultWithRule(MV_Result r, int idx)
@@ -1506,6 +1512,8 @@ function PopulateResultWithRule(MV_Result r, int idx)
 		PopulateResultWithRule(r, int(extendsIdx));
 	}
 
+	r.RemoveActors(CustomGame[idx].ExcludeActors);
+	r.RemoveMutators(CustomGame[idx].ExcludeMutators);
 	r.SetGameClass(CustomGame[idx].GameClass);
 	r.SetGameName(CustomGame[idx].GameName);
 	r.SetRuleName(CustomGame[idx].RuleName);
