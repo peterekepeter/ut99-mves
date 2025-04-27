@@ -61,11 +61,13 @@ var float EndGameTime;
 
 var string CurrentMode; //Clear on restart, if "", take gametype's default game mode
 
+var bool bRunning;
 var bool bLevelSwitchPending;
 var bool bVotingStage;
 var int VotingStagePreBeginWait;
 var bool bMapChangeIssued;
 var bool bXCGE_DynLoader;
+var bool bMissingClientPackage;
 
 struct GameType
 {
@@ -132,7 +134,7 @@ var MV_Result CurrentMap;
 var Music SongOverride;
 
 //XC_GameEngine and Unreal 227 interface
-//native(1718) final function bool AddToPackageMap( optional string PkgName);
+native(1718) final function bool AddToPackageMap( optional string PkgName);
 
 state Voting
 {
@@ -221,16 +223,19 @@ event PostBeginPlay()
 	local string Cmd, NextParm;
 	local Actor A;
 	local class<Actor> ActorClass;
-	local int MapIdx;
+	local int MapIdx, i;
 	local string LogoTexturePackage;
 	local string TravelMap;
 	local string CurrentPackages;
 	local bool bGotoSuccess;
 	local bool bNeedToRestorePackages, bNeedToRestoreMap;
 
-	if ( IsOtherInstanceRunning() ) 
+	Log("[MVE] PostBeginPlay "$Self);
+
+	bRunning = !IsOtherInstanceRunning();
+	if ( !bRunning ) 
 	{
-		Nfo("Detected multiple MapVotes, only first mapvote will work.");
+		Log("[MVE] Removing instance "$Self);
 		Destroy();
 		return;
 	}
@@ -285,6 +290,19 @@ event PostBeginPlay()
 		Extension.SetupWebApp(MapList);
 	RegisterMessageMutator();
 	
+	if ( IsBackgroundMode() )
+	{
+		CurrentMode = "Background";
+		Log("[MVE] Running in background mode until next map is voted");
+		CheckClientPackageInstalled();
+		return;
+	}
+
+	if ( !bOverrideServerPackages )
+	{
+		CheckClientPackageInstalled();
+	}
+
 	if ( DefaultSettings != "" )
 	{
 		Cmd = DefaultSettings;
@@ -297,7 +315,7 @@ event PostBeginPlay()
 	if ( bOverrideServerPackages && !bXCGE_DynLoader )
 	{
 	      // check that current packages contains all packages specified by mapvote
-		CurrentPackages = ConsoleCommand("Get ini:Engine.Engine.GameEngine ServerPackages");
+		CurrentPackages = GetEngineIniServerPackages();
 		Log("[MVE] CurrentPackages is "$CurrentPackages);
 		Log("[MVE] Current TickRate is "$ConsoleCommand("get ini:Engine.Engine.NetworkDevice NetServerMaxTickRate"));
 		LogoTexturePackage = GetPackageNameFromString(ClientLogoTexture);
@@ -314,7 +332,12 @@ event PostBeginPlay()
 		if ( ClientPackageInternal != "" && InStr(CurrentPackages, "\""$ClientPackageInternal$"\"") < 0 )
 		{
 			Nfo(ClientPackageInternal$" is missing from ServerPackages");
+			bMissingClientPackage = True;
 			bNeedToRestorePackages = True;
+		}
+		else 
+		{
+			bMissingClientPackage = False;
 		}
 		Cmd = CurrentGame.Packages;
 		if ( InStr( Cmd, "<") >= 0 )
@@ -470,7 +493,7 @@ event PostBeginPlay()
 		MapList.GenerateString();
 	if ( bResetServerPackages && bOverrideServerPackages )
 	{
-		MainServerPackages = ConsoleCommand("Get ini:Engine.Engine.GameEngine ServerPackages");
+		MainServerPackages = GetEngineIniServerPackages();
 		bResetServerPackages = False;
 		SaveConfig(); // initially populates updates MVE_Config with MainServerPackages
 	}
@@ -484,16 +507,34 @@ event PostBeginPlay()
 
 function bool IsOtherInstanceRunning() 
 {
-	local Mutator M;
+	local bool bDetected;
+	local MapVote MV;
 
-	// Check if mutator was added to GameInfo
-	for ( M = Level.Game.BaseMutator; M != None; M = M.NextMutator )
+	bDetected = False;
+
+	foreach AllActors(class'MapVote', MV)
 	{
-		if ( M.IsA('MapVote') )
-		{
-			return True;
-		}
+		if ( MV.bRunning )
+			bDetected = True;
+		Log("[MVE] INSTANCE "$MV$" isself "$(MV == Self));
 	}
+
+	return bDetected;
+}
+
+function bool IsBackgroundMode() 
+{
+	local string url;
+	url = Caps(Level.GetLocalURL());
+	Log("[MVE] Url is: `"$url$"`");
+	if ( InStr(url, Caps("Mutator="$Self.Class)) >= 0
+		|| InStr(url, Caps(","$Self.Class)) >= 0 ) 
+	{
+		Log("[MVE] Found in URL");
+		return False;
+	}
+	Log("[MVE] NOT Found in URL, self is: `"$Self.Class$"`");
+	return True;
 }
 
 function ExecuteSettings(string Settings) 
@@ -1087,6 +1128,10 @@ function UpdateMapListCaches()
 
 function OpenWindowFor( PlayerPawn Sender, optional MVPlayerWatcher W)
 {
+	if ( bMissingClientPackage ) 
+	{
+		Sender.ClientMessage("Map Vote not set up correctly! Please add `"$ClientPackageInternal$"` to ServerPackages!");
+	}
 	if ( bLevelSwitchPending )
 	{
 		Sender.ClientMessage("Cannot vote, switching to new map!");
@@ -1104,7 +1149,7 @@ function OpenWindowFor( PlayerPawn Sender, optional MVPlayerWatcher W)
 	if ( W == None )
 	{
 		Sender.ClientMessage("Looks like you're not part of the voter list. I'll try to fix that now.");
-		Err("Player '"$Sender.PlayerReplicationInfo.PlayerName$"' was not part of watchlist but requested to vote.");
+		Err("Player '"$Sender.PlayerReplicationInfo.PlayerName$"' was not part of watchlist but requested to vote");
 		PlayerJoined(Sender);
 		W = GetWatcherFor( Sender);
 	}
@@ -1576,7 +1621,12 @@ final function bool SetupTravelString( string mapStringWithIdx )
 		return False;
 	}
 
-	TravelInfo.TravelString = Result.Map$"?Game="$ParseAliases(GameClassName)$Result.GetUrlParametersString();
+	TravelInfo.TravelString = (
+		Result.Map
+		$"?Game="$ParseAliases(GameClassName)
+		$"?Mutator="$Self.Class
+		$Result.GetUrlParametersString()
+	);
 	TravelInfo.TravelIdx = Result.GameIndex;
 	Nfo("-> TravelString: `"$TravelInfo.TravelString$"`");
 	Nfo("-> GameIdx: `"$TravelInfo.TravelIdx$"`");
@@ -1618,7 +1668,7 @@ final function bool SetupTravelString( string mapStringWithIdx )
 			spk = ParseAliases( spk);
 		}
 		ConsoleCommand("set ini:Engine.Engine.GameEngine ServerPackages "$spk);
-		Nfo("-> ServerPackages: `"$ConsoleCommand("get ini:Engine.Engine.GameEngine ServerPackages")$"`");
+		Nfo("-> ServerPackages: `"$GetEngineIniServerPackages()$"`");
 	}
 	if ( Result.TickRate > 0 )
 	{
@@ -1627,6 +1677,27 @@ final function bool SetupTravelString( string mapStringWithIdx )
 		Nfo("-> TickRate: `"$ConsoleCommand("get ini:Engine.Engine.NetworkDevice NetServerMaxTickRate")$"`");
 	}
 	return True; // SUCCESS!!!
+}
+
+function CheckClientPackageInstalled()
+{
+	local string CurrentPackages;
+
+	CurrentPackages = GetEngineIniServerPackages();
+	if ( ClientPackageInternal != "" && InStr(CurrentPackages, "\""$ClientPackageInternal$"\"") < 0 )
+	{
+		Err("`"$ClientPackageInternal$"` not in ServerPackages, nobody will be able to vote");
+		bMissingClientPackage = True;
+	}
+	else 
+	{
+		bMissingClientPackage = False;
+	}
+}
+
+function string GetEngineIniServerPackages() 
+{
+	return ConsoleCommand("get ini:Engine.Engine.GameEngine ServerPackages");
 }
 
 function string ParseAliases(string input) 
