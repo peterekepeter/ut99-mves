@@ -9,11 +9,11 @@ var string SongPackage[1024];
 var string SongName[1024];
 
 
-function MV_Result ApplyOverrides(MV_Result result)
+function ApplyOverrides(MV_Result result)
 {
 	local int i;
     
-	for ( i = 0; i < RuleCount; i ++ )
+	for ( i = 0; i < RuleCount; i++ )
 	{
 		if ( RuleMatches(result, i) )
 		{
@@ -24,7 +24,6 @@ function MV_Result ApplyOverrides(MV_Result result)
 
 function private bool RuleMatches(MV_Result result, int i)
 {
-	local string mapCaps;
 	local string filterValue, filterBy, filterByCaps;
 
 	filterValue = Filter[i];

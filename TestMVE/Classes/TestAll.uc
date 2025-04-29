@@ -8,4 +8,5 @@ function TestMain()
 	TestChild(class'TestMvAliases');
 	TestChild(class'TestMapHistory');
 	TestChild(class'TestMapVoteResult');
+	TestChild(class'TestMapOverrides');
 }
