@@ -16,8 +16,8 @@ function TestMain()
 	AssertMapSongOverride("DM-XYZ", "", "does not match");
 	AssertMapSongOverride("DM-x", "Organic.Organic", "map match is not case sensitive");
 	AssertMapSongOverride("DM-Deck16][", "Razor-ub.Razor-ub", "2nd map song override");
-
 	Describe("Song overrides");
+
 	cfg.MapOverrides[0] = "Song==Moroset.Moroset?Song=Mech8.Mech8";
 	cfg.MapOverrides[1] = "SonG==A.a?Song=B.b";
 	parser.ParseConfiguration(overrides, cfg);
@@ -26,6 +26,16 @@ function TestMain()
 	AssertSongSongOverride("Garbage.Value", "", "no override if does not match");
 	AssertSongSongOverride("MoRoSet.MoRoSet", "Mech8.Mech8", "matching is not case sensitive");
 	AssertSongSongOverride("A.a", "B.b", "key is not case sensitive");
+
+	Describe("Mutator overrides");
+	cfg.MapOverrides[0] = "DM-Deck16][?MutatorList=Botpack.RocketArena,Botpack.LowGrav";
+	parser.ParseConfiguration(overrides, cfg);
+	result.Map = "DM-Deck16][";
+	overrides.ApplyOverrides(result);
+	AssertEquals(result.MutatorCount, "2", "two mutators were added");
+	AssertEquals(result.Mutators[0], "Botpack.RocketArena", "1st is rocket arena");
+	AssertEquals(result.Mutators[1], "Botpack.LowGrav", "2nd is lowgrav");
+
 }
 
 function AssertSongSongOverride(string mapsong, string expectedsong, string message)

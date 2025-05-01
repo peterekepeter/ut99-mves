@@ -45,6 +45,8 @@ function private ApplyEffects(MV_Result result, string effects)
 			else 
 				Err("in `"$value$"` Song requires `Package.Name` format");
 		}
+		else if ( key ~= "MutatorList" )
+			result.AddMutators(value);
 		else 
 			Err("unknown property key `"$key$"` in `"$kv$"`");
 	}
