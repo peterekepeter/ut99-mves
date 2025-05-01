@@ -187,24 +187,36 @@ still same, but if pick game mode which forbidden random restart. Up to 1024 tim
 
 ## MapOverrides
 
-Map overrides feature can be used to configure map specific rules, currently the
-only supported property is `Song`, it can be used to override the song played on
-the map.
+Map overrides feature can be used to configure things that happen when a 
+specific map is voted. Currently supported properties are:
 
-To enable this feature you need to set `bEnableMapOverrides` to true in the
+- `Song` - you can override the song of a level if you don't like it or the
+  if the author forgot to add one (happens to the best of us). For example you can
+  use the secret song `?Song=Organic.Organic`
+
+- `MutatorList` - you can add extra mutators which spawn only when a map is 
+  voted, you can use this for example to alter the gravity of some maps by 
+  spawning `?MutatorList=Botpack.LowGrav`
+
+To enable this feature you first need to set `bEnableMapOverrides` to true in the
 `[MVES.MapVote]` section of `MVE_Config.ini`
 
-`bOverrideServerPackages` should be enabled to allow `ServerPackages` to be
-automatically populated with the referenced song packages. Otherwise you need to
-manually add all used packages to `ServerPackages` in the `[Engine.GameEngine]`
-section of `UnrealTournament.ini`
+
+```ini
+bEnableMapOverrides=True
+```
+
+Recommended to also have `bOverrideServerPackages` set to True so that MVES can 
+take control over `ServerPackages` to be automatically populated with the 
+referenced song packages. Otherwise you need to manually add all necessary packages 
+to `ServerPackages` in the `[Engine.GameEngine]` section of `UnrealTournament.ini`
 
 Configuration Example:
 
 ```ini
 [MVES.MapOverridesConfig]
 MapOverridesVersion=1
-MapOverrides[0]=DM-Deck16][?Song=Organic.Organic
+MapOverrides[0]=DM-Deck16][?Song=Organic.Organic?MutatorList=Botpack.LowGrav
 MapOverrides[1]=DM-Gothic?Song=Mannodermaus-20200222.20200222
 MapOverrides[2]=Song==Phantom.Phantom?Song=X-void_b.X-void_b
 ```
