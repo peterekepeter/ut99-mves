@@ -3,8 +3,9 @@ class MV_MapOverridesParser expands MV_Parser;
 function ParseConfiguration(MV_MapOverrides target, MapOverridesConfig config)
 {
 	local int i, errorCount;
-	target.RuleCount = 0;
-	for ( i = 0; i < config.MapOverridesCount; i ++ )
+	target.MapFilterCount = 0;
+	target.SongFilterCount = 0;
+	for ( i = 0; i < config.MapOverridesCount; i++ )
 	{
 		errorCount = TryAddConfigLine(target, config.MapOverrides[i]);
 		if ( errorCount > 0 )
@@ -16,26 +17,15 @@ function ParseConfiguration(MV_MapOverrides target, MapOverridesConfig config)
 
 function private int TryAddConfigLine(MV_MapOverrides target, string line)
 {
-	local string rule, filter, properties;
+	local string rule;
 	local int errors;
 	errors = 0;
-	while ( TrySplit(line, ";", rule, line) )
+	while ( Tokenize(line, ";", rule) )
 	{
-		if ( target.RuleCount >= target.RuleMaxCount )
+		if ( !TryAddRule(target, rule) )
 		{
-			errors ++ ;
-			Err("max rule count "$target.RuleMaxCount$" was reached");
-			return errors;
-		}
-		if ( TryAddRule(target, rule) )
-		{
-			target.RuleCount ++ ;
-		}
-		else
-		{
-			errors ++ ;
+			errors++;
 			Err("error in rule `"$rule$"`");
-			ResetRuleIndex(target, target.RuleCount);
 		}
 	}
 	return errors;
@@ -43,60 +33,30 @@ function private int TryAddConfigLine(MV_MapOverrides target, string line)
 
 function private bool TryAddRule(MV_MapOverrides target, string rule)
 {
-	local string filter, properties, property;
-	if ( !TrySplit(rule, "?", filter, properties) )
+	local string filter, properties, filterkey, filtervalue;
+
+	if ( !SplitOne(rule, "?", filter, properties) )
 	{
 		Err("missing properties for rule, expected `?`");
 		return False;
 	}
-	while ( TrySplit(properties, "?", property, properties) )
-	{
-		if ( TryAddRuleProperty(target, property) )
-		{
-			target.Filter[target.RuleCount] = filter;
-		}
-		else
-		{
-			Err("error in property `"$property$"`");
-			return False;
-		}
-	}
-	return True;
-}
 
-function private bool TryAddRuleProperty(MV_MapOverrides target, string property)
-{
-	local string key, K, value, keyUpper, package;
-    
-	if ( !TrySplit(property, "=", key, value) )
+	if ( !SplitOne(filter, "==", filterkey, filtervalue) ) 
 	{
-		Err("expected `=`");
-		return False;
+		target.MapFilter[target.MapFilterCount] = filter;
+		target.MapEffects[target.MapFilterCount++] = properties;
+		return True;
 	}
-	K = Caps(key);
-	if ( K == "SONG" )
-	{   
-		if ( !TrySplit(value, ".", package, value) )
-		{
-			Err("Song requires `Package.Name` format"); 
-		}
-		target.SongPackage[target.RuleCount] = package;
-		target.SongName[target.RuleCount] = value;
+
+	if ( filterkey ~= "Song" ) 
+	{
+		target.SongFilter[target.SongFilterCount] = filtervalue;
+		target.SongEffects[target.SongFilterCount++] = properties;
+		return True;
 	}
 	else 
 	{
-		Err("unknown property key `"$key$"`");
+		Err("unknown filter key in `"$filter$"`");
+		return False;
 	}
-	return True;
-}
-
-function private ResetRuleIndex(MV_MapOverrides target, int i)
-{
-	target.Filter[i] = "";
-	target.SongName[i] = "";
-	target.SongPackage[i] = "";
-}
-
-defaultproperties
-{
 }

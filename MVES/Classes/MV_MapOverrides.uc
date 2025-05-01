@@ -1,64 +1,51 @@
 class MV_MapOverrides expands MV_Util;
 
+const FilterLimit = 256;
 
-const RuleMaxCount = 1024;
-var int RuleCount;
-var string Filter[1024]; 
-var string FilterBySong[1024];
-var string SongPackage[1024];
-var string SongName[1024];
+var int MapFilterCount;
+var string MapFilter[256];
+var string MapEffects[256];
 
+var int SongFilterCount;
+var string SongFilter[256];
+var string SongEffects[256];
 
-function ApplyOverrides(MV_Result result)
+function private ApplyOverrides(MV_Result result)
 {
 	local int i;
-    
-	for ( i = 0; i < RuleCount; i++ )
-	{
-		if ( RuleMatches(result, i) )
-		{
-			RuleApply(result, i);
-		}
-	}
+
+	for ( i = 0; i < MapFilterCount; i+=1 )
+		if ( result.Map ~= MapFilter[i] )
+			ApplyEffects(result, MapEffects[i]);
+	
+	for ( i = 0; i < SongFilterCount; i+=1 )
+		if ( result.OriginalSong ~= SongFilter[i] )
+			ApplyEffects(result, SongEffects[i]);
 }
 
-function private bool RuleMatches(MV_Result result, int i)
+function private ApplyEffects(MV_Result result, string effects)
 {
-	local string filterValue, filterBy, filterByCaps;
+	local string kv,key,value,package,obj;
 
-	filterValue = Filter[i];
-
-	if ( InStr(filterValue, "==") >= 0 && class'MV_Parser'.static.TrySplit(filterValue, "==", filterBy, filterValue) )
+	while ( class'MV_Parser'.static.Tokenize(effects, "?", kv) )
 	{
-		filterByCaps = Caps(filterBy);
-		if ( filterByCaps == "SONG" )
+		if ( !class'MV_Parser'.static.SplitOne(kv, "=", key, value) )
 		{
-			if ( Caps(Result.OriginalSong) == Caps(filterValue) )
+			Err("expected `=` inside `"$kv$"`");
+			continue;
+		}
+
+		if ( key ~= "Song" )
+		{   
+			if ( class'MV_Parser'.static.SplitOne(value, ".", package, obj) )
 			{
-				return True;
+				result.Song = package$"."$obj;
+				result.AddPackage(package);
 			}
+			else 
+				Err("in `"$value$"` Song requires `Package.Name` format");
 		}
 		else 
-		{
-			Err("Cannot filter by `"$filterBy$"`");
-		}
+			Err("unknown property key `"$key$"` in `"$kv$"`");
 	}
-	else if (Caps(Result.Map) == Caps(filterValue))
-	{
-		return True;
-	}
-	return False;
-}
-
-function private RuleApply(MV_Result result, int i)
-{
-	if ( SongName[i] != "" )
-	{
-		result.Song = SongPackage[i]$"."$SongName[i];
-		result.AddPackage(SongPackage[i]);
-	}
-}
-
-defaultproperties
-{
 }
