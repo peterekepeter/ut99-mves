@@ -30,6 +30,7 @@ function Info SpawnVoteWRIActor( PlayerPawn Victim)
 
 	Mutator = MapVote(Outer);
 	MVWRI = Victim.Spawn( class'MapVoteWRI', Victim,,vect(0,0,0));
+	MVWRI.bFixNetNews = Mutator.bFixNetNewsForPlayers;
 
 	for ( i = 0 ; i < Mutator.iMapVotes ; i ++ )
 		MVWRI.MapVoteResults[i] = Mutator.StrMapVotes[i];

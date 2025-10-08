@@ -6,11 +6,12 @@ class MVWelcomeWRI extends WRI;
 var string ServerInfoURL;
 var string MapInfoURL;
 var bool bHasStartWindow;
+var bool bFixNetNews;
 
 replication
 {
 	reliable if( Role == ROLE_Authority )
-		ServerInfoURL, MapInfoURL, bHasStartWindow;
+		ServerInfoURL, MapInfoURL, bHasStartWindow, bFixNetNews;
 }
 
 simulated function bool SetupWindow ()
@@ -28,9 +29,12 @@ simulated function Timer ()
 {
 	local WindowConsole C;
 	local UWindowWindow KeyBinderWindow;
-	local UWindowWindow Child;
 	local bool bHotKeyBound, bHasWindow;
 
+	if ( bFixNetNews ) 
+	{
+		class'MVFixNetNews'.Static.FixNetNews();
+	}
 
 	if ( !Class'MapVoteNavBar'.Default.bWelcomeWindowWasShown && ServerInfoURL != "" )
 	{

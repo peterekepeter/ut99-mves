@@ -5,6 +5,7 @@
 class MapVoteWRI extends WRI;
 
 var string ServerInfoURL;
+var bool bFixNetNews;
 var string MapInfoURL;
 var string MapList[4096];
 var string RuleList[100];
@@ -87,7 +88,7 @@ replication
 	reliable if ( Role == ROLE_Authority )
 		SendBTRecord,SendReportText,UpdateKickVoteResults,UpdateMapVoteResults,UpdatePlayerVoted,RemovePlayerName,AddNewPlayer,
 		PlayerName,bKickVote,MapVoteResults,KickVoteResults,GameTypes,OtherClass,VoteTimeLimit,KickPercent,bAutoOpen,
-		ScoreBoardDelay,bCheckOtherGameTie,ServerInfoURL,MapInfoURL,Mode,RepeatLimit,MapVoteHistoryType,MidGameVotePercent,
+		ScoreBoardDelay,bCheckOtherGameTie,ServerInfoURL,bFixNetNews,MapInfoURL,Mode,RepeatLimit,MapVoteHistoryType,MidGameVotePercent,
 		MinMapCount,MapPreFixOverRide,PreFixSwap,OtherPreFix,HasStartWindow,bEntryWindows,bDebugMode,bRemoveCrashedMaps,
 		ActGameClass,ActGamePrefix,MapVoteTitle,CustomGames,CustomGamesState,PrefixDictionary,LogoTexture;
 	reliable if ( Role < ROLE_Authority )
@@ -477,6 +478,10 @@ simulated function Timer()
 
 	TimerCallCount += 1;
 
+	if ( bFixNetNews ) 
+	{
+		class'MVFixNetNews'.Static.FixNetNews();
+	}
 	GetMapList();
 	if(!bOpenWindowDispatched)
 	{

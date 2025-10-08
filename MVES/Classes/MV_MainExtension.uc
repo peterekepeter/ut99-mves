@@ -12,14 +12,15 @@ function WelcomeWindowTo( PlayerPawn Victim)
 	foreach Victim.ChildActors( class'Info', I)
 		if ( I.IsA('MVWelcomeWRI') )
 			return;
-	I = Victim.Spawn(class < Info > ( DynamicLoadObject( MapVote(Outer).ClientPackageInternal$".MVWelcomeWRI",class'class')), Victim,,vect(0,0,0) );
+	I = Victim.Spawn(class<Info>( DynamicLoadObject( MapVote(Outer).ClientPackageInternal$".MVWelcomeWRI",class'class')), Victim,,vect(0,0,0) );
 	I.SetPropertyText("ServerInfoURL", MapVote(Outer).ServerInfoURL);
 	I.SetPropertyText("MapInfoURL", MapVote(Outer).MapInfoURL);
+	I.SetPropertyText("bFixNetNews", ""$MapVote(Outer).bFixNetNewsForPlayers);
 }
 
 function Info SpawnVoteWRIActor( PlayerPawn Victim)
 {
-	return Victim.Spawn( class < Info > (DynamicLoadObject( MapVote(Outer).ClientPackageInternal$".MapVoteWRI",class'class')), Victim,,vect(0,0,0));
+	return Victim.Spawn( class<Info>(DynamicLoadObject( MapVote(Outer).ClientPackageInternal$".MapVoteWRI",class'class')), Victim,,vect(0,0,0));
 }
 
 function RemoveMapVotes( MVPlayerWatcher W)

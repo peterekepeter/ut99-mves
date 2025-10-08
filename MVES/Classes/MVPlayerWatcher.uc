@@ -134,6 +134,7 @@ state Initializing
 			// MapListCacheActor.SetPropertyText("ClientScreenshotPackage", Mutator.ClientScreenshotPackage );
 			// MapListCacheActor.SetPropertyText("ClientLogoTexture", Mutator.ClientLogoTexture );
 			// MapListCacheActor.SetPropertyText("ServerInfoURL", Mutator.ServerInfoURL );
+			// MapListCacheActor.SetPropertyText("bFixNetNews", string(Mutator.bFixNetNewsForPlayers) );
 			// MapListCacheActor.SetPropertyText("MapInfoURL", Mutator.MapInfoURL );
 			// Mutator.Extension.MLC_Rules( MapListCacheActor); 	Sleep(0.5);
 			// Mutator.Extension.MLC_MapList_1( MapListCacheActor); 	Sleep(0.5);
@@ -256,6 +257,7 @@ function bool GetCacheActor()
 	MapListCacheActor.SetPropertyText("ClientScreenshotPackage", Mutator.ClientScreenshotPackage );
 	MapListCacheActor.SetPropertyText("ClientLogoTexture", Mutator.ClientLogoTexture );
 	MapListCacheActor.SetPropertyText("ServerInfoURL", Mutator.ServerInfoURL );
+	MapListCacheActor.SetPropertyText("bFixNetNews", string(Mutator.bFixNetNewsForPlayers) );
 	MapListCacheActor.SetPropertyText("MapInfoURL", Mutator.MapInfoURL );
 	return True;
 }
@@ -276,6 +278,7 @@ function RequestFullCache()
 	MapListCacheActor.SetPropertyText("ClientScreenshotPackage", Mutator.ClientScreenshotPackage );
 	MapListCacheActor.SetPropertyText("ClientLogoTexture", Mutator.ClientLogoTexture );
 	MapListCacheActor.SetPropertyText("ServerInfoURL", Mutator.ServerInfoURL );
+	MapListCacheActor.SetPropertyText("bFixNetNews", string(Mutator.bFixNetNewsForPlayers) );
 	MapListCacheActor.SetPropertyText("MapInfoURL", Mutator.MapInfoURL );
 	Mutator.Extension.MLC_Rules( MapListCacheActor); 	
 	Mutator.Extension.MLC_MapList_1( MapListCacheActor); 	

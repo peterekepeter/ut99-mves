@@ -48,6 +48,7 @@ var() config bool bEnableMapOverrides;
 var() config bool bEnableMapTags;
 var() config bool bAutoSetGameName;
 var() config bool bFixMutatorsQueryLagSpikes;
+var() config bool bFixNetNewsForPlayers;
 
 var() config bool bOverrideServerPackages;
 var() config bool bResetServerPackages;
@@ -1898,6 +1899,7 @@ defaultproperties
 	bAutoSetGameName=True
 	bSortAndDeduplicateMaps=True
 	bFixMutatorsQueryLagSpikes=True
+	bFixNetNewsForPlayers=True
 	VoteTimeLimit=60
 	DefaultMap="DM-Deck16]["
 	bSwitchToRandomMapOnIdle=True
