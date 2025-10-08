@@ -230,12 +230,9 @@ event PostBeginPlay()
 	local bool bGotoSuccess;
 	local bool bNeedToRestorePackages, bNeedToRestoreMap;
 
-	Log("[MVE] PostBeginPlay "$Self);
-
 	bRunning = !IsOtherInstanceRunning();
 	if ( !bRunning ) 
 	{
-		Log("[MVE] Removing instance "$Self);
 		Destroy();
 		return;
 	}
@@ -289,6 +286,10 @@ event PostBeginPlay()
 	if ( bEnableHTTPMapList && (Level.NetMode != NM_Standalone) )
 		Extension.SetupWebApp(MapList);
 	RegisterMessageMutator();
+
+	// init player detector
+	PlayerDetector = Spawn(class'MV_PlayerDetector');
+	PlayerDetector.Initialize(Self);
 	
 	if ( IsBackgroundMode() )
 	{
@@ -497,9 +498,6 @@ event PostBeginPlay()
 		bResetServerPackages = False;
 		SaveConfig(); // initially populates updates MVE_Config with MainServerPackages
 	}
-	// init player detector
-	PlayerDetector = Spawn(class'MV_PlayerDetector');
-	PlayerDetector.Initialize(Self);
 
 	// finally done!
 	Log("[MVE] Finished loading map: `"$TravelMap$"` idx: "$TravelInfo.TravelIdx$" mode: "$CurrentMode);
@@ -516,7 +514,6 @@ function bool IsOtherInstanceRunning()
 	{
 		if ( MV.bRunning )
 			bDetected = True;
-		Log("[MVE] INSTANCE "$MV$" isself "$(MV == Self));
 	}
 
 	return bDetected;
@@ -526,14 +523,11 @@ function bool IsBackgroundMode()
 {
 	local string url;
 	url = Caps(Level.GetLocalURL());
-	Log("[MVE] Url is: `"$url$"`");
 	if ( InStr(url, Caps("Mutator="$Self.Class)) >= 0
 		|| InStr(url, Caps(","$Self.Class)) >= 0 ) 
 	{
-		Log("[MVE] Found in URL");
 		return False;
 	}
-	Log("[MVE] NOT Found in URL, self is: `"$Self.Class$"`");
 	return True;
 }
 
