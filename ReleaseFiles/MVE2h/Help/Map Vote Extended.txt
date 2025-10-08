@@ -15,7 +15,7 @@ Quickstart
 
 2. Add the client package to ServerPackages inside UnrealTournament.ini:
 
-    ServerPackages=MVE2h
+    ServerPackages=MVE2dev
 
 3. Start your server with mapvote enabled:
 
@@ -42,7 +42,7 @@ Troubleshooting
     not see this log then the server component of mapvote did not start. Check 
     your server startup script and make sure it contains `?Mutator=MVES.MapVote`
 
-    B. Check that ServerPackages from UnrealTournament.ini contains MVE2h.
+    B. Check that ServerPackages from UnrealTournament.ini contains MVE2dev.
     This package contains the vote window. If it's missing then clients will 
     not download and are not able to display the mapvote window in game.
 
@@ -155,13 +155,13 @@ Advanced Installation
 =====================
 
 - If bOverrideServerPackages=True then MapVote will manage ServerPackages for
-you and will automatically add the user interface package MVE2h to ServerPackages
+you and will automatically add the user interface package MVE2dev to ServerPackages
 By default bOverrideServerPackages=True but if you have set 
 bOverrideServerPackages=False you will need to manually add the client package 
 yourself to ServerPackages:
 
 [Engine.GameEngine] 
-ServerPackages=MVE2h
+ServerPackages=MVE2dev
 
 
 - MapVote can be installed both in mutator or server actor mode. This will 

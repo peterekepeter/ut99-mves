@@ -32,9 +32,9 @@ function TestWrappedPackages()
 	Describe("MV_Result accepts packages wrapped in paren");
 	s.AddPackages("(\"SoldierSkins\",\"CommandoSkins\")");
 	AssertEquals(s.GetPackagesStringList(), "SoldierSkins,CommandoSkins", "can get string list");
-	s.AddPackages("(\"MVE2h\",\"CommandoSkins\")");
-	AssertEquals(s.GetPackagesStringList(), "SoldierSkins,CommandoSkins,MVE2h", "appends additional");
-	AssertEquals(s.GetWrappedPackages(), "(\"SoldierSkins\",\"CommandoSkins\",\"MVE2h\")", "can wrap packages");
+	s.AddPackages("(\"MVE2dev\",\"CommandoSkins\")");
+	AssertEquals(s.GetPackagesStringList(), "SoldierSkins,CommandoSkins,MVE2dev", "appends additional");
+	AssertEquals(s.GetWrappedPackages(), "(\"SoldierSkins\",\"CommandoSkins\",\"MVE2dev\")", "can wrap packages");
 }
 
 function TestMapLoading()

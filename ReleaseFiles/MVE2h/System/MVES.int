@@ -1,3 +1,3 @@
 [Public]
-Object=(Name=MVES.MapVote,Class=Class,MetaClass=Engine.Mutator,Description="MapVote MVE2h")
-Preferences=(Caption="MapVote MVE2h",Parent="Advanced Options",Class=MVES.MapVote,Immediate=True)
+Object=(Name=MVES.MapVote,Class=Class,MetaClass=Engine.Mutator,Description="MapVote MVE2dev")
+Preferences=(Caption="MapVote MVE2dev",Parent="Advanced Options",Class=MVES.MapVote,Immediate=True)
