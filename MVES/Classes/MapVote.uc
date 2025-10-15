@@ -3,6 +3,7 @@
 //================================================================================
 class MapVote expands Mutator config(MVE_Config);
 
+const MaxGametypes = 100;
 const ClientPackageDeprecatedValue = "automatic (will be removed)";
 const ClientPackageInternal = "MVE2dev";
 
@@ -829,7 +830,13 @@ function GenerateMapList(bool bFullscan)
 
 	if ( bReloadConfigDuringReload )
 	{
-		Log("[MVE] Reload config result: "@ConsoleCommand("RELOADCFG"));
+		Log("[MVE] Reload config result: `"@ConsoleCommand("RELOADCFG")$"`");
+	}
+
+	if ( IsMapvoteEmpty() )
+	{
+		Log("[MVE] All gametypes are empty, populating with a basic starter setup");
+		GenerateBasicMapvoteConfig();
 	}
 
 	if ( MapList == None )
@@ -1426,9 +1433,82 @@ function CountMapVotes( optional bool bForceTravel)
 
 }
 
+function GenerateBasicMapvoteConfig() 
+{
+	local int i,j,k,l;
+	local string NextG, NextGD, NextM, NextMJ, MutatorName;
+	local Class<TournamentGameInfo> CLS;
+	
+	// TODO enumerate types first then populate (better efficiency)
+	// TODO fallback if int files are missing
+	
+	i = 0;
+	do
+	{
+		j = 0;
+		GetNextIntDesc("TournamentGameInfo", i++, NextG, NextGD);
+		if ( NextG == "" ) 
+		{
+			continue;
+		}
+		CLS = Class<TournamentGameInfo>(DynamicLoadObject(NextG, class'Class', True));
+		if ( CLS == None ) 
+		{
+			continue;
+		}
+		MapFilters[i] = CLS.Default.MapPrefix$"list "$CLS.Default.MapPrefix$"-*";
+		do 
+		{
+			GetNextIntDesc("Mutator", j++, NextM, NextMJ);
+
+			l = InStr(NextMJ, ",");
+			if( l == -1 )
+			{
+				MutatorName = NextMJ;
+				// HelpText = "";
+			}
+			else
+			{
+				MutatorName = Left(NextMJ, l);
+				// HelpText = Mid(NextMJ, l + 1);
+			}
+			CustomGame[k].bEnabled = True;
+			CustomGame[k].GameClass = NextG;
+			CustomGame[k].GameName = CLS.Default.GameName;
+			CustomGame[k].RuleName = MutatorName;
+			CustomGame[k].MutatorList = NextM;
+			CustomGame[k].FilterCode = CLS.Default.MapPrefix$"list";
+			k++;
+			if ( k > MaxGametypes ) 
+			{
+				return;
+			}
+		}
+		until (NextM == "" || j >= 9)
+	}
+	until (NextG == "");
+
+}
+
 //***********************************
 //************** ACCESSORS *********
 //***********************************
+
+function bool IsMapvoteEmpty() 
+{
+	local int i;
+	
+	for ( i = 0; i < MaxGametypes; i+=1 )
+		if ( !IsGameEmpty(i) )
+			return False;
+		
+	return True;
+}
+
+function bool IsGameEmpty(int Idx)
+{
+	return CustomGame[Idx] == EmptyGame;
+}
 
 final function string GetMapFilter( int Idx)
 {
@@ -1893,8 +1973,11 @@ static function Nfo(coerce string message)
 	class'MV_Util'.static.Nfo(message);
 }
 
+// TODO investigate why is there save config
+// when by default bReloadOnNextRun is False
 defaultproperties
 {
+	bReloadOnNextRun=True
 	bReloadConfigDuringReload=True
 	bAutoSetGameName=True
 	bSortAndDeduplicateMaps=True
