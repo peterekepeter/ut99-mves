@@ -1430,64 +1430,101 @@ function CountMapVotes( optional bool bForceTravel)
 
 		Extension.UpdateMapVotes( WatcherList);
 	}
-
 }
 
 function GenerateBasicMapvoteConfig() 
 {
-	local int i,j,k,l;
-	local string NextG, NextGD, NextM, NextMJ, MutatorName;
-	local Class<TournamentGameInfo> CLS;
-	
-	// TODO enumerate types first then populate (better efficiency)
-	// TODO fallback if int files are missing
-	
-	i = 0;
-	do
+	local int i, j, l, totalCount, gameCount, ruleCount, filterCount;
+	local string next, desc;
+	local Class<TournamentGameInfo> GameClasses[10];
+	local string RuleName[10], RuleMutator[10], GameClassName[10];
+	local string currentFilter, addedFilterSet;
+
+	while ( gameCount < 10 )
 	{
-		j = 0;
-		GetNextIntDesc("TournamentGameInfo", i++, NextG, NextGD);
-		if ( NextG == "" ) 
-		{
-			continue;
-		}
-		CLS = Class<TournamentGameInfo>(DynamicLoadObject(NextG, class'Class', True));
-		if ( CLS == None ) 
-		{
-			continue;
-		}
-		MapFilters[i] = CLS.Default.MapPrefix$"list "$CLS.Default.MapPrefix$"-*";
-		do 
-		{
-			GetNextIntDesc("Mutator", j++, NextM, NextMJ);
+		// enumerate gametypes
+		GetNextIntDesc("TournamentGameInfo", i++, next, desc);
 
-			l = InStr(NextMJ, ",");
-			if( l == -1 )
-			{
-				MutatorName = NextMJ;
-				// HelpText = "";
-			}
-			else
-			{
-				MutatorName = Left(NextMJ, l);
-				// HelpText = Mid(NextMJ, l + 1);
-			}
-			CustomGame[k].bEnabled = True;
-			CustomGame[k].GameClass = NextG;
-			CustomGame[k].GameName = CLS.Default.GameName;
-			CustomGame[k].RuleName = MutatorName;
-			CustomGame[k].MutatorList = NextM;
-			CustomGame[k].FilterCode = CLS.Default.MapPrefix$"list";
-			k++;
-			if ( k > MaxGametypes ) 
-			{
-				return;
-			}
-		}
-		until (NextM == "" || j >= 9)
+		if ( next == "" )
+			break;
+	
+		GameClasses[gameCount] = Class<TournamentGameInfo>(
+			DynamicLoadObject(next, class'Class', True)
+		);
+		if ( GameClasses[gameCount] == None )
+			continue;
+		
+		GameClassName[gameCount] = next;
+		gameCount+=1;
 	}
-	until (NextG == "");
 
+	if ( gameCount <= 0 )
+	{
+		// user deleted all int files, this is a fallback
+		GameClasses[0] = class'DeathMatchPlus';
+		GameClassName[0] = "Botpack.DeathMatchPlus";
+		gameCount += 1;
+	}
+	
+	while ( ruleCount < 10 ) 
+	{
+		// enumerate mutators
+		GetNextIntDesc("Mutator", j++, next, desc);
+		
+		if ( next == "" )
+			break;
+
+		l = InStr(desc, ",");
+		if( l == -1 )
+		{
+			RuleName[ruleCount] = desc;
+			// HelpText = "";
+		}
+		else
+		{
+			RuleName[ruleCount] = Left(desc, l);
+			// HelpText = Mid(NextDescription, l + 1);
+		}
+		RuleMutator[ruleCount] = next;
+		ruleCount += 1;
+	}
+
+	if ( ruleCount <= 0 ) 
+	{
+		// user deleted int files fallback
+		RuleName[0] = "Classic";
+		RuleMutator[0] = "";
+		ruleCount = 1;
+	}
+
+	for ( i = 0; i < gameCount; i+=1 )
+	{
+		// setup filter for gametype
+		currentFilter = GameClasses[i].Default.MapPrefix$"list";
+
+		if ( InStr(addedFilterSet, currentFilter) == -1 )
+		{
+			addedFilterSet = addedFilterSet$";"$currentFilter;
+			MapFilters[filterCount++] = currentFilter@GameClasses[i].Default.MapPrefix$"-*";
+		}
+
+		// append gametypes
+		for ( j = 0; j < ruleCount; j+=1 ) 
+		{
+			CustomGame[totalCount].bEnabled = True;
+			CustomGame[totalCount].VotePriority = 1.0;
+			CustomGame[totalCount].GameClass = GameClassName[i];
+			CustomGame[totalCount].GameName = GameClasses[i].Default.GameName;
+			CustomGame[totalCount].RuleName = RuleName[j];
+			CustomGame[totalCount].MutatorList = RuleMutator[j];
+			CustomGame[totalCount].FilterCode = currentFilter;
+			
+			totalCount+=1;
+
+			if ( totalCount > MaxGametypes ) 
+				return;
+		}
+	}
 }
 
 //***********************************
