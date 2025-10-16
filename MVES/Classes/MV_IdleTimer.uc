@@ -148,5 +148,5 @@ static function string GetRelativeTime(int m)
 
 function SaveIdleState()
 {
-	MapVote.SaveIdleState(bIsIdle, EmptyMinutes);
+	MapVote.TravelInfo.SaveIdleState(bIsIdle, EmptyMinutes);
 }

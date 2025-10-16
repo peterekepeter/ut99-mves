@@ -225,7 +225,7 @@ event PostBeginPlay()
 	local string Cmd, NextParm;
 	local Actor A;
 	local class<Actor> ActorClass;
-	local int MapIdx, i;
+	local int MapIdx, i, TravelIdx;
 	local string LogoTexturePackage;
 	local string TravelMap;
 	local string CurrentPackages;
@@ -252,30 +252,6 @@ event PostBeginPlay()
 	}
 
 	LoadAliases();
-	EvalCustomGame(TravelInfo.TravelIdx);
-
-	if ( int(ConsoleCommand("get ini:Engine.Engine.GameEngine XC_Version")) >= 11 ) //Only XC_GameEngine contains this variable
-	{
-		bXCGE_DynLoader = True;
-		default.bXCGE_DynLoader = True; //So we get to see if it worked from clients!
-		AddToPackageMap(ClientPackageInternal);
-		if ( ClientScreenshotPackage != "" ) 
-		{
-			AddToPackageMap(ClientScreenshotPackage);
-		}
-		if ( ClientLogoTexture != "" )
-		{
-			LogoTexturePackage = GetPackageNameFromString(ClientLogoTexture);
-			if ( LogoTexturePackage != "" )
-			{
-				AddToPackageMap(LogoTexturePackage);
-			}
-			else 
-			{
-				Err("Invalid value for LogoTexturePackage, expected Package.Texture");
-			}
-		}
-	}
 	MapList = new class'MV_MapList';
 	MapList.Mutator = Self;
 	MapList.Reader = Spawn(class'FsMapsReader');
@@ -299,6 +275,32 @@ event PostBeginPlay()
 		Log("[MVE] Running in background mode until next map is voted");
 		CheckClientPackageInstalled();
 		return;
+	}
+
+	TravelIdx = TravelInfo.GetTravelIdx(Self);
+	EvalCustomGame(TravelIdx);
+
+	if ( int(ConsoleCommand("get ini:Engine.Engine.GameEngine XC_Version")) >= 11 ) //Only XC_GameEngine contains this variable
+	{
+		bXCGE_DynLoader = True;
+		Default.bXCGE_DynLoader = True; //So we get to see if it worked from clients!
+		AddToPackageMap(ClientPackageInternal);
+		if ( ClientScreenshotPackage != "" ) 
+		{
+			AddToPackageMap(ClientScreenshotPackage);
+		}
+		if ( ClientLogoTexture != "" )
+		{
+			LogoTexturePackage = GetPackageNameFromString(ClientLogoTexture);
+			if ( LogoTexturePackage != "" )
+			{
+				AddToPackageMap(LogoTexturePackage);
+			}
+			else 
+			{
+				Err("Invalid value for LogoTexturePackage, expected Package.Texture");
+			}
+		}
 	}
 
 	if ( !bOverrideServerPackages )
@@ -379,8 +381,8 @@ event PostBeginPlay()
 	if ( (bNeedToRestorePackages || bNeedToRestoreMap) && TravelInfo.RestoreTryCount < 3 ) 
 	{
 		TravelInfo.RestoreTryCount += 1;
-		Nfo("Goto `"$TravelMap$":"$TravelInfo.TravelIdx$"`` TryCount: `"$TravelInfo.RestoreTryCount$"`");
-		bGotoSuccess = GotoMap(TravelMap$":"$TravelInfo.TravelIdx, True);
+		Nfo("Goto `"$TravelMap$":"$TravelIdx$"`` TryCount: `"$TravelInfo.RestoreTryCount$"`");
+		bGotoSuccess = GotoMap(TravelMap$":"$TravelIdx, True);
 		if ( bGotoSuccess )
 		{
 			Level.NextSwitchCountdown = 0; // makes the switch really fast
@@ -473,7 +475,7 @@ event PostBeginPlay()
 			NextParm = MapList.MapGames( MapIdx);
 		if ( (string(Level.Game.Class) ~= ParseAliases(CustomGame[DefaultGameTypeIdx].GameClass)) && (InStr(NextParm, MapList.TwoDigits(DefaultGameTypeIdx)) >= 0) ) //Map is in default game mode list and matches gametype
 		{
-			TravelInfo.TravelIdx = DefaultGameTypeIdx;
+			TravelInfo.SetTravelIdx(Self, DefaultGameTypeIdx);
 			goto DEFAULT_MODE;
 		}
  		// Log( Level.Game.Class @ CustomGame[DefaultGameTypeIdx].GameClass @ MapIdx @ NextParm @ MapList.TwoDigits(DefaultGameTypeIdx));
@@ -488,7 +490,7 @@ event PostBeginPlay()
 		{
 			Level.Game.GameName = "Crashed"@Level.Game.GameName;
 		}
-		TravelInfo.TravelIdx = -1;
+		TravelInfo.SetTravelIdx(Self, -1);
 		TravelInfo.TravelString = "";
 	}
       
@@ -498,11 +500,12 @@ event PostBeginPlay()
 	{
 		MainServerPackages = GetEngineIniServerPackages();
 		bResetServerPackages = False;
+		Log("SAVE CONFIG! 503 pgb");
 		SaveConfig(); // initially populates updates MVE_Config with MainServerPackages
 	}
 
 	// finally done!
-	Log("[MVE] Finished loading map: `"$TravelMap$"` idx: "$TravelInfo.TravelIdx$" mode: "$CurrentMode);
+	Log("[MVE] Finished loading map: `"$TravelMap$"` idx: "$TravelIdx$" mode: "$CurrentMode);
 }
 
 function bool IsOtherInstanceRunning() 
@@ -740,13 +743,6 @@ function bool CheckForTie ()
 	}
 }
 
-function SaveIdleState(bool isIdle, int minutes) 
-{
-	TravelInfo.EmptyMinutes = minutes;
-	TravelInfo.bIsIdle = isIdle;
-	TravelInfo.SaveConfig();
-}
-
 function bool SwitchToDefaultMap()
 {
 	local string TravelMap;
@@ -859,11 +855,14 @@ function MapChangeIssued()
 {
 	local string aStr;
 	local string notValidReason;
+	local int TravelIdx;
+
+	TravelIdx = TravelInfo.GetTravelIdx(Self);
 
 	bMapChangeIssued = True;
 	Log("[MVE] Map change issued with URL: "$Level.NextURL, 'MapVote');
 	aStr = Extension.ByDelimiter( Level.NextURL, "?");
-	aStr = Extension.ByDelimiter( aStr, "#" )$":"$string(TravelInfo.TravelIdx) ; //Map name plus current IDX
+	aStr = Extension.ByDelimiter( aStr, "#" )$":"$string(TravelIdx) ; //Map name plus current IDX
 	while ( InStr( aStr, " ") == 0 )
 	{
 		aStr = Mid( aStr, 1);
@@ -872,11 +871,11 @@ function MapChangeIssued()
 	{
 		if ( Level.bNextItems )
 		{
-			BroadcastMessage( Extension.ByDelimiter( aStr, ":")$GameRuleCombo(TravelInfo.TravelIdx)@"has been selected as next map.", True);
+			BroadcastMessage( Extension.ByDelimiter( aStr, ":")$GameRuleCombo(TravelIdx)@"has been selected as next map.", True);
 		}
 		else 
 		{			
-			BroadcastMessage( Extension.ByDelimiter( aStr, ":")$GameRuleCombo(TravelInfo.TravelIdx)@"has been forced.", True);
+			BroadcastMessage( Extension.ByDelimiter( aStr, ":")$GameRuleCombo(TravelIdx)@"has been forced.", True);
 		}
 		TravelInfo.TravelString = Level.NextURL;
 	}
@@ -884,6 +883,7 @@ function MapChangeIssued()
 	{
 		Log("[MVE] Map code "$aStr$" not found in map list: "$notValidReason, 'MapVote');
 	}
+	// TODO some of these save configs might not be necessary
 	TravelInfo.SaveConfig();
 }
 
@@ -1087,7 +1087,9 @@ function CleanRules()
 	iGames = i;
 
 	if ( bSave )
+	{
 		SaveConfig();
+	}
 }
 
 function CountFilters()
@@ -1229,7 +1231,6 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 	{
 		Nfo("Admin force switch to "$prettyMapName);
 		GotoMap(MapString,True);
-		SaveConfig();
 		BroadcastMessage("Server Admin has force a map switch to "$prettyMapName, True);
 		return;
 	}
@@ -1739,7 +1740,7 @@ final function bool SetupTravelString( string mapStringWithIdx )
 		$"?Mutator="$Self.Class
 		$Result.GetUrlParametersString()
 	);
-	TravelInfo.TravelIdx = Result.GameIndex;
+	TravelInfo.SetTravelIdx(Self, Result.GameIndex);
 	Nfo("-> TravelString: `"$TravelInfo.TravelString$"`");
 	Nfo("-> GameIdx: `"$TravelInfo.TravelIdx$"`");
 		
