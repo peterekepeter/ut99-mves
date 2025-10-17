@@ -411,7 +411,7 @@ function Created ()
 
 function RestoreSelection()
 {
-	local int ruleList, mapList, i;
+	local int ruleList, mapList;
 	local UWindowList item;
 
 	ruleList = -1;
@@ -696,6 +696,7 @@ function SelectGameRuleListItem(UWindowDialogControl C)
 	if ( UMenuRuleVoteList(RuleListBox(C).SelectedItem).MapName != ClientConf.SelectedGameRule )
 	{
 		ClientConf.SetSelectedGameRule(UMenuRuleVoteList(RuleListBox(C).SelectedItem).MapName);
+		RestoreSelection();
 		SaveClientConfigWithDebounce();
 	}
 }
@@ -741,6 +742,7 @@ function SelectGameModeListItem()
 	if ( UMenuGameModeVoteList(GMListBox.SelectedItem).MapName != ClientConf.SelectedGameMode )
 	{
 		ClientConf.SetSelectedGameMode(UMenuGameModeVoteList(GMListBox.SelectedItem).MapName);
+		RestoreSelection();
 		SaveClientConfigWithDebounce();
 	}
 }
