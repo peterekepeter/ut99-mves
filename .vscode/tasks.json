@@ -34,6 +34,12 @@
             "problemMatcher": []
         },
         {
+            "label": "watch client, build and run server",
+            "type": "shell",
+            "command": "nodemon -e uc -x \"ucx build MVE2dev MVES && ucx ucc server\"",
+            "problemMatcher": []
+        },
+        {
             "label": "watch test",
             "type": "shell",
             "command": "nodemon -e uc -x \"ucx build MVE2dev MVES TestMVE && ucx ucc TestMVE.TestAll\"",
