@@ -7,7 +7,7 @@ class MapVoteClientWindow extends UWindowPageWindow;
 #exec TEXTURE IMPORT FILE=TEXTURES\ListsBoxBackground.pcx MIPS=OFF
 
 const VOTE_WAIT = 0.625;
-const FEATURE_SEARCH = False;
+const FEATURE_SEARCH = True;
 
 var GameModeListBox GMListBox;
 var DummyListBox RListDummy;
@@ -77,85 +77,50 @@ var Color WhiteColor;
 var Color DeepBlueColor;
 var Color BlackColor;
 
+var int CurrentMapListIndex;
+
 var UWindowEditControl txtSearch;
 var UWindowSmallButton btnNext, btnPrev;
-var UMenuLabelControl lblSearch;
 
-var int SelectedSearchIndex;
-var float SearchOffset;
-var int TotalSearchItems;
-var string CurrentMapName;
-
-struct ST_MapvoteList
+function NextSearchItem(string txt, optional bool bPrev)
 {
-	var UMenuMapVoteList Item;
-	var byte Column;
-};
+	local int mapList, try;
+	local UMenuMapVoteList SearchOrigin, Current;
 
-var ST_MapvoteList SearchList[ArrayCount(RListBox)];
-
-function NextSearchItem(optional bool bPrev)
-{
-	if( SelectedSearchIndex > 0 )
+	mapList = CurrentMapListIndex;
+	SearchOrigin = UMenuMapVoteList(MapListBox[mapList].SelectedItem);
+	Current = SearchOrigin;
+	txt = Caps(txt);
+	
+	do
 	{
-		if( bPrev )
-		{
-			SelectedSearchIndex--;
-			if( SelectedSearchIndex < 1 ) SelectedSearchIndex = TotalSearchItems;    
-		}
-		else
-		{       
-			SelectedSearchIndex++;    
-			if( SelectedSearchIndex > TotalSearchItems ) SelectedSearchIndex = 1; 
-		}    
-    
-		SelectMapFromSearch(SelectedSearchIndex);                   
-    //lbSelectedMap.SetText("Selected Map:" $ CurrentMapName);
-		lblSearch.SetText(SelectedSearchIndex$"/"$TotalSearchItems);
-	}
-  //else
-    //lbSelectedMap.SetText("");
-  
-	if( len(txtSearch.GetValue()) >= 3 ) 
-		lblSearch.SetText(SelectedSearchIndex$"/"$TotalSearchItems);
-	else
-		lblSearch.SetText("");
-}
+		if ( bPrev )
+			Current = UMenuMapVoteList(Current.Prev);
+		else 
+			Current = UMenuMapVoteList(Current.Next);
 
-function FindMap(string SearchText)
-{
-	local UMenuMapVoteList MapItem;
-	local int i;  
-
-	TotalSearchItems = 0;
-   
-	for( i = 0; i < ArrayCount(MapListBox); i++ )
-	{
-		for( MapItem = UMenuMapVoteList(MapListBox[i].Items); MapItem != None; MapItem = UMenuMapVoteList(MapItem.Next) )
+		if ( Current == None ) 
 		{
-			if( InStr( Caps(MapItem.MapName), Caps(SearchText) ) != -1 && TotalSearchItems < ArrayCount(SearchList) )
+			Current = UMenuMapVoteList(MapListBox[mapList].Items);
+			if ( bPrev ) 
 			{
-				SearchList[++TotalSearchItems].Item = MapItem;
-				SearchList[TotalSearchItems].Column = i;
-				Log("matched "$MapItem$" "$TotalSearchItems$" col "$i);
+				Current = UMenuMapVoteList(Current.Last);
 			}
 		}
+		if ( InStr(Caps(Current.MapName), txt) != -1 ) 
+		{
+			MapListBox[mapList].SetSelectedItem(Current);
+			SelectMapListItem(MapListBox[mapList]);
+			break;
+		}
+		if ( try++ > 5000 ) 
+		{
+			Log("[MVE] Warning! Runaway seach loop!!!!");
+			break;		
+		}
 	}
-   
-	if( TotalSearchItems > 0 )
-		SelectMapFromSearch(1);
+	until(Current == SearchOrigin);
 }
-
-
-function SelectMapFromSearch(int Index)
-{
-	if( SearchList[Index].Item != None ) 
-	{
-		MapListBox[SearchList[Index].Column].SetSelectedItem(SearchList[Index].Item);     
-		CurrentMapName = SearchList[Index].Item.MapName;
-	}    
-}
-
 
 function MapVoteListBox GetMapVoteList(int Num)
 {
@@ -254,10 +219,6 @@ function Created ()
 		txtSearch.SetNumericOnly(False);
 		txtSearch.SetHistory(True);
 		txtSearch.SetMaxLength(150);
-		lblSearch = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',WinWidth - XL,TOP,60.0,20.0));
-		lblSearch.SetText("Search");
-		lblSearch.SetFont(0);
-		lblSearch.SetTextColor(TextColor);
 	}
 	
 	GMListBox = GameModeListBox(CreateControl(Class'GameModeListBox',10.0,26.0,MapListwidth,ListHeight / 2));
@@ -355,7 +316,7 @@ function Created ()
 	lblTitle.SetFont(1);
 	lblTitle.Align = TA_Center;
 	lblTitle.SetTextColor(TextColorTitle);
-	lblTitle3 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',30.0 + 2.5 * MapListwidth + PlayerListwidth,10.0,MapListwidth + 20,20.0));
+	lblTitle3 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',30.0 + 2.25 * MapListwidth + PlayerListwidth,10.0,MapListwidth * 0.5 + 20,20.0));
 	lblTitle3.SetFont(1);
 	lblTitle3.Align = TA_Center;
 	lblTitle3.SetTextColor(TextColorTitles);
@@ -443,6 +404,7 @@ function RestoreSelection()
 		break;
 	}
 	
+	CurrentMapListIndex = mapList;
 	if ( mapList < 0 || ClientConf.SelectedMap == "" ) return;
 	
 	for ( item = MapListBox[mapList].Items; item != None; item = item.Next )
@@ -579,10 +541,10 @@ function Notify (UWindowDialogControl C, byte E)
 			switch (C)
 			{
 				case btnNext:
-					NextSearchItem(False);
+					NextSearchItem(txtSearch.GetValue(), False);
 					break;
 				case btnPrev:
-					NextSearchItem(True);
+					NextSearchItem(txtSearch.GetValue(), True);
 					break;
 			case GMListBox:
 				SelectGameModeListItem();
@@ -643,7 +605,7 @@ function Notify (UWindowDialogControl C, byte E)
 			case txtMessage:
 				SayTxtMessage();
 				case txtSearch:
-					FindMap(txtSearch.GetValue());
+					NextSearchItem(txtSearch.GetValue());
 			break;
 		}
 		default:
@@ -674,6 +636,7 @@ function SelectGameRuleListItem(UWindowDialogControl C)
 	if ( UMenuRuleVoteList(RuleListBox(C).SelectedItem) == None )
 		return;
 	listNum = UMenuRuleVoteList(RuleListBox(C).SelectedItem).listNum;
+	CurrentMapListIndex = listNum;
 	MapVoteListDummy.WinWidth = 0.0;
 	MapVoteListDummy.WinHeight = 0.0;
 	MapVoteListDummy.Resized();
