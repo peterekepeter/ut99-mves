@@ -602,13 +602,16 @@ function Notify (UWindowDialogControl C, byte E)
 		case DE_EnterPressed:
 			switch(C)
 			{
-			case txtMessage:
-				SayTxtMessage();
+				case txtMessage:
+					SayTxtMessage();
+					break;
 				case txtSearch:
-					NextSearchItem(txtSearch.GetValue());
+					NextSearchItem(txtSearch.GetValue(), txtSearch.EditBox.bShiftDown);
+					break;
+			}
 			break;
-		}
 		default:
+			break;
 	}
 }
 
