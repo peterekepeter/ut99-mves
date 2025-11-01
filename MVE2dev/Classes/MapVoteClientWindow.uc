@@ -77,6 +77,7 @@ var Color WhiteColor;
 var Color DeepBlueColor;
 var Color BlackColor;
 
+var int CurrentRuleListIndex;
 var int CurrentMapListIndex;
 
 var UWindowEditControl txtSearch;
@@ -685,6 +686,7 @@ function SelectGameModeListItem()
 	if ( UMenuGameModeVoteList(GMListBox.SelectedItem) == None )
 		return;
 	listNum = UMenuGameModeVoteList(GMListBox.SelectedItem).listNum;
+	CurrentRuleListIndex = listNum;
 	RListDummy.WinWidth = 0.0;
 	RListDummy.WinHeight = 0.0;
 	RListDummy.Resized();
@@ -1043,6 +1045,36 @@ function Paint (Canvas C, float MouseX, float MouseY)
 
 function KeyDown (int Key, float X, float Y)
 {
+	local PlayerPawn P;
+
+	P = GetPlayerOwner();
+
+	if ( Key == P.EInputKey.IK_Right )
+	{
+		switch (ActiveWindow)
+		{
+			case GMListBox:
+				RListBox[CurrentRuleListIndex].ActivateWindow(0, False);
+				break;
+			case RListBox[CurrentRuleListIndex]:
+				MapListBox[CurrentMapListIndex].ActivateWindow(0, False);
+				break;
+		}
+	}
+
+	if ( Key == P.EInputKey.IK_Left )
+	{
+		switch (ActiveWindow)
+		{
+			case MapListBox[CurrentMapListIndex]:
+				RListBox[CurrentRuleListIndex].ActivateWindow(0, False);
+				break;
+			case RListBox[CurrentRuleListIndex]:
+				GMListBox.ActivateWindow(0, False);
+				break;
+		}
+	}
+
 	ParentWindow.KeyDown(Key,X,Y);
 }
 

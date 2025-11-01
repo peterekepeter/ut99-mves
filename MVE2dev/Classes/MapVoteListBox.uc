@@ -91,6 +91,7 @@ function KeyDown (int Key, float X, float Y)
 	P=GetPlayerOwner();
 	if(Key == P.EInputKey.IK_MouseWheelDown || Key == P.EInputKey.IK_Down)
 	{
+		if ( SelectedItem == None ) SelectedItem = UWindowListBoxItem(Items);
 		if ( (SelectedItem != None) && (SelectedItem.Next != None) )
 		{
 			SetSelectedItem(UWindowListBoxItem(SelectedItem.Next));
@@ -99,6 +100,7 @@ function KeyDown (int Key, float X, float Y)
 	}
 	if(Key == P.EInputKey.IK_MouseWheelUp || Key == P.EInputKey.IK_Up)
 	{
+		if ( SelectedItem == None ) SelectedItem = UWindowListBoxItem(Items.Last);
 		if ( (SelectedItem != None) && (SelectedItem.Prev != None) && (SelectedItem.Sentinel != SelectedItem.Prev) )
 		{
 			SetSelectedItem(UWindowListBoxItem(SelectedItem.Prev));
@@ -107,6 +109,7 @@ function KeyDown (int Key, float X, float Y)
 	}
 	if(Key == P.EInputKey.IK_PageDown)
 	{
+		if ( SelectedItem == None ) SelectedItem = UWindowListBoxItem(Items);
 		if ( SelectedItem != None )
 		{
 			ItemPointer=SelectedItem;
@@ -128,6 +131,7 @@ JL0149:
 	}
 	if(Key == P.EInputKey.IK_PageUp)
 	{
+		if ( SelectedItem == None ) SelectedItem = UWindowListBoxItem(Items.Last);
 		if ( SelectedItem != None )
 		{
 			ItemPointer=SelectedItem;
