@@ -8,6 +8,7 @@ var float VotePriority;
 var Color BXTC;
 var Color BXC;
 var MapVoteClientWindow CW;
+var bool bRequestingSearch;
 
 function Paint (Canvas C, float MouseX, float MouseY)
 {
@@ -211,6 +212,13 @@ function Find(string SearchText)
         J0x70:
         goto J0x10;
     }
+}
+
+function KeyType(int Key, float X, float Y)
+{
+	// TODO maybe there is a cleaner way to achieve this?
+	bRequestingSearch = True;
+	ParentWindow.KeyType(Key, X, Y);
 }
 
 defaultproperties

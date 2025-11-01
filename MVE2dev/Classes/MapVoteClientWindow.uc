@@ -540,64 +540,69 @@ function Notify (UWindowDialogControl C, byte E)
 		case DE_Click:
 			switch (C)
 			{
+				case txtSearch:
+					txtSearch.EditBox.bSelectOnFocus = True;
+					break;
+
 				case btnNext:
 					NextSearchItem(txtSearch.GetValue(), False);
 					break;
+
 				case btnPrev:
 					NextSearchItem(txtSearch.GetValue(), True);
 					break;
-			case GMListBox:
-				SelectGameModeListItem();
-			break;
+
+				case GMListBox:
+					SelectGameModeListItem();
+					break;
+						
+				case RuleListBox(C):
+					SelectGameRuleListItem(C);
+					break;
+						
+				case SendButton:
+					SayTxtMessage();
+					break;
+						
+				case VoteButton:
+					SubmitVote();
+					break;
+						
+				case CloseButton:
+					ParentWindow.ParentWindow.Close();
+					break;
+						
+				case MapVoteListBox(C):
+					SelectMapListItem(C);
+					break;
 					
-			case RuleListBox(C):
-				SelectGameRuleListItem(C);
-			break;
+				case lstMapStatus:
+					if ( MapStatusListItem(lstMapStatus.SelectedItem) == None ) return;
+					listNum = MapStatusListItem(lstMapStatus.SelectedItem).CGNum;
+					DeSelectAllOtherMapListBoxItems(MapListBox[0],0);
+					MapListBox[listNum].SelectMap(MapStatusListItem(lstMapStatus.SelectedItem).MapName);
+					SelectionTime = GetPlayerOwner().Level.TimeSeconds;
+					break;
+						
+				case KickVoteButton:
+					if ( PlayerVoteListItem(PlayerListBox.SelectedItem) == None )
+						return;
+					if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
+					{
+						GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE KICK "$PlayerVoteListItem(PlayerListBox.SelectedItem).PlayerName);
+						LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
+					}
+					break;
+						
+				case lstKickStatus:
 					
-			case SendButton:
-				SayTxtMessage();
-			break;
-					
-			case VoteButton:
-				SubmitVote();
-			break;
-					
-			case CloseButton:
-				ParentWindow.ParentWindow.Close();
-			break;
-					
-			case MapVoteListBox(C):
-				SelectMapListItem(C);
-			break;
-					
-			case lstMapStatus:
-				
-				if ( MapStatusListItem(lstMapStatus.SelectedItem) == None ) return;
-			listNum = MapStatusListItem(lstMapStatus.SelectedItem).CGNum;
-			DeSelectAllOtherMapListBoxItems(MapListBox[0],0);
-			MapListBox[listNum].SelectMap(MapStatusListItem(lstMapStatus.SelectedItem).MapName);
-			SelectionTime = GetPlayerOwner().Level.TimeSeconds;
-			break;
-					
-			case KickVoteButton:
-				if ( PlayerVoteListItem(PlayerListBox.SelectedItem) == None )
-				return;
-			if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
-			{
-				GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE KICK "$PlayerVoteListItem(PlayerListBox.SelectedItem).PlayerName);
-				LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
+					if ( KickStatusListItem(lstKickStatus.SelectedItem) == None )
+						return;
+					PlayerListBox.SelectPlayer(KickStatusListItem(lstKickStatus.SelectedItem).PlayerName);
+					break;
+				default:
 			}
 			break;
-					
-			case lstKickStatus:
-				
-				if ( KickStatusListItem(lstKickStatus.SelectedItem) == None )
-				return;
-			PlayerListBox.SelectPlayer(KickStatusListItem(lstKickStatus.SelectedItem).PlayerName);
-			break;
-			default:
-		}
-		break;
 			
 		case DE_EnterPressed:
 			switch(C)
@@ -1039,6 +1044,21 @@ function Paint (Canvas C, float MouseX, float MouseY)
 function KeyDown (int Key, float X, float Y)
 {
 	ParentWindow.KeyDown(Key,X,Y);
+}
+
+function KeyType(int Key, float X, float Y)
+{
+	// handle typing into map list as search
+	if ( MapListBox[CurrentMapListIndex].bRequestingSearch )
+	{
+		MapListBox[CurrentMapListIndex].bRequestingSearch = False;
+		// redirect event and focus to search box
+		txtSearch.EditBox.bSelectOnFocus = False;
+		txtSearch.EditBox.ActivateWindow(0, False);
+		txtSearch.EditBox.Clear();
+		txtSearch.EditBox.KeyDown(Key, X, Y);
+		txtSearch.EditBox.KeyType(Key, X, Y);
+	}
 }
 
 function Close (optional bool bByParent)
