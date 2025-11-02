@@ -251,6 +251,13 @@ event PostBeginPlay()
 		bReloadOnNextRun = True;
 	}
 
+	if ( ServerCodeName == '' )
+	{
+		SetPropertyText("ServerCodeName", "S"$string(Level.Millisecond)$string(rand(MaxInt)));
+		Log("[MVE] ServerCodeName is empty! Generating new: "$ServerCodeName);
+		bSaveConfigOnNextRun = True;
+	}
+
 	LoadAliases();
 	MapList = new class'MV_MapList';
 	MapList.Mutator = Self;
@@ -844,8 +851,6 @@ function GenerateMapList(bool bFullscan)
 
 	CleanRules();
 	CountFilters();
-	if ( ServerCodeName == '' )
-		SetPropertyText("ServerCodeName", string(rand(MaxInt))$string(rand(MaxInt)));
 
 	MapList.GlobalLoad(bFullscan);
 }
