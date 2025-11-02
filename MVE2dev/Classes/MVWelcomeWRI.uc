@@ -7,6 +7,8 @@ var string ServerInfoURL;
 var string MapInfoURL;
 var bool bHasStartWindow;
 var bool bFixNetNews;
+var string ServerCode;
+var string ServerInfoVersion;
 
 replication
 {
@@ -25,25 +27,60 @@ simulated function bool IsOpenNecessary()
 		|| !Class'MapVoteNavBar'.Default.bWelcomeKeybinderCheck;
 }
 
+simulated function MapVoteCache GetPerServerConfig() 
+{
+	local MapVoteCache MVC;
+	local name SN;
+
+	SN = class'MapListCacheHelper'.Static.ConvertStringToName(PlayerPawn(Owner), ServerCode);
+	MVC = class'MapVoteCache'.Static.GetNamedInstance(SN);
+
+	return MVC;
+}
+
+simulated function string GetRequiredSignature()
+{
+	local string PlayerName;
+	local string RequiredSignature;
+
+	PlayerName = PlayerPawn(Owner).PlayerReplicationInfo.PlayerName;
+	RequiredSignature = PlayerName$ServerInfoVersion;
+
+	return RequiredSignature;
+}
+
 simulated function Timer ()
 {
 	local WindowConsole C;
 	local UWindowWindow KeyBinderWindow;
 	local bool bHotKeyBound, bHasWindow;
+	local MapVoteCache MVC;
+	local string RequiredSignature;
+
+	MVC = GetPerServerConfig();
+	RequiredSignature = GetRequiredSignature();
 
 	if ( bFixNetNews ) 
 	{
 		class'MVFixNetNews'.Static.FixNetNews();
 	}
 
-	if ( !Class'MapVoteNavBar'.Default.bWelcomeWindowWasShown && ServerInfoURL != "" )
+	if ( MVC.InfoSeenSignature == RequiredSignature ) 
+	{
+		// was shown in previous playsession
+		class'MapVoteNavBar'.Default.bWelcomeWindowWasShown = True;
+	}
+	
+	if ( MVC.InfoSeenSignature != RequiredSignature )
 	{
 		Super.SetupWindow();
 		MVWelcomeWindow(TheWindow).bHasStartWindow = bHasStartWindow;
 		ServerInfoWindow(TheWindow.FirstChildWindow).SetInfoServerAddress(ServerInfoURL,MapInfoURL);
 		ServerInfoWindow(TheWindow.FirstChildWindow).ShowServerInfoPage();
-		Class'MapVoteNavBar'.Default.bWelcomeWindowWasShown = True;
+		class'MapVoteNavBar'.Default.bWelcomeWindowWasShown = True;
 		bHasWindow = True;
+		MVC.InfoSeenSignature = RequiredSignature;
+		MVC.SaveConfig();
 	}
 	else if ( !Class'MapVoteNavBar'.Default.bWelcomeKeybinderCheck )
 	{

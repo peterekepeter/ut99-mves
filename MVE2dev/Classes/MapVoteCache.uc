@@ -7,6 +7,7 @@ class MapVoteCache extends Object
 var config bool bCached;
 var config string ServerName;
 var config string LastUpdate;
+var config string InfoSeenSignature;
 var config string RuleList[100];
 var config int RuleListCount;
 var config string GameModeName[ArrayCount(RuleList)];

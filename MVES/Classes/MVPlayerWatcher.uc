@@ -102,7 +102,7 @@ state Initializing
 	PostID:
 	PlayerIP = class'MV_MainExtension'.static.ByDelimiter( Watched.GetPlayerNetworkAddress(), ":"); //Remove port
 	bInitialized = True;
-	if ( Mutator.bWelcomeWindow && Mutator.ServerInfoURL != "")
+	if ( Mutator.bWelcomeWindow )
 	{
 		Mutator.Extension.WelcomeWindowTo( Watched);
 	}

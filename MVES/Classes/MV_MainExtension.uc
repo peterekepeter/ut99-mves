@@ -16,6 +16,8 @@ function WelcomeWindowTo( PlayerPawn Victim)
 	I.SetPropertyText("ServerInfoURL", MapVote(Outer).ServerInfoURL);
 	I.SetPropertyText("MapInfoURL", MapVote(Outer).MapInfoURL);
 	I.SetPropertyText("bFixNetNews", ""$MapVote(Outer).bFixNetNewsForPlayers);
+	I.SetPropertyText("ServerCode", ""$MapVote(Outer).ServerCodeName);
+	I.SetPropertyText("ServerInfoVersion", MapVote(Outer).ServerInfoVersion);
 }
 
 function Info SpawnVoteWRIActor( PlayerPawn Victim)

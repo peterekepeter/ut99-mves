@@ -9,11 +9,11 @@ static function NeedServerMapList (MapListCache C);
 
 static simulated function name ConvertServerCode (MapListCache C)
 {
-	PlayerPawn(C.Owner).GetEntryLevel().ConsoleCommand("set" @ string(Default.Class) @ "ServerCodeN" @ C.ServerCode);
-	return Default.ServerCodeN;
+	return ConvertStringToName(PlayerPawn(C.Owner), C.ServerCode);
 }
 
-defaultproperties
+static simulated function name ConvertStringToName(PlayerPawn P, string C)
 {
-      ServerCodeN="None"
+	P.GetEntryLevel().ConsoleCommand("set"@string(Default.Class)@"ServerCodeN"@C);
+	return Default.ServerCodeN;
 }
