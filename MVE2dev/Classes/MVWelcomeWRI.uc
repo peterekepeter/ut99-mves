@@ -13,12 +13,12 @@ var string ServerInfoVersion;
 replication
 {
 	reliable if( Role == ROLE_Authority )
-		ServerInfoURL, MapInfoURL, bHasStartWindow, bFixNetNews;
+		ServerInfoURL, MapInfoURL, bHasStartWindow, bFixNetNews, ServerInfoVersion, ServerCode;
 }
 
 simulated function bool SetupWindow ()
 {
-	SetTimer(1.0, False);
+	SetTimer(1.0, True);
 }
 
 simulated function bool IsOpenNecessary()
@@ -56,6 +56,14 @@ simulated function Timer ()
 	local bool bHotKeyBound, bHasWindow;
 	local MapVoteCache MVC;
 	local string RequiredSignature;
+
+	Log("Welcom WRI timer!");
+
+	if ( ServerCode == "" ) 
+	{
+		Log("Server code empty! exiting!");
+		return;
+	}
 
 	MVC = GetPerServerConfig();
 	RequiredSignature = GetRequiredSignature();

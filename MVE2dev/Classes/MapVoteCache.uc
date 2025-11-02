@@ -35,7 +35,11 @@ var int iNewMaps[32];
 
 simulated static function MapVoteCache GetNamedInstance(name ServerCode) 
 {
-		return new (class'MVE_ClientCache', ServerCode) class'MapVoteCache';
+	if ( ServerCode == '' ) 
+	{
+		return None;
+	}
+	return new (class'MVE_ClientCache', ServerCode) class'MapVoteCache';
 }
 
 simulated function CacheClear ()

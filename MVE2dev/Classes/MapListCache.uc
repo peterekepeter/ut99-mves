@@ -659,3 +659,9 @@ final simulated function SetVotePriority( int Idx, float Value)
 {
 	VotePriority[Idx] = Value;
 }
+
+defaultproperties
+{
+	RemoteRole=ROLE_SimulatedProxy
+	NetUpdateFrequency=100.000000
+}
