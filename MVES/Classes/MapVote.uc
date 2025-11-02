@@ -26,7 +26,7 @@ var() config int DefaultGameTypeIdx; //For crashes
 var() config name ServerCodeName; //Necessary for our ServerCode
 
 var() config int MidGameVotePercent, KickPercent;
-var() config int MapCostAddPerLoad, MapCostMaxAllow;
+var() config int MapCostAddPerLoad, MapCostMaxAllow, RuleCostMaxAllow;
 
 enum EIDType
 {

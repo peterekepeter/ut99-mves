@@ -206,8 +206,9 @@ function EnumerateGames()
 function bool IsValidMap( out string MapString, out string reason )
 {
 	local string MapName, GameIdx, targetIdxList;
-	local int i, iLen, colonAt;
+	local int i, iLen, colonAt, GameIdxInt;
 	local bool bMapFound;
+	local MV_Result R;
 	
 	reason = "";
 	iLen = InStr( MapString, ":");
@@ -228,9 +229,15 @@ function bool IsValidMap( out string MapString, out string reason )
 	}
 	MapName = Left( MapString, iLen);
 
-	if ( History.IsExcluded(MapName, Mutator.MapCostMaxAllow) )
+	// TODO this is not optimal
+	R = new class'MV_Result';
+	GameIdxInt = int(GameIdx);
+	R.GameName = Mutator.GameName(GameIdxInt);
+	R.RuleName = Mutator.RuleName(GameIdxInt);
+	R.Map = MapName;
+	if ( !History.IsAllowed(R, Mutator.MapCostMaxAllow, Mutator.RuleCostMaxAllow, reason) )
 	{
-		reason = "map is on cooldown";
+		reason = reason@"was played too recently!";
 		return False;
 	}
 

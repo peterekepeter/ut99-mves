@@ -16,38 +16,73 @@ var MapElement DefaultMapElement;
 
 function NewMapPlayed(MV_Result r, int MapCostAddPerLoad)
 {
-	local int i, lastSmaller;
-	lastSmaller = -1;
+	local int i, j;
+	local bool bFound;
 
+	// decrement existig and pop when cost is less than 0
 	for ( i = 0 ; i < ElementCount ; i += 1 )
 	{
-		while ( --Elements[i].Acc <= 0 && i < ElementCount )
+		if ( Elements[i].Map == r.Map 
+			&& Elements[i].GameName == r.GameName
+			&& Elements[i].RuleName == r.RuleName )
 		{
-			PopList(i);
+			Elements[i].Acc += MapCostAddPerLoad;
+			bFound = True;
 		}
-		if ( Elements[i].Map < r.Map ) 
+		else 
 		{
-			lastSmaller = i;
+			while ( --Elements[i].Acc <= 0 && i < ElementCount ) 
+			{
+				PopList(i);
+			}
 		}
 	}
 
-	i = lastSmaller + 1;
+	if ( bFound ) return;
 
-	if ( i < ElementCount && Elements[i].Map == r.Map ) 
+	// if ( ElementCount < 512 )
+	// {
+	// 	i = ElementCount;
+	// }
+	// else 
+	// {
+	// 	i = FindMinCostIndex();
+	// }
+
+	i = ElementCount;
+	Elements[ElementCount].Map = r.Map;
+	Elements[ElementCount].GameName = r.GameName;
+	Elements[ElementCount].RuleName = r.RuleName;
+	Elements[ElementCount].Acc = MapCostAddPerLoad;
+	ElementCount += 1;
+
+	if ( ElementCount < 512 )
 	{
-		// update existing
-		Elements[i].Acc += MapCostAddPerLoad;
+		// cleanup one afer the newly inserted
+		Elements[ElementCount] = DefaultMapElement;
 	}
-	else 
+}
+
+function int FindMinCostIndex() 
+{
+	local int i, j;
+
+	if ( ElementCount <= 0 ) 
 	{
-		// insert new
-		PushList(i);
-		Elements[i].Map = r.Map;
-		Elements[i].Acc = MapCostAddPerLoad;
+		return -1;
 	}
 
-	Elements[i].GameName = r.GameName;
-	Elements[i].RuleName = r.RuleName;
+	j = 0;
+
+	for ( i = 1 ; i < ElementCount ; i += 1 )
+	{
+		if ( Elements[i].Acc < Elements[j].Acc ) 
+		{
+			j = i;
+		}
+	}
+
+	return j;
 }
 
 function PopList( int idx )
@@ -65,38 +100,60 @@ function PopList( int idx )
 	Elements[ElementCount] = DefaultMapElement;
 }
 
-function PushList( int idx )
-{
-	local int i;
-	for ( i = ElementCount;  i > idx; i -= 1 )
-	{
-		Elements[i] = Elements[i - 1];
-		i--;
-	}
-	ElementCount += 1;
-}
-
 function bool IsExcluded( string map, int MapCostMaxAllow )
 {
-	local int i;
+	local int i, cost;
+
 	for ( i = 0; i < ElementCount; i += 1 )
 	{
 		if ( Elements[i].Map == map )
 		{
-			return Elements[i].Acc > MapCostMaxAllow; 
+			cost += Elements[i].Acc;
 		}
 	}
-	return False; // not found
+	Log("Sum is "$cost);
+	return cost > MapCostMaxAllow; // not found
+}
+
+function bool IsAllowed( MV_Result r, int MapCostMax, int RuleCostMax, out string reason)
+{
+	local int i, mapCost, ruleCost;
+
+	reason = "";
+
+	for ( i = 0; i < ElementCount; i += 1 )
+	{
+		if ( Elements[i].Map == r.Map )
+			mapCost += Elements[i].Acc;
+		if ( Elements[i].RuleName == r.RuleName )
+			ruleCost += Elements[i].Acc;
+	}
+
+	if ( mapCost > MapCostMax )
+	{
+		reason = "map";
+		return False;
+	}
+
+	if ( ruleCost > RuleCostMax )
+	{
+		reason = "rule";
+		return False;
+	}
+
+	return True;
 }
 
 function DebugPrintHistory() 
 {
 	local int i, acc;
-	local string name;
+	local string G, R, M;
 	for ( i = 0; i < ElementCount; i+=1 )
 	{
-		name = Elements[i].Map;
+		G = Elements[i].GameName;
+		R = Elements[i].RuleName;
+		M = Elements[i].Map;
 		acc = Elements[i].Acc;
-		Log(i$" : "$name$" "$acc);
+		Log(i$" : "$G@R@M@acc);
 	}
 }

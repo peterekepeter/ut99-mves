@@ -3,6 +3,7 @@ class TestMapHistory extends TestClass;
 var MapHistory History;
 var MV_Result Result;
 var int MaxCost, CostAdd;
+var int MapCostMax, RuleCostMax;
 
 function TestMain()
 {
@@ -47,6 +48,25 @@ function TestMain()
 	AssertNotExcluded("DM-Deck16][", "both maps can still be played");
 	AssertNotExcluded("DM-Fractal", "both maps can still be played");
 
+	Describe("Handles garbage in config");
+	CostAdd = 4;
+	MaxCost = 1;
+	History.ElementCount = 10; // invalid entries
+	MapPlayed("DM-Deck16][");
+	AssertExcluded("DM-Deck16][", "because just played");
+
+	Describe("Same map played in different gametypes");
+	CostAdd = 3;
+	MaxCost = 3;
+	Played("DM", "iGib", "DM-Fractal");
+	Played("DM", "Flak", "DM-Fractal");
+	AssertExcluded("DM-Fractal", "because sum of played");
+
+	Describe("repeating rule not allowed");
+	CostAdd = 1;
+	RuleCostMax = 0;
+	Played("DM", "iGib", "DM-Fractal");
+	AssertNotAllowedRule("DM", "iGib", "DM-Deck16][", "iGib was just played");
 }
 
 function MapPlayed(optional string map, optional string game, optional string rule) 
@@ -57,6 +77,32 @@ function MapPlayed(optional string map, optional string game, optional string ru
 		game = "DeathMatch";
 	if ( rule == "" ) 
 		rule = "InstaGib";
+	result.Map = map;
+	result.GameName = game;
+	result.RuleName = rule;
+	History.NewMapPlayed(result, CostAdd);
+}
+
+function AssertNotAllowedRule(string game, string rule, string map, string message)
+{
+	AssertAllowed("rule", False, game, rule, map, message);
+}
+
+function AssertAllowed(string reason, bool value, string game, string rule, string map, string message)
+{
+	local string outreason;
+	local bool outbool;
+
+	result.Map = map;
+	result.GameName = game;
+	result.RuleName = rule;
+	outbool = History.IsAllowed(result, MapCostMax, RuleCostMax, outreason);
+	AssertEquals(outbool, value, message);
+	AssertEquals(outreason, reason, message);
+}
+
+function Played(string game, string rule, string map) 
+{
 	result.Map = map;
 	result.GameName = game;
 	result.RuleName = rule;
@@ -83,4 +129,6 @@ function Describe(string name)
 	History.ElementCount = 0;
 	MaxCost = 0;
 	CostAdd = 0;
+	MapCostMax = 0;
+	RuleCostMax = 0;
 }

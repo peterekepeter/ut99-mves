@@ -6,7 +6,7 @@ function TestMain()
 	TestChild(class'TestMapTags');
 	TestChild(class'TestMapListEncoder');
 	TestChild(class'TestMvAliases');
-	TestChild(class'TestMapHistory');
 	TestChild(class'TestMapVoteResult');
 	TestChild(class'TestMapOverrides');
+	TestChild(class'TestMapHistory');
 }
