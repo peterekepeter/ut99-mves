@@ -229,18 +229,6 @@ function bool IsValidMap( out string MapString, out string reason )
 	}
 	MapName = Left( MapString, iLen);
 
-	// TODO this is not optimal
-	R = new class'MV_Result';
-	GameIdxInt = int(GameIdx);
-	R.GameName = Mutator.GameName(GameIdxInt);
-	R.RuleName = Mutator.RuleName(GameIdxInt);
-	R.Map = MapName;
-	if ( !History.IsAllowed(R, Mutator.MapCostMaxAllow, Mutator.RuleCostMaxAllow, reason) )
-	{
-		reason = reason@"was played too recently!";
-		return False;
-	}
-
 	// find map in list 
 	bMapFound = False;
 	for ( i = 0 ; i < iMapList ; i++ )

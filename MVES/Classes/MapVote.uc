@@ -1199,13 +1199,18 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 	local int iU;
 	local string prettyMapName;
 	local string notValidReason;
+	local string mapName;
+	local MV_Result R;
+	local bool force;
+
+	force = Sender.bAdmin;
 
 	if ( bLevelSwitchPending )
 	{
 		Sender.ClientMessage("Server is about to change map, voting isn't allowed.");
 		return;
 	}
-	if ( !Sender.bAdmin && !CanVote(Sender) )
+	if ( !force && !CanVote(Sender) )
 	{
 		Sender.ClientMessage("You're not allowed to vote.");
 		return;
@@ -1213,9 +1218,11 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 	W = GetWatcherFor( Sender);
 	if ( W == None || W.bOverflow )
 		return;
+	
+	// TODO the [X] convention is no longer used, remove
 	if ( Left( MapString, 3) == "[X]" )
 	{
-		if ( Sender.bAdmin )
+		if ( force )
 			MapString = Mid( MapString, 3);
 		else
 		{
@@ -1230,14 +1237,27 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 		return;
 	}
 
+	mapName = Extension.ByDelimiter(MapString,":", 0);
 	iU = int(Extension.ByDelimiter(MapString,":",1));
-	prettyMapName = Extension.ByDelimiter(MapString,":")@GameRuleCombo(iU);
+	prettyMapName = mapName@GameRuleCombo(iU);
 
-	if ( Sender.bAdmin )
+	// TODO warn if admin passowrd not set
+	if ( force )
 	{
 		Nfo("Admin force switch to "$prettyMapName);
 		GotoMap(MapString,True);
 		BroadcastMessage("Server Admin has force a map switch to "$prettyMapName, True);
+		return;
+	}
+
+	// TODO this is not optimal
+	R = new class'MV_Result';
+	R.GameName = Self.GameName(iU);
+	R.RuleName = Self.RuleName(iU);
+	R.Map = MapName;
+	if ( !MapList.History.IsAllowed(R, Self.MapCostMaxAllow, Self.RuleCostMaxAllow, notValidReason) )
+	{
+		Sender.ClientMessage("Cannot vote, "$notValidReason$" was played too recently in "$prettyMapName);
 		return;
 	}
 
@@ -1251,6 +1271,7 @@ function PlayerVoted( PlayerPawn Sender, string MapString)
 	W.PlayerVote = MapString;
 	Extension.UpdatePlayerVotedInWindows(W);
 	BroadcastMessage( Sender.PlayerReplicationInfo.PlayerName$" voted for "$prettyMapName, True);
+	// TODO recount votes on player leave
 	CountMapVotes();
 }
 
