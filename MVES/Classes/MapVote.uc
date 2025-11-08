@@ -920,10 +920,9 @@ function PlayerJoined( PlayerPawn P)
 	{
 		P.ClientSetMusic(SongOverride, 0, 0, MTRAN_Instant );
 	}
-
-	if ( bFixMissingSongPlayback && P.Song == None )
+	else if ( bFixMissingSongPlayback && Level.Song == None && P.Song == None )
 	{
-		P.ClientSetMusic(Music'MVE2dev.MV_SilentSong', 0, 0, MTRAN_Instant);
+		P.ClientSetMusic(Music'MV_SilentSong', 0, 0, MTRAN_Instant);
 	}
 
 	//Give this player a watcher
