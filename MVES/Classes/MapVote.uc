@@ -70,6 +70,7 @@ var bool bLevelSwitchPending;
 var bool bVotingStage;
 var int VotingStagePreBeginWait;
 var bool bMapChangeIssued;
+var bool bMapChangeByMVE;
 var bool bXCGE_DynLoader;
 var bool bMissingClientPackage;
 
@@ -801,11 +802,17 @@ event Tick( float DeltaTime)
 		CurrentID = Level.Game.CurrentID;
 	}
 	if ( Level.NextURL != "" && !bMapChangeIssued )
-		MapChangeIssued();
-	if ( bMapChangeIssued && (Level.NextSwitchCountdown < 0) && (Level.NextURL == "") ) //Handle switch failure
 	{
+		bMapChangeIssued = True;
+		MapChangeIssued();
+	}
+	if ( bMapChangeIssued && (Level.NextSwitchCountdown < 0) && (Level.NextURL == "") )
+	{
+		// Handle switch failure
 		bLevelSwitchPending = False;
 		bMapChangeIssued = False;
+		bMapChangeByMVE = False;
+		
 		Level.NextSwitchCountDown = 4;
 		Extension.RemoveMapVotes( WatcherList);
 		if ( bVotingStage )
@@ -866,29 +873,39 @@ function MapChangeIssued()
 
 	TravelIdx = TravelInfo.GetTravelIdx(Self);
 
-	bMapChangeIssued = True;
-	Log("[MVE] Map change issued with URL: "$Level.NextURL, 'MapVote');
-	aStr = Extension.ByDelimiter( Level.NextURL, "?");
-	aStr = Extension.ByDelimiter( aStr, "#" )$":"$string(TravelIdx) ; //Map name plus current IDX
-	while ( InStr( aStr, " ") == 0 )
+	if ( !bMapChangeByMVE ) 
 	{
-		aStr = Mid( aStr, 1);
-	}
-	if ( MapList.IsValidMap( aStr, notValidReason ) )	
-	{
-		if ( Level.bNextItems )
-		{
-			BroadcastMessage( Extension.ByDelimiter( aStr, ":")$GameRuleCombo(TravelIdx)@"has been selected as next map.", True);
-		}
-		else 
-		{			
-			BroadcastMessage( Extension.ByDelimiter( aStr, ":")$GameRuleCombo(TravelIdx)@"has been forced.", True);
-		}
+		Log("[MVE] Detected map change to "$Level.NextURL$" initiated outside of MVE", 'MapVote');
+		// TODO handle this in a better way
+		// coop maps will reference a teleporter exit 
+		// Example "nyleve#leavevr?peer" and this will error out
 		TravelInfo.TravelString = Level.NextURL;
 	}
-	else
+	else 
 	{
-		Log("[MVE] Map code "$aStr$" not found in map list: "$notValidReason, 'MapVote');
+		Log("[MVE] Map change issued with URL: "$Level.NextURL, 'MapVote');
+		aStr = Extension.ByDelimiter( Level.NextURL, "?");
+		aStr = Extension.ByDelimiter( aStr, "#" )$":"$string(TravelIdx) ; //Map name plus current IDX
+		while ( InStr( aStr, " ") == 0 )
+		{
+			aStr = Mid( aStr, 1);
+		}
+		if ( MapList.IsValidMap( aStr, notValidReason ) )	
+		{
+			if ( Level.bNextItems )
+			{
+				BroadcastMessage( Extension.ByDelimiter( aStr, ":")$GameRuleCombo(TravelIdx)@"has been selected as next map.", True);
+			}
+			else 
+			{			
+				BroadcastMessage( Extension.ByDelimiter( aStr, ":")$GameRuleCombo(TravelIdx)@"has been forced.", True);
+			}
+			TravelInfo.TravelString = Level.NextURL;
+		}
+		else
+		{
+			Log("[MVE] Map code "$aStr$" not found in map list: "$notValidReason, 'MapVote');
+		}
 	}
 	// TODO some of these save configs might not be necessary
 	TravelInfo.SaveConfig();
@@ -1866,9 +1883,10 @@ function ProcessMapOverrides(MV_Result map)
 
 final function bool GotoMap( string MapString, optional bool bImmediate)
 {
+	// TODO [X] convention no longer used
 	if ( Left(MapString,3) == "[X]" )
 	{
-		//Random sent me here
+		// Random sent me here
 		MapString = Mid(MapString,3);
 	}
 	if ( !SetupTravelString( MapString ) )
@@ -1933,9 +1951,11 @@ final function string CapNumberWord( int Number)
 
 final function ExecuteTravel()
 {
+	bMapChangeByMVE = True;
 	Level.ServerTravel( TravelInfo.TravelString,False);
 	if ( bShutdownServerOnTravel )
 	{
+		Log("[MVE] Shutting down server instance");
 		ConsoleCommand("exit");
 	}
 }

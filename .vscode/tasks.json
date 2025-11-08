@@ -40,6 +40,12 @@
             "problemMatcher": []
         },
         {
+            "label": "runloop",
+            "type": "shell",
+            "command": "sh scripts/runloop.sh",
+            "problemMatcher": []
+        },
+        {
             "label": "watch test",
             "type": "shell",
             "command": "nodemon -e uc -x \"ucx build MVE2dev MVES TestMVE && ucx ucc TestMVE.TestAll\"",

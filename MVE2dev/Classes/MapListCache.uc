@@ -89,7 +89,7 @@ final simulated function SaveToMapVoteCache()
 	{
 		return;
 	}
-
+	// FIX Access none 'MVC'
 	class'MapListCacheHelper'.static.ConvertServerCode(self);
 	MVC.bCached = true;
 
