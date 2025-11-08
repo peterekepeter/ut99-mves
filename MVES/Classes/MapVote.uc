@@ -51,6 +51,7 @@ var() config bool bEnableMapTags;
 var() config bool bAutoSetGameName;
 var() config bool bFixMutatorsQueryLagSpikes;
 var() config bool bFixNetNewsForPlayers;
+var() config bool bFixMissingSongPlayback;
 
 var() config bool bOverrideServerPackages;
 var() config bool bResetServerPackages;
@@ -901,6 +902,11 @@ function PlayerJoined( PlayerPawn P)
 	if ( bEnableMapOverrides && SongOverride != None )
 	{
 		P.ClientSetMusic(SongOverride, 0, 0, MTRAN_Instant );
+	}
+
+	if ( bFixMissingSongPlayback && P.Song == None )
+	{
+		P.ClientSetMusic(Music'MVE2dev.MV_SilentSong', 0, 0, MTRAN_Instant);
 	}
 
 	//Give this player a watcher
@@ -2048,6 +2054,7 @@ defaultproperties
 	bSortAndDeduplicateMaps=True
 	bFixMutatorsQueryLagSpikes=True
 	bFixNetNewsForPlayers=True
+	bFixMissingSongPlayback=True
 	VoteTimeLimit=60
 	DefaultMap="DM-Deck16]["
 	bSwitchToRandomMapOnIdle=True

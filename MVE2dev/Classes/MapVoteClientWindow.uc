@@ -3,6 +3,7 @@
 //================================================================================
 class MapVoteClientWindow extends UWindowPageWindow;
 
+#exec OBJ LOAD FILE=Packages\MV_SilentSong.umx PACKAGE=MVE2dev
 #exec TEXTURE IMPORT FILE=TEXTURES\BackgroundTexture.pcx MIPS=OFF
 #exec TEXTURE IMPORT FILE=TEXTURES\ListsBoxBackground.pcx MIPS=OFF
 
