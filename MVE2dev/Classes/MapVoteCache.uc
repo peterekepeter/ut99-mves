@@ -32,6 +32,7 @@ var config string MapList15[256];
 var config string MapList16[256];
 var config int MapCount;
 var int iNewMaps[32];
+var string ServerCode;
 
 simulated static function MapVoteCache GetNamedInstance(name ServerCode) 
 {

@@ -90,8 +90,12 @@ final simulated function SaveToMapVoteCache()
 		return;
 	}
 	// FIX Access none 'MVC'
-	class'MapListCacheHelper'.static.ConvertServerCode(self);
-	MVC.bCached = true;
+	
+	MVC = GetMVCInstanceForServerCode();
+	if ( MVC == None )
+		return;
+
+	MVC.bCached = True;
 
 	if(PlayerPawn(Owner).GameReplicationInfo != none)
 	{
@@ -448,29 +452,44 @@ final simulated function bool LinkerAddValue(string S)
 	return bSuccess;
 }
 
+final simulated function MapVoteCache GetMVCInstanceForServerCode() 
+{
+	local name N;
+	if ( Self.ServerCode == "" )
+		return None; // not ready yet
+	
+	if ( MVC != None && MVC.ServerCode == Self.ServerCode )
+		return MVC;
+
+	N = class'MapListCacheHelper'.Static.ConvertServerCode(Self);
+	MVC = class'MapVoteCache'.Static.GetNamedInstance(N);
+	MVC.ServerCode = Self.ServerCode;
+
+	return MVC;
+}
+
 final simulated function ChaceCheck()
 {
 	local int i;
-	local name codename;
 
-	if(!(Role != ROLE_Authority) || Level.NetMode == NM_Standalone)
-	{
+	if ( Role == ROLE_Authority || Level.NetMode == NM_Standalone )
 		return;
-	}
 
-	if(((HTTPMapListLocation == "") || ServerCode == "") || LastUpdate == "")
-	{
+	if ( HTTPMapListLocation == "" || ServerCode == "" || LastUpdate == "" )
 		return;
-	}
-	codename = class'MapListCacheHelper'.static.ConvertServerCode(self);
-	MVC = class'MapVoteCache'.static.GetNamedInstance(codename);
-	bChaceCheck = true;
 
-	if(!MVC.bCached || MVC.LastUpdate != LastUpdate)
+	MVC = GetMVCInstanceForServerCode();
+
+	if ( MVC == None )
+		return;
+	
+	bChaceCheck = True;
+
+	if( !MVC.bCached || MVC.LastUpdate != LastUpdate )
 	{
-		bNeedServerMapList = true;
+		bNeedServerMapList = True;
 
-		if(HTTPMapListLocation ~= "None")
+		if( HTTPMapListLocation ~= "None" )
 		{
 			MVC.CacheClear();
 			NeedServerMapList();
