@@ -38,24 +38,15 @@ simulated function MapVoteCache GetPerServerConfig()
 	return MVC;
 }
 
-simulated function string GetRequiredSignature()
-{
-	local string PlayerName;
-	local string RequiredSignature;
-
-	PlayerName = PlayerPawn(Owner).PlayerReplicationInfo.PlayerName;
-	RequiredSignature = PlayerName$ServerInfoVersion;
-
-	return RequiredSignature;
-}
-
 simulated function Timer ()
 {
 	local WindowConsole C;
 	local UWindowWindow KeyBinderWindow;
 	local bool bHotKeyBound, bHasWindow;
 	local MapVoteCache MVC;
-	local string RequiredSignature;
+	local string RequiredInfoSignature;
+	local string PlayerName;
+	local string RequiredKeybindSignature;
 
 	Log("Welcom WRI timer!");
 
@@ -66,20 +57,28 @@ simulated function Timer ()
 	}
 
 	MVC = GetPerServerConfig();
-	RequiredSignature = GetRequiredSignature();
+
+	PlayerName = PlayerPawn(Owner).PlayerReplicationInfo.PlayerName;
+	RequiredInfoSignature = PlayerName$ServerInfoVersion;
+	RequiredKeybindSignature = PlayerName;
 
 	if ( bFixNetNews ) 
 	{
 		class'MVFixNetNews'.Static.FixNetNews();
 	}
 
-	if ( MVC.InfoSeenSignature == RequiredSignature ) 
+	if ( MVC.InfoSeenSignature == RequiredInfoSignature ) 
 	{
 		// was shown in previous playsession
 		class'MapVoteNavBar'.Default.bWelcomeWindowWasShown = True;
 	}
+
+	if ( MVC.KeybindSeenSignature == RequiredKeybindSignature )
+	{
+		class'MapVoteNavBar'.Default.bWelcomeKeybinderCheck = True;
+	}
 	
-	if ( MVC.InfoSeenSignature != RequiredSignature )
+	if ( MVC.InfoSeenSignature != RequiredInfoSignature )
 	{
 		Super.SetupWindow();
 		MVWelcomeWindow(TheWindow).bHasStartWindow = bHasStartWindow;
@@ -87,10 +86,10 @@ simulated function Timer ()
 		ServerInfoWindow(TheWindow.FirstChildWindow).ShowServerInfoPage();
 		class'MapVoteNavBar'.Default.bWelcomeWindowWasShown = True;
 		bHasWindow = True;
-		MVC.InfoSeenSignature = RequiredSignature;
+		MVC.InfoSeenSignature = RequiredInfoSignature;
 		MVC.SaveConfig();
 	}
-	else if ( !Class'MapVoteNavBar'.Default.bWelcomeKeybinderCheck )
+	else if ( MVC.KeybindSeenSignature != RequiredKeybindSignature )
 	{
 		Class'MapVoteNavBar'.Default.bWelcomeKeybinderCheck = True;
 		bHotKeyBound = IsHotKeyBound();
@@ -103,10 +102,12 @@ simulated function Timer ()
 			KeyBinderWindow.bLeaveOnscreen = True;
 			KeyBinderWindow.ShowWindow();
 			bHasWindow = True;
+			MVC.KeybindSeenSignature = RequiredKeybindSignature;
+			MVC.SaveConfig();
 		}
 	}
 
-	if (!bHasWindow)
+	if ( !bHasWindow )
 	{
 		WindowConsole(PlayerPawn(Owner).Player.Console).CloseUWindow();
 	}
