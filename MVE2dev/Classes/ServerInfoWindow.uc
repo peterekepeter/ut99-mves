@@ -18,6 +18,7 @@ var string ServerInfoURL;
 var string MapInfoURL;
 var string version;
 var bool bShownInitial;
+var MapVoteNavBar NavBar;
 
 function Created ()
 {
@@ -30,7 +31,8 @@ function Created ()
 	VSplitter.bSizable = False;
 	VSplitter.bBottomGrow = False;
 	VSplitter.SplitPos = ParentWindow.WinHeight - 45;
-	VSplitter.BottomClientWindow = VSplitter.CreateWindow(Class'MapVoteNavBar',0.00,0.00,WinWidth,WinHeight,OwnerWindow);
+	NavBar = MapVoteNavBar(VSplitter.CreateWindow(Class'MapVoteNavBar',0.00,0.00,WinWidth,WinHeight,OwnerWindow));
+	VSplitter.BottomClientWindow = NavBar;
 	SetAcceptsFocus();
 }
 

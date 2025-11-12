@@ -13,6 +13,8 @@ var() config string ClientScreenshotPackage; // Load this package
 var() config string ClientLogoTexture; // Clients will load and display this texture
 var() config string ServerInfoURL;
 var() config string ServerInfoVersion;
+var() config bool bServerInfoRequiresAccept;
+var() config string ServerInfoAcceptLabel;
 var() config string MapInfoURL;
 var() config string HTTPMapListLocation; //HTTPMapListPort is needs to be attached here as well
 

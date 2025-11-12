@@ -6,18 +6,26 @@ class MV_MainExtension expands Object;
 function WelcomeWindowTo( PlayerPawn Victim)
 {
 	local info I;
+	local MapVote M;
 
 	if ( Victim.IsA('Spectator') )
 		return;
 	foreach Victim.ChildActors( class'Info', I)
 		if ( I.IsA('MVWelcomeWRI') )
 			return;
-	I = Victim.Spawn(class<Info>( DynamicLoadObject( MapVote(Outer).ClientPackageInternal$".MVWelcomeWRI",class'class')), Victim,,vect(0,0,0) );
-	I.SetPropertyText("ServerInfoURL", MapVote(Outer).ServerInfoURL);
-	I.SetPropertyText("MapInfoURL", MapVote(Outer).MapInfoURL);
-	I.SetPropertyText("bFixNetNews", ""$MapVote(Outer).bFixNetNewsForPlayers);
-	I.SetPropertyText("ServerInfoVersion", MapVote(Outer).ServerInfoVersion);
-	I.SetPropertyText("ServerCode", string(MapVote(Outer).ServerCodeName));
+	M = MapVote(Outer);
+	I = Victim.Spawn(class<Info>( DynamicLoadObject( M.ClientPackageInternal$".MVWelcomeWRI",class'class')), Victim,,vect(0,0,0) );
+	if ( !M.bServerInfoRequiresAccept ) 
+		I.SetPropertyText("RequireAccept", "None");
+	else if (M.ServerInfoAcceptLabel == "")
+		I.SetPropertyText("RequireAccept", "I accept the server rules");
+	else
+		I.SetPropertyText("RequireAccept", M.ServerInfoAcceptLabel);
+	I.SetPropertyText("ServerInfoURL", M.ServerInfoURL);
+	I.SetPropertyText("MapInfoURL", M.MapInfoURL);
+	I.SetPropertyText("bFixNetNews", ""$M.bFixNetNewsForPlayers);
+	I.SetPropertyText("ServerInfoVersion", M.ServerInfoVersion);
+	I.SetPropertyText("ServerCode", string(M.ServerCodeName));
 }
 
 function Info SpawnVoteWRIActor( PlayerPawn Victim)

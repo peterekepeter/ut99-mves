@@ -7,13 +7,14 @@ var string ServerInfoURL;
 var string MapInfoURL;
 var bool bHasStartWindow;
 var bool bFixNetNews;
+var string RequireAccept;
 var string ServerCode;
 var string ServerInfoVersion;
 
 replication
 {
 	reliable if( Role == ROLE_Authority )
-		ServerInfoURL, MapInfoURL, bHasStartWindow, bFixNetNews, ServerInfoVersion, ServerCode;
+		ServerInfoURL, RequireAccept, MapInfoURL, bHasStartWindow, bFixNetNews, ServerInfoVersion, ServerCode;
 }
 
 simulated function bool SetupWindow ()
@@ -47,12 +48,20 @@ simulated function Timer ()
 	local string RequiredInfoSignature;
 	local string PlayerName;
 	local string RequiredKeybindSignature;
+	local string RequiredAcceptSignature;
+	local bool bRequireAccept;
 
-	Log("Welcom WRI timer!");
+	Log("Welcome WRI timer!");
 
 	if ( ServerCode == "" ) 
 	{
-		Log("Server code empty! exiting!");
+		Log("Server code empty, awaiting replication...");
+		return;
+	}
+
+	if ( RequireAccept == "" )
+	{
+		Log("RequireAccept empty, awaiting replication...");
 		return;
 	}
 
@@ -61,15 +70,25 @@ simulated function Timer ()
 	PlayerName = PlayerPawn(Owner).PlayerReplicationInfo.PlayerName;
 	RequiredInfoSignature = PlayerName$ServerInfoVersion;
 	RequiredKeybindSignature = PlayerName;
+	bRequireAccept = RequireAccept != "None";
+
+	if ( bRequireAccept )
+		RequiredAcceptSignature = PlayerName$"_checked_"$ServerInfoVersion;
+	else 
+		RequiredAcceptSignature = "";
 
 	if ( bFixNetNews ) 
 	{
 		class'MVFixNetNews'.Static.FixNetNews();
 	}
 
-	if ( MVC.InfoSeenSignature == RequiredInfoSignature ) 
+	if ( 
+		MVC.InfoSeenSignature == RequiredInfoSignature && 
+		( !bRequireAccept || MVC.InfoAcceptSignature == RequiredAcceptSignature ) 
+	) 
 	{
-		// was shown in previous playsession
+		// was shown in previous playsession, this disables WelcomeWRI
+		// TODO check for playername
 		class'MapVoteNavBar'.Default.bWelcomeWindowWasShown = True;
 	}
 
@@ -77,14 +96,24 @@ simulated function Timer ()
 	{
 		class'MapVoteNavBar'.Default.bWelcomeKeybinderCheck = True;
 	}
+
+	Log("seen "$MVC.InfoSeenSignature == RequiredInfoSignature$" accepted "$MVC.InfoAcceptSignature == RequiredAcceptSignature$" need accept "$bRequireAccept);
 	
-	if ( MVC.InfoSeenSignature != RequiredInfoSignature )
+	if ( MVC.InfoSeenSignature != RequiredInfoSignature 
+		|| bRequireAccept && MVC.InfoAcceptSignature != RequiredAcceptSignature )
 	{
 		Super.SetupWindow();
 		MVWelcomeWindow(TheWindow).bHasStartWindow = bHasStartWindow;
 		ServerInfoWindow(TheWindow.FirstChildWindow).SetInfoServerAddress(ServerInfoURL,MapInfoURL);
 		ServerInfoWindow(TheWindow.FirstChildWindow).ShowServerInfoPage();
-		class'MapVoteNavBar'.Default.bWelcomeWindowWasShown = True;
+		if ( bRequireAccept ) 
+		{
+			ServerInfoWindow(TheWindow.FirstChildWindow).NavBar.SetRequiredAccept(bRequireAccept, RequireAccept, MVC); 
+		}
+		else
+		{
+			class'MapVoteNavBar'.Default.bWelcomeWindowWasShown = True;
+		}
 		bHasWindow = True;
 		MVC.InfoSeenSignature = RequiredInfoSignature;
 		MVC.SaveConfig();

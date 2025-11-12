@@ -10,6 +10,8 @@ var UWindowSmallButton ReportButton2;
 var UWindowSmallButton TipsButton;
 var UWindowSmallButton AboutButton;
 var UWindowSmallButton CloseButton;
+var UWindowCheckbox AcceptCheck;
+var UMenuLabelControl AcceptLabel;
 var bool bWelcomeWindowWasShown;
 var bool bWelcomeKeybinderCheck;
 
@@ -27,13 +29,13 @@ function Created ()
 	local Color TextColor;
 
 	Super.Created();
-	TextColor.R=171;
-	TextColor.G=171;
-	TextColor.B=171;
-	ServerInfoButton=UWindowSmallButton(CreateControl(Class'UWindowSmallButton',1.00,0,59.00,10.00));
+	TextColor.R=255;
+	TextColor.G=255;
+	TextColor.B=255;
+	ServerInfoButton=UWindowSmallButton(CreateControl(Class'UWindowSmallButton',1.00,1,59.00,10.00));
 	ServerInfoButton.Text="Server Info";
 	ServerInfoButton.DownSound=Sound'Click';
-	MapInfoButton=UWindowSmallButton(CreateControl(Class'UWindowSmallButton',60.00,0,59.00,10.00));
+	MapInfoButton=UWindowSmallButton(CreateControl(Class'UWindowSmallButton',60.00,1,59.00,10.00));
 	MapInfoButton.Text="Map Info";
 	MapInfoButton.DownSound=Sound'Click';
 	// ReportButton1=UWindowSmallButton(CreateControl(Class'UWindowSmallButton',120.00,0,139.00,10.00));
@@ -44,10 +46,10 @@ function Created ()
 	// ReportButton2.Text="Report 2: Map Vote Sequence";
 	// ReportButton2.DownSound=Sound'Click';
 	// ReportButton2.bDisabled=True;
-	AboutButton=UWindowSmallButton(CreateControl(Class'UWindowSmallButton',120.00,0,39.00,10.00));
+	AboutButton=UWindowSmallButton(CreateControl(Class'UWindowSmallButton',120.00,1,39.00,10.00));
 	AboutButton.Text="About";
 	AboutButton.DownSound=Sound'Click';
-	TipsButton=UWindowSmallButton(CreateControl(Class'UWindowSmallButton',160.00,0,69.00,10.00));
+	TipsButton=UWindowSmallButton(CreateControl(Class'UWindowSmallButton',160.00,1,69.00,10.00));
 	TipsButton.Text="Map Vote Tips";
 	TipsButton.DownSound=Sound'Click';
 	/*lblKeyBind = UMenuLabelControl(CreateControl(class'UMenuLabelControl',715.00,2.0,100,10.00));
@@ -66,10 +68,26 @@ function Created ()
 	SetAcceptsFocus();
 	LoadExistingKeys();*/
 	//CloseButton=UWindowSmallButton(CreateControl(Class'UWindowSmallButton',850.00,0,80.00,10.00));
-	CloseButton=UWindowSmallButton(CreateControl(Class'UWindowSmallButton',WinWidth - 89,0,80.00,10.00));
+	AcceptCheck = UWindowCheckbox(CreateControl(Class'UWindowCheckbox',WinWidth - 110,2,20.0,10.0));
+	AcceptLabel = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',230,2,WinWidth - 110 - 230,10.0));
+	AcceptLabel.Align = TA_Right;
+	AcceptLabel.SetText("");
+	AcceptLabel.SetTextColor(TextColor);
+	AcceptCheck.WinHeight = 0;
+	AcceptLabel.WinHeight = 0;
+
+	CloseButton=UWindowSmallButton(CreateControl(Class'UWindowSmallButton',WinWidth - 86,1,80.00,10.00));
 	CloseButton.Text="Close";
 	//CloseButton.DownSound=Sound'WindowClose';
-	BackgroundColor = class'MapVoteClientConfig'.static.GetInstance().BackgroundColor;
+	BackgroundColor = class'MapVoteClientConfig'.Static.GetInstance().BackgroundColor;
+}
+
+function SetRequiredAccept(bool bRequireAccept, string RequireAccept, MapVoteCache MVC)
+{
+	Log("Set require accept!");
+	AcceptLabel.SetText(RequireAccept);
+	AcceptCheck.WinHeight = 10;
+	AcceptLabel.WinHeight = 10;
 }
 
 function Notify (UWindowDialogControl C, byte E)
@@ -123,3 +141,4 @@ function Close (bool ByParent)
 {
 	Super.Close(ByParent);
 }
+
