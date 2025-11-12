@@ -80,7 +80,6 @@ var bool bMapListLoad;
 var bool bRulesListLoaded;
 var MapVoteClientConfig ClientConf;
 var MapVoteTabWindow CWindow;
-var Class<MapListCacheHelper> Helper;
 var int TimerCallCount;
 
 replication
@@ -9668,7 +9667,6 @@ defaultproperties
 			bMapListLoad=False
 			ClientConf=None
 			CWindow=None
-			helper=None
 			WindowClass=Class'MapVoteFramedWindow'
 			WinLeft=50
 			WinTop=20

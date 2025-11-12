@@ -4,7 +4,6 @@
 class MapListCache extends Info
 	config(MVE_ClientCache);
 
-var Class<MapListCacheHelper> Helper;
 var string ServerCode;
 var string LastUpdate;
 var string RuleList[100];
@@ -51,6 +50,7 @@ var string ClientLogoTexture;
 var string ServerInfoURL;
 var string MapInfoURL;
 var MV_Callbacks ServerCallbacks;
+var NameConverter Converter;
 
 replication
 {
@@ -458,10 +458,14 @@ final simulated function MapVoteCache GetMVCInstanceForServerCode()
 	if ( Self.ServerCode == "" )
 		return None; // not ready yet
 	
-	if ( MVC != None && MVC.ServerCode == Self.ServerCode )
+	if ( MVC != None && MVC.ServerCode == ServerCode )
 		return MVC;
 
-	N = class'MapListCacheHelper'.Static.ConvertServerCode(Self);
+	if ( Converter == None )
+		Converter = new class'NameConverter';
+
+	N = Converter.Convert(ServerCode);
+
 	MVC = class'MapVoteCache'.Static.GetNamedInstance(N);
 	MVC.ServerCode = Self.ServerCode;
 

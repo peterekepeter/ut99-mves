@@ -10,6 +10,7 @@ var bool bFixNetNews;
 var string RequireAccept;
 var string ServerCode;
 var string ServerInfoVersion;
+var NameConverter Converter;
 
 replication
 {
@@ -31,10 +32,13 @@ simulated function bool IsOpenNecessary()
 simulated function MapVoteCache GetPerServerConfig() 
 {
 	local MapVoteCache MVC;
-	local name SN;
+	local Name N;
+	
+	if ( Converter == None )
+		Converter = new class'NameConverter';
 
-	SN = class'MapListCacheHelper'.Static.ConvertStringToName(PlayerPawn(Owner), ServerCode);
-	MVC = class'MapVoteCache'.Static.GetNamedInstance(SN);
+	N = Converter.Convert(ServerCode);
+	MVC = class'MapVoteCache'.Static.GetNamedInstance(N);
 
 	return MVC;
 }

@@ -36,13 +36,15 @@ var config int MapCount;
 var int iNewMaps[32];
 var string ServerCode;
 
-simulated static function MapVoteCache GetNamedInstance(name ServerCode) 
+static function MapVoteCache GetNamedInstance(name ServerCode) 
 {
+	local MapVoteCache C;
+
 	if ( ServerCode == '' ) 
-	{
 		return None;
-	}
-	return new (class'MVE_ClientCache', ServerCode) class'MapVoteCache';
+
+	C = new (class'MVE_ClientCache', ServerCode) class'MapVoteCache';
+	return C;
 }
 
 simulated function CacheClear ()
