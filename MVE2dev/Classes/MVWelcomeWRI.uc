@@ -112,7 +112,7 @@ simulated function Timer ()
 		ServerInfoWindow(TheWindow.FirstChildWindow).ShowServerInfoPage();
 		if ( bRequireAccept ) 
 		{
-			ServerInfoWindow(TheWindow.FirstChildWindow).NavBar.SetRequiredAccept(bRequireAccept, RequireAccept, MVC); 
+			ServerInfoWindow(TheWindow.FirstChildWindow).NavBar.SetRequiredAccept(bRequireAccept, RequireAccept, RequiredAcceptSignature, MVC); 
 		}
 		else
 		{
