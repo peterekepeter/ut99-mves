@@ -1,19 +1,13 @@
  
+ - add example for using MinPlayers setting as it's not an intuitive setting
+
  - bug, if 1 player votes and the other players leave, vote does not pass, it says already voted
 
  - reload config possible since 469d https://github.com/OldUnreal/UnrealTournamentPatches/issues/480
 
  - RELOAD can fail, write state to config before reload to prevent infinite crash loop
 
- - inject CLIENT_VERSION and SERVER_VERSION
  - test the release package with a clean UT99 to see if it works
-
-## Map Groups???
-
- - would complicate the UI :(
- - In the map list have the maps groupped by section.
- - For example BT maps groupped by difficulty.
- - Tournament maps groupped by size.
 
 ## Idle Switch
 
@@ -25,15 +19,9 @@
 
 ## Priority List
 
-- switch to a default map/gametype when server empty (configurable threshold 5mins 10mins 15mins)
-- limit the gametype randomness when nobody votes
 - render screenshot with better filtering
-- maintain view of last map when window reopens
-- map search on client side
-- extra URL arguments per gametype
 - custom map folders
 - find a way do not replicate map list after map list is loaded
-
 
 
 ## Cleanup Aliases
