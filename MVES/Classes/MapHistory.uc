@@ -22,6 +22,10 @@ function NewMapPlayed(MV_Result r, int MapCostAddPerLoad)
 	// decrement existig and pop when cost is less than 0
 	for ( i = 0 ; i < ElementCount ; i += 1 )
 	{
+		while ( --Elements[i].Acc <= 0 && i < ElementCount ) 
+		{
+			PopList(i);
+		}
 		if ( Elements[i].Map == r.Map 
 			&& Elements[i].GameName == r.GameName
 			&& Elements[i].RuleName == r.RuleName )
@@ -29,32 +33,24 @@ function NewMapPlayed(MV_Result r, int MapCostAddPerLoad)
 			Elements[i].Acc += MapCostAddPerLoad;
 			bFound = True;
 		}
-		else 
-		{
-			while ( --Elements[i].Acc <= 0 && i < ElementCount ) 
-			{
-				PopList(i);
-			}
-		}
 	}
 
 	if ( bFound ) return;
 
-	// if ( ElementCount < 512 )
-	// {
-	// 	i = ElementCount;
-	// }
-	// else 
-	// {
-	// 	i = FindMinCostIndex();
-	// }
-
-	i = ElementCount;
-	Elements[ElementCount].Map = r.Map;
-	Elements[ElementCount].GameName = r.GameName;
-	Elements[ElementCount].RuleName = r.RuleName;
-	Elements[ElementCount].Acc = MapCostAddPerLoad;
-	ElementCount += 1;
+	if ( ElementCount < 512 )
+	{
+		i = ElementCount;
+		ElementCount += 1;
+	}
+	else 
+	{
+		i = FindMinCostIndex();
+	}
+	
+	Elements[i].Map = r.Map;
+	Elements[i].GameName = r.GameName;
+	Elements[i].RuleName = r.RuleName;
+	Elements[i].Acc = MapCostAddPerLoad;
 
 	if ( ElementCount < 512 )
 	{
@@ -87,17 +83,12 @@ function int FindMinCostIndex()
 
 function PopList( int idx )
 {
-	local int i;
-	ElementCount -= 1;
-	for ( i = idx; i < ElementCount; i += 1 )
+	if ( idx < ElementCount ) 
 	{
-		Elements[i] = Elements[i + 1];
+		ElementCount -= 1;
+		Elements[idx] = Elements[ElementCount];
+		Elements[ElementCount] = DefaultMapElement;
 	}
-	if ( ElementCount < 0 ) 
-	{
-		ElementCount = 0;
-	}
-	Elements[ElementCount] = DefaultMapElement;
 }
 
 function bool IsExcluded( string map, int MapCostMaxAllow )

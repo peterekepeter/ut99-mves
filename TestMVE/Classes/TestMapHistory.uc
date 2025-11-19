@@ -55,6 +55,14 @@ function TestMain()
 	MapPlayed("DM-Deck16][");
 	AssertExcluded("DM-Deck16][", "because just played");
 
+	Describe("Same map played it still decreases cost first then adds");
+	CostAdd = 1;
+	MaxCost = 0;
+	MapPlayed("DM-Deck16][");
+	MapPlayed("DM-Deck16]["); // admin force
+	MapPlayed("DM-Fractal");
+	AssertNotExcluded("DM-Deck16][", "can be played again");
+
 	Describe("Same map played in different gametypes");
 	CostAdd = 3;
 	MaxCost = 3;
