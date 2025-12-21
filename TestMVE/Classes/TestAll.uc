@@ -9,4 +9,5 @@ function TestMain()
 	TestChild(class'TestMapVoteResult');
 	TestChild(class'TestMapOverrides');
 	TestChild(class'TestMapHistory');
+	TestChild(class'TestMapVote');
 }

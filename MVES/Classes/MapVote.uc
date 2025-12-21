@@ -877,11 +877,18 @@ function MapChangeIssued()
 
 	if ( !bMapChangeByMVE ) 
 	{
-		Log("[MVE] Detected map change to "$Level.NextURL$" initiated outside of MVE", 'MapVote');
-		// TODO handle this in a better way
-		// coop maps will reference a teleporter exit 
-		// Example "nyleve#leavevr?peer" and this will error out
-		TravelInfo.TravelString = Level.NextURL;
+		aStr = ParseMapFromURL(Level.NextURL);
+		if ( aStr == "" ) 
+		{
+			// ?Restart from Assault gametype should end up here
+			Log("[MVE] Detected level restart initiated outside of MVE in URL "$Level.NextURL, 'MapVote');
+		}
+		else 
+		{
+			// coop teleporters end up here
+			Log("[MVE] Detected map change to `"$aStr$"` initiated outside of MVE in URL "$Level.NextURL, 'MapVote');
+			TravelInfo.TravelString = aStr;
+		}
 	}
 	else 
 	{
@@ -911,6 +918,21 @@ function MapChangeIssued()
 	}
 	// TODO some of these save configs might not be necessary
 	TravelInfo.SaveConfig();
+}
+
+static function string ParseMapFromURL(string change)
+{
+	local int i, j, pos;
+	while ( InStr( change, " ") == 0 )
+	{
+		change = Mid( change, 1);
+	}
+	pos = Len(change);
+	i = InStr(change, "#");
+	j = InStr(change, "?");
+	if ( i >= 0 ) pos = i;
+	if ( j >= 0 && j < pos ) pos = j;
+	return Mid(change, 0, pos);
 }
 
 function PlayerJoined( PlayerPawn P)
