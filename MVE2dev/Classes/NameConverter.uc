@@ -1,6 +1,15 @@
 class NameConverter extends Object;
 
 var name ResultName;
+var NameConverter Instance;
+
+static function name ToName(string input)
+{
+	if ( Default.Instance == None )
+		Default.Instance = new (None) class'NameConverter';
+	Default.Instance.SetString(input);
+	return Default.Instance.ResultName;
+}
 
 function SetString(string str) 
 {

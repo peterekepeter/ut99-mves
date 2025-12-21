@@ -50,7 +50,6 @@ var string ClientLogoTexture;
 var string ServerInfoURL;
 var string MapInfoURL;
 var MV_Callbacks ServerCallbacks;
-var NameConverter Converter;
 
 replication
 {
@@ -454,19 +453,13 @@ final simulated function bool LinkerAddValue(string S)
 
 final simulated function MapVoteCache GetMVCInstanceForServerCode() 
 {
-	local name N;
 	if ( Self.ServerCode == "" )
 		return None; // not ready yet
 	
 	if ( MVC != None && MVC.ServerCode == ServerCode )
 		return MVC;
 
-	if ( Converter == None )
-		Converter = new class'NameConverter';
-
-	N = Converter.Convert(ServerCode);
-
-	MVC = class'MapVoteCache'.Static.GetNamedInstance(N);
+	MVC = class'MapVoteCache'.Static.GetStrNamedInstance(ServerCode);
 	MVC.ServerCode = Self.ServerCode;
 
 	return MVC;

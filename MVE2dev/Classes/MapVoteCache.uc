@@ -36,6 +36,11 @@ var config int MapCount;
 var int iNewMaps[32];
 var string ServerCode;
 
+static function MapVoteCache GetStrNamedInstance(string ServerCode)
+{
+	return GetNamedInstance(class'NameConverter'.Static.ToName(ServerCode));
+}
+
 static function MapVoteCache GetNamedInstance(name ServerCode) 
 {
 	local MapVoteCache C;
