@@ -1084,7 +1084,7 @@ function PlayerKickVoted( MVPlayerWatcher Kicked, optional string OverrideReason
 		foreach Kicked.Watched.ChildActors (class'Info', NexgenRPCI) //Issue a NexGen ban if possible
 			if ( NexgenRPCI.IsA('NexgenClientCore') )
 			{
-				class'MV_NexgenUtil'.static.banPlayer( Kicked.NexGenClient, NexgenRPCI, Reason);
+				class'MV_NexgenUtil'.Static.banPlayer( Kicked.NexGenClient, NexgenRPCI, Reason);
 				Log("[MVE] Nexgen Ban issued: "$Kicked.NexGenClient@NexgenRPCI, 'MapVote');
 				return;
 			}
@@ -1706,7 +1706,7 @@ final function bool CanVote(PlayerPawn Sender)
 final function MV_Result GenerateMapResult(string map, int idx)
 {
 	local MV_Result r;
-	r = class'MV_Result'.static.Create();
+	r = class'MV_Result'.Static.Create();
 	r.Map = map;
 	r.GameIndex = idx;
 	PopulateResultWithDefaults(r);
@@ -1738,7 +1738,7 @@ function PopulateResultWithRule(MV_Result r, int idx)
 		r.AddDerivedFrom(idx);
 	}
 	
-	while ( class'MV_Parser'.static.TrySplit(extends, ",", extendsIdx, extends) )
+	while ( class'MV_Parser'.Static.TrySplit(extends, ",", extendsIdx, extends) )
 	{
 		PopulateResultWithRule(r, int(extendsIdx));
 	}
@@ -1777,14 +1777,22 @@ final function bool SetupTravelString( string mapStringWithIdx )
 {
 	local string spk, GameClassName, LogoTexturePackage, mapFileName, idxString;
 	local MV_Result Result;
+	local int idx;
 
-	if ( !class'MV_Parser'.static.TrySplit(mapStringWithIdx, ":", mapFileName, idxString) ) 
+	if ( !class'MV_Parser'.Static.TrySplit(mapStringWithIdx, ":", mapFileName, idxString) ) 
 	{
 		Log("[MVE] Failed to parse map string `"$mapStringWithIdx$"` defaulting to current mode ");
 		idxString = ""$CurrentGameIdx;
 	}
+
+	idx = int(idxString);
+
+	if ( GameName(idx) ~= "Random" || RuleName(idx) ~= "Random" ) 
+	{
+		idx = PickRandomGameFrom(idx);
+	}
 	
-	Result = GenerateMapResult(mapFileName, int(idxString));
+	Result = GenerateMapResult(mapFileName, idx);
 
 	if ( Result.Map ~= "Random" )
 	{
@@ -1865,6 +1873,40 @@ final function bool SetupTravelString( string mapStringWithIdx )
 	return True; // SUCCESS!!!
 }
 
+function int PickRandomGameFrom(int idx)
+{
+	local int i, weight;
+	local bool bFilterRule, bFilterGametype;
+	local string rule, game;
+
+	rule = CustomGame[idx].RuleName;
+	game = CustomGame[idx].GameName;
+
+	bFilterRule = !(rule ~= "Random");
+	bFilterGametype = !(rule ~= "Random");
+
+	weight = 1;
+
+	for ( i = 0; i < ArrayCount(CustomGame); i = i + 1 )
+	{
+		if ( !CustomGame[i].bEnabled )
+			continue;
+		if ( bFilterRule && !(rule ~= CustomGame[i].RuleName) )
+			continue;
+		if ( bFilterGametype && !(game ~= CustomGame[i].GameName) )
+			continue;
+		if ( "Random" ~= CustomGame[i].RuleName )
+			continue;
+		if ( "Random" ~= CustomGame[i].GameName )
+			continue;
+		if ( Rand(weight) == 0 )
+			idx = i;
+		weight = weight + 1;
+	}
+
+	return idx;
+}
+
 function CheckClientPackageInstalled()
 {
 	local string CurrentPackages;
@@ -1914,7 +1956,12 @@ final function bool GotoMap( string MapString, optional bool bImmediate)
 	}
 	if ( !SetupTravelString( MapString ) )
 	{
-		Err("GotoMap: SetupTravelString has failed!");
+		// retry in case the Random option hits something that cannot be loaded
+		Nfo("Retrying SetupTravelString"); 
+		if ( !SetupTravelString( MapString ) )
+		{
+			Err("GotoMap: SetupTravelString has failed!");
+		}
 		return False;
 	}
 	ResetCurrentGametypeBeforeTravel();
@@ -2070,7 +2117,7 @@ function CommonCommands( Actor Sender, String S)
 static function string GetPackageNameFromString(string objectReference)
 {
 	local string name, ignore;
-	if ( class'MV_Parser'.static.TrySplit(objectReference, ".", name, ignore) )
+	if ( class'MV_Parser'.Static.TrySplit(objectReference, ".", name, ignore) )
 	{
 		return name;
 	}
@@ -2079,12 +2126,12 @@ static function string GetPackageNameFromString(string objectReference)
 
 static function Err(coerce string message)
 {
-	class'MV_Util'.static.Err(message);
+	class'MV_Util'.Static.Err(message);
 }
 
 static function Nfo(coerce string message)
 {
-	class'MV_Util'.static.Nfo(message);
+	class'MV_Util'.Static.Nfo(message);
 }
 
 // TODO investigate why is there save config
