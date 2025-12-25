@@ -111,13 +111,12 @@ function NextSearchItem(string txt, optional bool bPrev)
 		}
 		if ( InStr(Caps(Current.MapName), txt) != -1 ) 
 		{
-			MapListBox[mapList].SetSelectedItem(Current);
-			SelectMapListItem(MapListBox[mapList]);
+			SelectListItemWithoutNotify(MapListBox[mapList], Current);
+			SelectMapListItem(MapListBox[mapList], True);
 			break;
 		}
-		if ( try++ > 5000 ) 
+		if ( try++> 5000 ) 
 		{
-			Log("[MVE] Warning! Runaway seach loop!!!!");
 			break;		
 		}
 	}
@@ -139,7 +138,7 @@ function int GetMapVoteListNum(MapVoteListBox MLB)
 		return UMenuMapVoteList(MapVoteListDummy.SelectedItem).CGNum;
 	}
 
-	for ( i = 0; i < ArrayCount(MapListBox); ++ i )
+	for ( i = 0; i < ArrayCount(MapListBox);++i )
 	{
 		if ( MLB == MapListBox[i] )
 			return i;
@@ -177,7 +176,7 @@ function Created ()
 	// local UMenuLabelControl lblSearch;
 
 	Super.Created();
-	ClientConf = class'MapVoteClientConfig'.static.GetInstance();
+	ClientConf = class'MapVoteClientConfig'.Static.GetInstance();
 
 	TitleColor1 = ClientConf.GetColorOfGameModTitleColor();
 	TitleColor2 = ClientConf.GetColorOfRuleTitleColor();
@@ -230,7 +229,7 @@ function Created ()
 	// commenting out next line disables prefix for new maps section
   // MapVoteListDummy.CW = self; 
 	
-	for ( i = 0; i < ArrayCount(RListBox); i ++ )
+	for ( i = 0; i < ArrayCount(RListBox); i++ )
 	{
 		RListBox[i] = RuleListBox(CreateControl(Class'RuleListBox',20.0 + MapListwidth,26.0,0.0,0.0));
 		RListBox[i].Items.Clear();
@@ -372,52 +371,111 @@ function Created ()
 
 function RestoreSelection()
 {
+	ApplySelectionArgs(ClientConf.SelectedGameMode, ClientConf.SelectedGameRule, ClientConf.SelectedMap);
+}
+
+function ApplySelectionArgs(string selectedGame, string selectedGameRule, string selectedMap)
+{
 	local int ruleList, mapList;
 	local UWindowList item;
+	local bool bFoundGame, bFoundRule, bFoundMap;
 
 	ruleList = -1;
 	mapList = -1;
+	bFoundGame = False;
+	bFoundRule = False;
+	bFoundMap = False;
 
-	if ( ClientConf.SelectedGameMode == "" ) return;
+RETRY_GAME:
+
+	if ( selectedGame == "" && GMListBox.Items != None && GMListBox.Items.Next != None )
+		selectedGame = UMenuGameModeVoteList(GMListBox.Items.Next).MapName;
+
+	if ( selectedGame == "" ) return;
 
 	for ( item = GMListBox.Items; item != None; item = item.Next )
 	{
-		if ( UMenuGameModeVoteList(item).MapName != ClientConf.SelectedGameMode ) 
+		if ( UMenuGameModeVoteList(item).MapName != selectedGame ) 
 			continue;
-	
-		GMListBox.SetSelectedItem(UWindowListBoxItem(item));
-		GMListBox.MakeSelectedVisible();
+
+		SelectListItemWithoutNotify(GMListBox, UWindowListBoxItem(item));
 		ruleList = UMenuGameModeVoteList(item).listNum;
-		SelectGameModeListItem();
+		SelectGameModeListItem(False);
+		bFoundGame = True;
 		break;
 	}
 
-	if ( ruleList < 0 || ClientConf.SelectedGameRule == "" ) return;
+	if ( !bFoundGame && selectedGame != "" ) 
+	{
+		selectedGame = "";
+		goto RETRY_GAME;
+	}
+
+RETRY_RULE:
+
+	if ( selectedGameRule == "" && ruleList != -1 && RListBox[ruleList].Items != None && RListBox[ruleList].Items.Next != None )
+		selectedGameRule = UMenuRuleVoteList(RListBox[ruleList].Items.Next).MapName;
+
+	if ( ruleList < 0 || selectedGameRule == "" ) return;
 
 	for ( item = RListBox[ruleList].Items; item != None; item = item.Next )
 	{
-		if ( UMenuRuleVoteList(item).MapName != ClientConf.SelectedGameRule )
+		if ( UMenuRuleVoteList(item).MapName != selectedGameRule )
 			continue;
-		
-		RListBox[ruleList].SetSelectedItem(UWindowListBoxItem(item));
-		RListBox[ruleList].MakeSelectedVisible();
+
+		SelectListItemWithoutNotify(RListBox[ruleList], UWindowListBoxItem(item));
 		mapList = UMenuRuleVoteList(item).listNum;
-		SelectGameRuleListItem(RListBox[ruleList]);
+		SelectGameRuleListItem(RListBox[ruleList], False);
+		bFoundRule = True;
 		break;
 	}
-	
+
+	if ( !bFoundRule && selectedGameRule != "" ) 
+	{
+		selectedGameRule = "";
+		goto RETRY_RULE;
+	}
+
 	CurrentMapListIndex = mapList;
-	if ( mapList < 0 || ClientConf.SelectedMap == "" ) return;
-	
+
+RETRY_MAP:
+
+	if ( selectedMap == "" && MapListBox[mapList].Items != None && MapListBox[mapList].Items.Next != None )
+		selectedMap = UMenuMapVoteList(MapListBox[mapList].Items.Next).MapName;
+
+	if ( mapList < 0 || selectedMap == "" ) return;
+
 	for ( item = MapListBox[mapList].Items; item != None; item = item.Next )
 	{
-		if ( UMenuMapVoteList(item).MapName != ClientConf.SelectedMap )
+		if ( UMenuMapVoteList(item).MapName != selectedMap )
 			continue;
-		
-		MapListBox[mapList].SetSelectedItem(UWindowListBoxItem(item));
-		MapListBox[mapList].MakeSelectedVisible();
-		SelectMapListItem(MapListBox[mapList]);
+
+		SelectListItemWithoutNotify(MapListBox[mapList], UWindowListBoxItem(item));
+		SelectMapListItem(MapListBox[mapList], False);
+		bFoundMap = True;
 		break;
+	}
+
+	if ( !bFoundMap && selectedMap != "" )
+	{
+		selectedMap = "";
+		goto RETRY_MAP;
+	}
+}
+
+function SelectListItemWithoutNotify(UWindowListBox ListBox, UWindowListBoxItem NewSelected)
+{
+	if( NewSelected != None && ListBox.SelectedItem != NewSelected )
+	{
+		if( ListBox.SelectedItem != None )
+			ListBox.SelectedItem.bSelected = False;
+
+		ListBox.SelectedItem = NewSelected;
+
+		if( ListBox.SelectedItem != None )
+			ListBox.SelectedItem.bSelected = True;
+
+		ListBox.MakeSelectedVisible();
 	}
 }
 
@@ -425,7 +483,7 @@ function DeSelectAllOtherMapListBoxItems (MapVoteListBox selListBox, int listNum
 {
 	local int i;
 
-	for( i = 0; i < ArrayCount(MapListBox); i ++ )
+	for( i = 0; i < ArrayCount(MapListBox); i++ )
 	{
 		if( listnum != i )
 		{
@@ -446,7 +504,7 @@ function UWindowListBoxItem getSelectedItem(optional out int CGNum)
 {
 	local int i;
 	
-	for( i = 0; i < ArrayCount(MapListBox); i ++ )
+	for( i = 0; i < ArrayCount(MapListBox); i++ )
 	{
 		if( MapListBox[i].SelectedItem != None )
 		{
@@ -473,71 +531,70 @@ function Notify (UWindowDialogControl C, byte E)
 		case DE_Change:
 			switch(C)
 			{
-			default:
-		}
-		break;
+				default:
+			}
+			break;
 				
 		case DE_DoubleClick:
 			switch (C)
 			{			
-			case MapVoteListBox(C):
+				case MapVoteListBox(C):
 				
-				if ( MapVoteListBox(C).SelectedItem == None )
-				return;
-			listNum = GetMapVoteListNum(MapVoteListBox(C));
-			if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
-			{
-				if ( (Left(UMenuMapVoteList(MapVoteListBox(C).SelectedItem).MapName,3) != "[X]") || GetPlayerOwner().PlayerReplicationInfo.bAdmin )
-				{
-					GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE MAP "$UMenuMapVoteList(MapVoteListBox(C).SelectedItem).MapName$":"$string(listNum));
-					LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
-				}
-			}
-			SelectionTime = GetPlayerOwner().Level.TimeSeconds;
-			DeSelectAllOtherMapListBoxItems(MapVoteListBox(C),listNum);
-			break;
+					if ( MapVoteListBox(C).SelectedItem == None )
+						return;
+					listNum = GetMapVoteListNum(MapVoteListBox(C));
+					if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
+					{
+						if ( (Left(UMenuMapVoteList(MapVoteListBox(C).SelectedItem).MapName,3) != "[X]") || GetPlayerOwner().PlayerReplicationInfo.bAdmin )
+						{
+							GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE MAP "$UMenuMapVoteList(MapVoteListBox(C).SelectedItem).MapName$":"$string(listNum));
+							LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
+						}
+					}
+					SelectionTime = GetPlayerOwner().Level.TimeSeconds;
+					DeSelectAllOtherMapListBoxItems(MapVoteListBox(C),listNum);
+					break;
 					
-			case lstMapStatus:
+				case lstMapStatus:
 				
-				if ( MapStatusListItem(lstMapStatus.SelectedItem) == None )
-				return;
-			listNum = MapStatusListItem(lstMapStatus.SelectedItem).CGNum;
-			DeSelectAllOtherMapListBoxItems(MapListBox[0],0);
-			MapListBox[listNum].SelectMap(MapStatusListItem(lstMapStatus.SelectedItem).MapName);
-			if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
-			{
-				GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE MAP "$MapStatusListItem(lstMapStatus.SelectedItem).MapName$":"$string(MapStatusListItem(lstMapStatus.SelectedItem).CGNum));
-				LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
-			}
-			SelectionTime = GetPlayerOwner().Level.TimeSeconds;
-			break;
+					if ( MapStatusListItem(lstMapStatus.SelectedItem) == None )
+						return;
+					listNum = MapStatusListItem(lstMapStatus.SelectedItem).CGNum;
+					DeSelectAllOtherMapListBoxItems(MapListBox[0],0);
+					MapListBox[listNum].SelectMap(MapStatusListItem(lstMapStatus.SelectedItem).MapName);
+					if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
+					{
+						GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE MAP "$MapStatusListItem(lstMapStatus.SelectedItem).MapName$":"$string(MapStatusListItem(lstMapStatus.SelectedItem).CGNum));
+						LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
+					}
+					SelectionTime = GetPlayerOwner().Level.TimeSeconds;
+					break;
 					
-			case PlayerListBox:
+				case PlayerListBox:
 				
-				if ( PlayerVoteListItem(PlayerListBox.SelectedItem) == None )
-				return;
-			if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
-			{
-				GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE KICK "$PlayerVoteListItem(PlayerListBox.SelectedItem).PlayerName);
-				LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
-			}
-			break;
+					if ( PlayerVoteListItem(PlayerListBox.SelectedItem) == None )
+						return;
+					if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
+					{
+						GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE KICK "$PlayerVoteListItem(PlayerListBox.SelectedItem).PlayerName);
+						LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
+					}
+					break;
 					
-			case lstKickStatus:
+				case lstKickStatus:
 				
-				if ( PlayerVoteListItem(PlayerListBox.SelectedItem) == None )
-				return;
-			PlayerListBox.SelectPlayer(KickStatusListItem(lstKickStatus.SelectedItem).PlayerName);
-			Log("Select Player:"@KickStatusListItem(lstKickStatus.SelectedItem).PlayerName);
-			if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
-			{
-				GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE KICK "$PlayerVoteListItem(PlayerListBox.SelectedItem).PlayerName);
-				LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
+					if ( PlayerVoteListItem(PlayerListBox.SelectedItem) == None )
+						return;
+					PlayerListBox.SelectPlayer(KickStatusListItem(lstKickStatus.SelectedItem).PlayerName);
+					if ( GetPlayerOwner().Level.TimeSeconds > LastVoteTime + 0.625 )
+					{
+						GetPlayerOwner().ConsoleCommand("MUTATE BDBMAPVOTE KICK "$PlayerVoteListItem(PlayerListBox.SelectedItem).PlayerName);
+						LastVoteTime = GetPlayerOwner().Level.TimeSeconds;
+					}
+					break;
+				default:
 			}
 			break;
-			default:
-		}
-		break;
 		
 		case DE_Click:
 			switch (C)
@@ -555,11 +612,11 @@ function Notify (UWindowDialogControl C, byte E)
 					break;
 
 				case GMListBox:
-					SelectGameModeListItem();
+					SelectGameModeListItem(True);
 					break;
 						
 				case RuleListBox(C):
-					SelectGameRuleListItem(C);
+					SelectGameRuleListItem(C, True);
 					break;
 						
 				case SendButton:
@@ -575,7 +632,7 @@ function Notify (UWindowDialogControl C, byte E)
 					break;
 						
 				case MapVoteListBox(C):
-					SelectMapListItem(C);
+					SelectMapListItem(C, True);
 					break;
 					
 				case lstMapStatus:
@@ -622,7 +679,7 @@ function Notify (UWindowDialogControl C, byte E)
 	}
 }
 
-function SelectMapListItem(UWindowDialogControl C)
+function SelectMapListItem(UWindowDialogControl C, bool bSaveSelection)
 {
 	local int listNum;
 	
@@ -631,14 +688,14 @@ function SelectMapListItem(UWindowDialogControl C)
 	SelectionTime = GetPlayerOwner().Level.TimeSeconds;
 	DeSelectAllOtherMapListBoxItems(MapVoteListBox(C),listNum);
 
-	if ( UMenuMapVoteList(MapVoteListBox(C).SelectedItem).MapName != ClientConf.SelectedMap )
+	if ( bSaveSelection && UMenuMapVoteList(MapVoteListBox(C).SelectedItem).MapName != ClientConf.SelectedMap )
 	{
 		ClientConf.SetSelectedMap(UMenuMapVoteList(MapVoteListBox(C).SelectedItem).MapName);
 		SaveClientConfigWithDebounce();
 	}
 }
 
-function SelectGameRuleListItem(UWindowDialogControl C) 
+function SelectGameRuleListItem(UWindowDialogControl C, bool bSaveSelection) 
 {
 	local int listNum, i;
 	local string s;
@@ -651,7 +708,7 @@ function SelectGameRuleListItem(UWindowDialogControl C)
 	MapVoteListDummy.WinHeight = 0.0;
 	MapVoteListDummy.Resized();
 		
-	for ( i = 0; i < ArrayCount(RListBox); i ++ )
+	for ( i = 0; i < ArrayCount(RListBox); i++ )
 	{
 		if ( MapListBox[i].SelectedItem != None )
 		{
@@ -672,7 +729,7 @@ function SelectGameRuleListItem(UWindowDialogControl C)
 	}
 	lblTitle3.SetText(s);
 
-	if ( UMenuRuleVoteList(RuleListBox(C).SelectedItem).MapName != ClientConf.SelectedGameRule )
+	if ( bSaveSelection && UMenuRuleVoteList(RuleListBox(C).SelectedItem).MapName != ClientConf.SelectedGameRule )
 	{
 		ClientConf.SetSelectedGameRule(UMenuRuleVoteList(RuleListBox(C).SelectedItem).MapName);
 		RestoreSelection();
@@ -680,7 +737,7 @@ function SelectGameRuleListItem(UWindowDialogControl C)
 	}
 }
 
-function SelectGameModeListItem()
+function SelectGameModeListItem(bool bSaveSelection)
 {
 	local int listNum, i;
 				
@@ -696,7 +753,7 @@ function SelectGameModeListItem()
 	MapVoteListDummy.Resized();
 	lblTitle3.SetText("New Maps");
 		
-	for ( i = 0; i < ArrayCount(RListBox); i ++ )
+	for ( i = 0; i < ArrayCount(RListBox); i++ )
 	{
 		if ( MapListBox[i].SelectedItem != None )
 		{
@@ -719,7 +776,7 @@ function SelectGameModeListItem()
 	RListBox[listNum].WinHeight = ListHeight / 2;
 	RListBox[listNum].Resized();
 
-	if ( UMenuGameModeVoteList(GMListBox.SelectedItem).MapName != ClientConf.SelectedGameMode )
+	if ( bSaveSelection && UMenuGameModeVoteList(GMListBox.SelectedItem).MapName != ClientConf.SelectedGameMode )
 	{
 		ClientConf.SetSelectedGameMode(UMenuGameModeVoteList(GMListBox.SelectedItem).MapName);
 		RestoreSelection();
@@ -766,7 +823,7 @@ function int getListNum(string MapName, int CGNum)
 	local int i;
 
 	i = 0;
-	J0x07:
+J0x07:
     // End:0x40 [Loop If]
 	if( i < ArrayCount(RListBox) )
 	{
@@ -775,7 +832,7 @@ function int getListNum(string MapName, int CGNum)
 		{
 			return i;
 		}
-		++ i;
+		++i;
         // [Loop Continue]
 		goto J0x07;
 	}
@@ -797,17 +854,17 @@ function Tick(float DeltaTime)
 	if ( (SelectionTime != 0) && (GetPlayerOwner().Level.TimeSeconds > SelectionTime + debounceTime) && (getSelectedItem() != None) )
 	{
 		MapName = UMenuMapVoteList(getSelectedItem()).MapName;
-		SetSelectedMap(MapName);
+		ShowSelectedMap(MapName);
 		SelectionTime = 0.0;
 	}
-	if ( (ConfigChangeTime != 0) && (GetPlayerOwner().Level.TimeSeconds > ConfigChangeTime + 1) )
+	if ( (ConfigChangeTime != 0) && (GetPlayerOwner().Level.TimeSeconds > ConfigChangeTime + 2) )
 	{
 		SaveClientConfigPendingChanges();
 	}
 	Super.Tick(DeltaTime);
 }
 
-function SetSelectedMap(string MapName)
+function ShowSelectedMap(string MapName)
 {
 	local int i, pos;
 	local string Prefix, RealPreFix, RealMapName;
@@ -821,7 +878,7 @@ function SetSelectedMap(string MapName)
 	
 	if( i != -1 )
 		MapName = Left(MapName, i);
-	
+
 	RealMapName = GetRealMapname(MapName);
 
 	ResolveScreenshotAndSummary(RealMapName, MapName);
@@ -879,7 +936,7 @@ function ResolveScreenshotAndSummary(string realMapName, string virtualMapName)
 	if ( packageName != "" )
 	{
 		// try to load screenshot and summary from ScreenshotBundle
-		BundleClass = class < Commandlet > (DynamicLoadObject(packageName$".ScreenshotBundle", class'Class'));
+		BundleClass = class<Commandlet>(DynamicLoadObject(packageName$".ScreenshotBundle", class'Class'));
 		if ( BundleClass != None )
 		{
 			BundleInstance = new BundleClass;
@@ -1125,7 +1182,7 @@ simulated function string GetPrefix(int CGNum)
 	local UMenuRuleVoteList MenuRule;
 	local UMenuGameModeVoteList MenuGame;
 	
-	for ( i = 0; i < ArrayCount(RListBox); i ++ ) 
+	for ( i = 0; i < ArrayCount(RListBox); i++ ) 
 	{
 		for ( MenuRule = UMenuRuleVoteList(RListBox[i].Items.Next); MenuRule != None; MenuRule = UMenuRuleVoteList(MenuRule.Next) ) 
 		{
