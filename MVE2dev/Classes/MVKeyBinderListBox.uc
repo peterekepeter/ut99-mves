@@ -1,7 +1,7 @@
 //================================================================================
 // MVKeyBinderListBox.
 //================================================================================
-class MVKeyBinderListBox extends UWindowListBox;
+class MVKeyBinderListBox extends MVBaseListBox;
 
 function Paint (Canvas C, float MouseX, float MouseY)
 {

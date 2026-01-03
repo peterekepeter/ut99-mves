@@ -1,7 +1,7 @@
 //================================================================================
 // MapStatusListBox.
 //================================================================================
-class MapStatusListBox extends UWindowListBox;
+class MapStatusListBox extends MVBaseListBox;
 
 function Created ()
 {
@@ -74,6 +74,15 @@ function SelectMap (string MapName)
 function DoubleClickItem (UWindowListBoxItem i)
 {
 	UWindowDialogClientWindow(ParentWindow).Notify(self,11);
+}
+
+function EditCopy()
+{
+	local PlayerPawn P;
+
+	P = GetPlayerOwner();
+
+	P.CopyToClipboard(MapStatusListItem(SelectedItem).MapName);
 }
 
 defaultproperties

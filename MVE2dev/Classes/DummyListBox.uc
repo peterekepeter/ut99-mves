@@ -1,7 +1,7 @@
 //================================================================================
 // DummyListBox.
 //================================================================================
-class DummyListBox extends UWindowListBox;
+class DummyListBox extends MVBaseListBox;
 
 function Paint (Canvas C, float MouseX, float MouseY)
 {

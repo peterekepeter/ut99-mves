@@ -1,7 +1,7 @@
 //================================================================================
 // KickStatusListBox.
 //================================================================================
-class KickStatusListBox extends UWindowListBox;
+class KickStatusListBox extends MVBaseListBox;
 
 function Created ()
 {
@@ -68,6 +68,15 @@ function SelectPlayer (string PlayerName)
 function DoubleClickItem (UWindowListBoxItem i)
 {
 	UWindowDialogClientWindow(ParentWindow).Notify(self,11);
+}
+
+function EditCopy()
+{
+	local PlayerPawn P;
+
+	P = GetPlayerOwner();
+
+	P.CopyToClipboard(KickStatusListItem(SelectedItem).PlayerName);
 }
 
 defaultproperties

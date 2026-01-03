@@ -1,7 +1,7 @@
 //================================================================================
 // MapVoteListBox.
 //================================================================================
-class MapVoteListBox extends UWindowListBox;
+class MapVoteListBox extends MVBaseListBox;
 
 var int Count;
 var float VotePriority;
@@ -88,7 +88,10 @@ function KeyDown (int Key, float X, float Y)
 	local UWindowListBoxItem ItemPointer;
 	local PlayerPawn P;
 
+	Super.KeyDown(Key, X, Y);
+
 	P=GetPlayerOwner();
+
 	if(Key == P.EInputKey.IK_MouseWheelDown || Key == P.EInputKey.IK_Down)
 	{
 		if ( SelectedItem == None ) SelectedItem = UWindowListBoxItem(Items);
@@ -220,9 +223,25 @@ function Find(string SearchText)
 
 function KeyType(int Key, float X, float Y)
 {
+	Super.KeyType(Key, X, Y);
+
+	if ( bControlDown ) return;
+
 	// TODO maybe there is a cleaner way to achieve this?
-	bRequestingSearch = True;
+	if ( !bControlDown )
+	{
+		bRequestingSearch = True;
+	}
 	ParentWindow.KeyType(Key, X, Y);
+}
+
+function EditCopy()
+{
+	local PlayerPawn P;
+
+	P = GetPlayerOwner();
+
+	P.CopyToClipboard(UMenuMapVoteList(SelectedItem).MapName);
 }
 
 defaultproperties

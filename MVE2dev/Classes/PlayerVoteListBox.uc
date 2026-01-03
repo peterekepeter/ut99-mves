@@ -1,7 +1,7 @@
 //================================================================================
 // PlayerVoteListBox.
 //================================================================================
-class PlayerVoteListBox extends UWindowListBox;
+class PlayerVoteListBox extends MVBaseListBox;
 
 var bool bDisabled;
 
@@ -67,6 +67,8 @@ function KeyDown (int Key, float X, float Y)
 	local int i;
 	local UWindowListBoxItem ItemPointer;
 	local PlayerPawn P;
+
+	Super.KeyDown(Key, X, Y);
 
 	if ( bDisabled )
 	{
@@ -166,6 +168,15 @@ function DoubleClickItem (UWindowListBoxItem i)
 		return;
 	}
 	UWindowDialogClientWindow(ParentWindow).Notify(self,11);
+}
+
+function EditCopy()
+{
+	local PlayerPawn P;
+
+	P = GetPlayerOwner();
+
+	P.CopyToClipboard(PlayerVoteListItem(SelectedItem).PlayerName);
 }
 
 defaultproperties

@@ -1,7 +1,7 @@
 //================================================================================
 // GameModeListBox.
 //================================================================================
-class GameModeListBox extends UWindowListBox;
+class GameModeListBox extends MVBaseListBox;
 
 var Color BXTC;
 var Color BXC;
@@ -82,6 +82,8 @@ function KeyDown (int Key, float X, float Y)
 	local UWindowListBoxItem ItemPointer;
 	local UMenuMapVoteList MapItem;
 	local PlayerPawn P;
+
+	Super.KeyDown(Key, X, Y);
 
 	P=GetPlayerOwner();
 	if(Key == P.EInputKey.IK_MouseWheelDown || Key == P.EInputKey.IK_Down)
@@ -184,6 +186,15 @@ function Find (string SearchText)
 			break;
 		}
 	}
+}
+
+function EditCopy()
+{
+	local PlayerPawn P;
+
+	P = GetPlayerOwner();
+
+	P.CopyToClipboard(UMenuGameModeVoteList(SelectedItem).MapName);
 }
 
 defaultproperties

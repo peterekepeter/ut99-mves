@@ -2,7 +2,7 @@
 // RuleListBox.
 //================================================================================
 
-class RuleListBox extends UWindowListBox;
+class RuleListBox extends MVBaseListBox;
 
 var Color BXTC;
 var Color BXC;
@@ -82,6 +82,8 @@ function KeyDown (int Key, float X, float Y)
 	local int i;
 	local UWindowListBoxItem ItemPointer;
 	local PlayerPawn P;
+
+	Super.KeyDown(Key, X, Y);
 
 	P=GetPlayerOwner();
 	if(Key == P.EInputKey.IK_MouseWheelDown || Key == P.EInputKey.IK_Down)
@@ -210,6 +212,15 @@ J0x10:
 			goto J0x10;
 		}
     }
+}
+
+function EditCopy()
+{
+	local PlayerPawn P;
+
+	P = GetPlayerOwner();
+
+	P.CopyToClipboard(UMenuRuleVoteList(SelectedItem).MapName);
 }
 
 defaultproperties
