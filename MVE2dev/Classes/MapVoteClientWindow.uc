@@ -1153,8 +1153,11 @@ function KeyType(int Key, float X, float Y)
 
 function Close (optional bool bByParent)
 {
-	local int W;
-	local int Mode;
+	local string interruptedMessage;
+	local PlayerPawn PP;
+	local Console C;
+
+	interruptedMessage = txtMessage.GetValue();
 
 	if ( ClientConf.bLoadScreenShot != cbLoadScreenShot.bChecked )
 	{
@@ -1163,6 +1166,17 @@ function Close (optional bool bByParent)
 	}
 	SaveClientConfigPendingChanges();
 	Super.Close(bByParent);
+	
+	if ( interruptedMessage != "" && interruptedMessage != " " )
+	{
+		PP = GetPlayerOwner();
+		if ( PP != None && PP.Player != None && PP.Player.Console != None )
+		{
+			C = PP.Player.Console;
+			C.Talk();
+			C.TypedStr = C.TypedStr$interruptedMessage;
+		}
+	}
 }
 
 final simulated function RuleListBox GetRListBox( int Idx)
