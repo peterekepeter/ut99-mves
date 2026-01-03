@@ -19,6 +19,11 @@ INCLPAT="--include *.uc --include *.txt --include *.int --include *.md --include
 RELEASEDIR=ReleaseFiles/$VER
 RELEASEDIRTEMPLATE=ReleaseFiles/MVE2h
 WORKDIR=$(pwd)
+DOCSDIR=./docs
+
+markdown() {
+    npx markdown-to-html-cli -s "$1" -o "$2" --img-base64 --title "$3"
+}
 
 cleanup() {
     echo "Cleaning up source tree..."
@@ -46,6 +51,9 @@ build () {
     mv $SYSTEMDIR/MVES.u $RELEASEDIR/System/
     mv $SYSTEMDIR/$VER.u $RELEASEDIR/System/
     rm $SYSTEMDIR/TestMVE.u
+    cp $DOCSDIR/quickstart.txt "$RELEASEDIR/Help/$VER Quickstart.txt"
+    markdown $DOCSDIR/changelog.md "$RELEASEDIR/Help/$VER Changelog.html" "$VER Changelog"
+    markdown $DOCSDIR/feature-documentation.md "$RELEASEDIR/Help/$VER Manual.html" "$VER Manual"
 
     echo "Archiving..."
     cd ReleaseFiles
