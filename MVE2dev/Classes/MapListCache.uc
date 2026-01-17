@@ -72,37 +72,197 @@ replication
 		ServerCode, iNewMaps, ClientScreenshotPackage, ClientLogoTexture, ServerInfoURL, MapInfoURL;
 
 	reliable if(Role < ROLE_Authority)
-		NeedServerMapList, FinishServerMapList, bChaceCheck, 
+		NeedServerMapList, bChaceCheck, 
 		bClientLoadEnd;
+}
+
+simulated function Tick (float F)
+{
+	if ( !bInitialized )
+	{
+		Initialized();
+	} 
+	else 
+	{
+		Disable('Tick');
+	}
+}
+
+final simulated function Initialized()
+{
+	local PlayerPawn P;
+	local LevelInfo L;
+
+	if( Owner == None )
+	{
+		return;
+	}
+
+	if( bInitialized )
+	{
+		return;
+	}
+	bInitialized = True;
+
+	if( Level.NetMode == NM_Client )
+	{
+		foreach AllActors(class'PlayerPawn', P)
+		{
+			if( P.Player == None )
+			{
+				continue;                
+			}
+			break;            
+		}        
+
+		if( P != None )
+		{
+			L = P.GetEntryLevel();
+			if( (L == None) || P != Owner )
+			{
+				Destroy();
+				return;
+			}
+		}
+		else
+		{
+			Destroy();
+			return;
+		}
+	}
+	if ( Level.NetMode != NM_DedicatedServer )
+	{
+		SetTimer(0.50, True);
+	}
+}
+
+simulated function Timer ()
+{
+	if ( Owner == None )
+	{
+		Destroy();
+		return;
+	}
+	if ( bClientLoadEnd )
+	{
+		SetTimer(0.0,False);
+		return;
+	}
+	if ( !bChaceCheck )
+	{
+		ChaceCheck();
+	}
+	if ( bHTTPReceiving )
+	{
+		HTTPLinkerSetup();
+		return;
+	}
+	MapListCheck();
+}
+
+final simulated function MapListCheck ()
+{
+	local int i;
+	local int NECount;
+	local int RLCount;
+	local int RCount;
+
+	if ( Level.NetMode == NM_DedicatedServer )
+	{
+		return;
+	}
+	if ( MapCount == 0 )
+	{
+		return;
+	}
+	i = 0;
+	while ( i < 256 )
+	{
+		NECount += MapCounter(MapList1[i]);
+		NECount += MapCounter(MapList2[i]);
+		NECount += MapCounter(MapList3[i]);
+		NECount += MapCounter(MapList4[i]);
+		NECount += MapCounter(MapList5[i]);
+		NECount += MapCounter(MapList6[i]);
+		NECount += MapCounter(MapList7[i]);
+		NECount += MapCounter(MapList8[i]);
+		NECount += MapCounter(MapList9[i]);
+		NECount += MapCounter(MapList10[i]);
+		NECount += MapCounter(MapList11[i]);
+		NECount += MapCounter(MapList12[i]);
+		NECount += MapCounter(MapList13[i]);
+		NECount += MapCounter(MapList14[i]);
+		NECount += MapCounter(MapList15[i]);
+		NECount += MapCounter(MapList16[i]);
+		i++;
+	}
+	i = 0;
+
+	while ( i < ArrayCount(RuleList) )
+	{
+		if ( RuleList[i] != "" )
+		{
+			RLCount++;
+		}
+		if ( (GameModeName[i] != "") && (RuleName[i] != "") && (VotePriority[i] > 0) )
+		{
+			RCount++;
+		}
+		i++;
+	}
+
+	LoadMapCount = NECount;
+	LoadRuleCount = RCount;
+	LoadPercentage = (NECount + RLCount + RCount) * 100 / (MapCount + RuleListCount + RuleCount);
+
+	if ( (RLCount == RuleListCount) && (RCount == RuleCount) )
+	{
+		bRulesAreLoaded = True;
+	}
+
+	if ( (NECount == MapCount) && (RLCount == RuleListCount) && (RCount == RuleCount) )
+	{
+		bClientLoadEnd = True;
+		if ( bNeedServerMapList )
+		{
+			SaveToMapVoteCache();
+		}
+		bNeedServerMapList = False;
+	}
 }
 
 final simulated function SaveToMapVoteCache()
 {
-	local int i;
+	if( Level.NetMode == NM_DedicatedServer )
+	{
+		return;
+	}
+	if( ServerCode == "" || LastUpdate == "" )
+	{
+		return;
+	}
 
-	if( Role == ROLE_Authority || Level.NetMode == NM_Standalone )
-	{
-		return;
-	}
-	if(ServerCode == "" || LastUpdate == "")
-	{
-		return;
-	}
-	// FIX Access none 'MVC'
-	
 	MVC = GetMVCInstanceForServerCode();
 	if ( MVC == None )
+	{
 		return;
+	}
 
+	SaveToCache(MVC);
+}
+
+final simulated function SaveToCache(MapVoteCache MVC)
+{
+	local int i;
 	MVC.bCached = True;
 
-	if(PlayerPawn(Owner).GameReplicationInfo != none)
+	if( PlayerPawn(Owner).GameReplicationInfo != None )
 	{
 		MVC.ServerName = PlayerPawn(Owner).GameReplicationInfo.ServerName;
 	}
 	MVC.LastUpdate = LastUpdate;
 	
-	for ( i = 0; i < ArrayCount(RuleList); ++i )
+	for ( i = 0; i < ArrayCount(RuleList); i+=1 )
 	{
 		MVC.RuleList[i] = RuleList[i];
 		MVC.GameModeName[i] = GameModeName[i];
@@ -112,7 +272,7 @@ final simulated function SaveToMapVoteCache()
 	MVC.RuleListCount = RuleListCount;
 	MVC.RuleCount = RuleCount;
 
-	for ( i = 0; i < 256; ++ i)
+	for ( i = 0; i < 256; i+=1 )
 	{
 		MVC.MapList1[i] = MapList1[i];
 		MVC.MapList2[i] = MapList2[i];
@@ -133,7 +293,7 @@ final simulated function SaveToMapVoteCache()
 	}
 	MVC.MapCount = MapCount;
 
-	for (i = 0; i < ArrayCount(iNewMaps); i++)
+	for ( i = 0; i < ArrayCount(iNewMaps); i+=1 )
 	{
 		MVC.iNewMaps[i] = iNewMaps[i];
 	}
@@ -141,59 +301,128 @@ final simulated function SaveToMapVoteCache()
 	MVC.SaveConfig();
 }
 
-simulated function Tick (float F)
+final simulated function ChaceCheck()
 {
-	if ( !bInitialized )
-	{
-		Initialized();
-	} else {
-		Disable('Tick');
-	}
-}
 
-final simulated function Initialized()
-{
-	local PlayerPawn P;
-	local LevelInfo L;
-
-	if(Owner == none)
+	if ( Level.NetMode == NM_DedicatedServer )
 	{
 		return;
 	}
 
-	if(bInitialized)
+	if ( HTTPMapListLocation == "" || ServerCode == "" || LastUpdate == "" )
 	{
 		return;
 	}
-	bInitialized = true;
 
-	if(Level.NetMode == NM_Client)
+	MVC = GetMVCInstanceForServerCode();
+
+	if ( MVC == None )
 	{
-		foreach AllActors(class'PlayerPawn', P)
-		{
-			if(P.Player == none)
-			{
-				continue;                
-			}
-			break;            
-		}        
+		return;
+	}
+	
+	// all information loaded to successfully complete the cache check
+	bChaceCheck = True;
 
-		if(P != none)
+	if( !MVC.bCached || MVC.LastUpdate != LastUpdate )
+	{
+		bNeedServerMapList = True;
+
+		if( HTTPMapListLocation ~= "None" )
 		{
-			L = P.GetEntryLevel();
-			if((L == none) || P != Owner)
-			{
-				Destroy();
-				return;
-			}
+			MVC.CacheClear();
+			NeedServerMapList();
 		}
 		else
 		{
-			Destroy();
-			return;
+			MVC.CacheClear();
+			HTTPLinkerSetup();
 		}
+		return;
 	}
-	SetTimer(0.50, true);
+
+	LoadFromCache(MVC);
+}
+
+final simulated function LoadFromCache(MapVoteCache MVC)
+{
+	local int i;
+
+	for ( i = 0; i < ArrayCount(RuleList); i+=1 )
+	{
+		RuleList[i] = MVC.RuleList[i];
+		GameModeName[i] = MVC.GameModeName[i];
+		RuleName[i] = MVC.RuleName[i];
+		VotePriority[i] = MVC.GetVotePriority(i);
+	}
+	RuleListCount = MVC.RuleListCount;
+	RuleCount = MVC.RuleCount;
+
+	for ( i = 0; i < 256; i+=1 )
+	{
+		MapList1[i] = MVC.MapList1[i];
+		MapList2[i] = MVC.MapList2[i];
+		MapList3[i] = MVC.MapList3[i];
+		MapList4[i] = MVC.MapList4[i];
+		MapList5[i] = MVC.MapList5[i];
+		MapList6[i] = MVC.MapList6[i];
+		MapList7[i] = MVC.MapList7[i];
+		MapList8[i] = MVC.MapList8[i];
+		MapList9[i] = MVC.MapList9[i];
+		MapList10[i] = MVC.MapList10[i];
+		MapList11[i] = MVC.MapList11[i];
+		MapList12[i] = MVC.MapList12[i];
+		MapList13[i] = MVC.MapList13[i];
+		MapList14[i] = MVC.MapList14[i];
+		MapList15[i] = MVC.MapList15[i];
+		MapList16[i] = MVC.MapList16[i];
+	}
+	MapCount = MVC.MapCount;
+}
+
+final function NeedServerMapList()
+{
+	if( Role != ROLE_Authority )
+	{
+		return;
+	}
+
+	HTTPMapListLocation = "None";
+	bNeedServerMapList = True;
+	ServerCallbacks.RequestFullCache();
+}
+
+final simulated function MapVoteCache GetMVCInstanceForServerCode() 
+{
+	if ( Self.ServerCode == "" )
+		return None; // not ready yet
+	
+	if ( MVC != None && MVC.ServerCode == ServerCode )
+		return MVC;
+
+	MVC = class'MapVoteCache'.Static.GetStrNamedInstance(ServerCode);
+	MVC.ServerCode = Self.ServerCode;
+
+	return MVC;
+}
+
+final simulated function int MapCounter (string S)
+{
+	if ( InStr(S,";") == -1 )
+	{
+		return 0;
+	}
+	return 1;
+}
+
+final simulated function float GetVotePriority( int Idx)
+{
+	return VotePriority[Idx];
+}
+
+final simulated function SetVotePriority( int Idx, float Value)
+{
+	VotePriority[Idx] = Value;
 }
 
 final simulated function HTTPStateReset ()
@@ -234,24 +463,10 @@ final simulated function HTTPLinkerSetup ()
 	Path = Mid(temp,pos);
 	if ( HTTPLastParameter != "" )
 	{
-		Path = Path $ "&val=" $ HTTPLastParameter;
+		Path = Path$"&val="$HTTPLastParameter;
 	}
-	Link = Spawn(Class'HTTPMapListReceiver',self);
+	Link = Spawn(Class'HTTPMapListReceiver',Self);
 	Link.BrowseCurrentURI(host,Path,int(Port));
-}
-
-final simulated function bool checksam (string P, string V)
-{
-	if ( Left(P,7) ~= "MapList" )
-	{
-		if ( Mid(V,Len(V) - 1) == ";" )
-		{
-			return True;
-		} else {
-			return False;
-		}
-	}
-	return True;
 }
 
 final simulated function bool LinkerAddValue(string S)
@@ -263,24 +478,24 @@ final simulated function bool LinkerAddValue(string S)
 	local string PTemp;
 	local bool bSuccess;
 
-	bSuccess = true;
+	bSuccess = True;
 	// End:0x4E
-	if(S ~= "[END]")
+	if( S ~= "[END]" )
 	{
 		HTTPLastParameter = "";
-		bHTTPReceiving = false;
+		bHTTPReceiving = False;
 		return bSuccess;
 	}
 	// End:0x67
-	if(S ~= "[Next]")
+	if( S ~= "[Next]" )
 	{
 		return bSuccess;
 	}
 	pos = InStr(S, "=");
 	// End:0x95
-	if(pos == -1)
+	if( pos == -1 )
 	{
-		bSuccess = false;
+		bSuccess = False;
 		return bSuccess;
 	}
 	P = Left(S, pos);
@@ -288,7 +503,7 @@ final simulated function bool LinkerAddValue(string S)
 	PTemp = P;
 	pos = InStr(P, "[");
 	// End:0x142
-	if(pos > 0)
+	if( pos > 0 )
 	{
 		temp = P;
 		P = Left(P, pos);
@@ -298,26 +513,26 @@ final simulated function bool LinkerAddValue(string S)
 		i = int(temp);
 	}
 	// End:0x1D0
-	if(P ~= "MapList")
+	if( P ~= "MapList" )
 	{
 		// End:0x177
-		if(i < 256)
+		if( i < 256 )
 		{
-			P = P $ "1";
+			P = P$"1";
 		}
 		// End:0x1D0
 		else
 		{
 			iTemp = int(float(i) - (float(i) % float(256)));
 			iTemp /= float(256);
-			++ iTemp;
-			P = P $ string(iTemp);
+			++iTemp;
+			P = P$string(iTemp);
 			i = int(float(i) % float(256));
 		}
 	}
 	bSuccess = checksam(P, V);
 	// End:0x1F9
-	if(!bSuccess)
+	if( !bSuccess )
 	{
 		return bSuccess;
 	}
@@ -439,241 +654,32 @@ final simulated function bool LinkerAddValue(string S)
 			break;
 		// End:0xFFFF
 		default:
-			bSuccess = false;
+			bSuccess = False;
 			// End:0x574
 			break;
 	}
 	// End:0x588
-	if(bSuccess)
+	if( bSuccess )
 	{
 		HTTPLastParameter = PTemp;
 	}
 	return bSuccess;
 }
 
-final simulated function MapVoteCache GetMVCInstanceForServerCode() 
+final simulated function bool checksam (string P, string V)
 {
-	if ( Self.ServerCode == "" )
-		return None; // not ready yet
-	
-	if ( MVC != None && MVC.ServerCode == ServerCode )
-		return MVC;
-
-	MVC = class'MapVoteCache'.Static.GetStrNamedInstance(ServerCode);
-	MVC.ServerCode = Self.ServerCode;
-
-	return MVC;
-}
-
-final simulated function ChaceCheck()
-{
-	local int i;
-
-	if ( Role == ROLE_Authority || Level.NetMode == NM_Standalone )
-		return;
-
-	if ( HTTPMapListLocation == "" || ServerCode == "" || LastUpdate == "" )
-		return;
-
-	MVC = GetMVCInstanceForServerCode();
-
-	if ( MVC == None )
-		return;
-	
-	bChaceCheck = True;
-
-	if( !MVC.bCached || MVC.LastUpdate != LastUpdate )
+	if ( Left(P,7) ~= "MapList" )
 	{
-		bNeedServerMapList = True;
-
-		if( HTTPMapListLocation ~= "None" )
+		if ( Mid(V,Len(V) - 1) == ";" )
 		{
-			MVC.CacheClear();
-			NeedServerMapList();
-		}
-		else
+			return True;
+		} 
+		else 
 		{
-			MVC.CacheClear();
-			HTTPLinkerSetup();
+			return False;
 		}
-		return;
 	}
-
-	for (i = 0; i < ArrayCount(RuleList); ++i)
-	{
-		RuleList[i] = MVC.RuleList[i];
-		GameModeName[i] = MVC.GameModeName[i];
-		RuleName[i] = MVC.RuleName[i];
-		VotePriority[i] = MVC.GetVotePriority(i);
-	}
-	RuleListCount = MVC.RuleListCount;
-	RuleCount = MVC.RuleCount;
-
-	for (i = 0; i < 256; ++i)
-	{
-		MapList1[i] = MVC.MapList1[i];
-		MapList2[i] = MVC.MapList2[i];
-		MapList3[i] = MVC.MapList3[i];
-		MapList4[i] = MVC.MapList4[i];
-		MapList5[i] = MVC.MapList5[i];
-		MapList6[i] = MVC.MapList6[i];
-		MapList7[i] = MVC.MapList7[i];
-		MapList8[i] = MVC.MapList8[i];
-		MapList9[i] = MVC.MapList9[i];
-		MapList10[i] = MVC.MapList10[i];
-		MapList11[i] = MVC.MapList11[i];
-		MapList12[i] = MVC.MapList12[i];
-		MapList13[i] = MVC.MapList13[i];
-		MapList14[i] = MVC.MapList14[i];
-		MapList15[i] = MVC.MapList15[i];
-		MapList16[i] = MVC.MapList16[i];
-	
-	}
-	MapCount = MVC.MapCount;
-	FinishServerMapList();
-}
-
-final function NeedServerMapList()
-{
-	//local string S;
-	if(Role != ROLE_Authority)
-	{
-		return;
-	}
-
-	HTTPMapListLocation = "None";
-	bNeedServerMapList = true;
-	ServerCallbacks.RequestFullCache();
-/*     S = Left(string(default.Class), InStr(string(default.Class), "."));
-	S = Mid(S, 0, Len(S) - 1);
-	Helper = class<MapListCacheHelper>(DynamicLoadObject(S $ "S.MapListCacheHelperS", Class.Class));
-	Helper.static.NeedServerMapList(self); */
-}
-
-final function FinishServerMapList()
-{
-	if(Role != ROLE_Authority)
-	{
-		return;
-	}
-
-	SetTimer(0.0,False);
-	bNeedServerMapList = false;
-	ServerCallbacks.FullCacheLoaded();
-}
-
-simulated function Timer ()
-{
-	if ( Owner == None )
-	{
-		Destroy();
-		return;
-	}
-	if ( bClientLoadEnd )
-	{
-		SetTimer(0.0,False);
-		return;
-	}
-	if ( !bChaceCheck )
-	{
-		ChaceCheck();
-	}
-	if ( bHTTPReceiving )
-	{
-		HTTPLinkerSetup();
-		return;
-	}
-	MapListCheck();
-}
-
-final simulated function MapListCheck ()
-{
-	local int i;
-	local int NECount;
-	local int RLCount;
-	local int RCount;
-
-	if (  !(Role != ROLE_Authority) || (Level.NetMode == NM_Standalone) )
-	{
-		return;
-	}
-	if ( MapCount == 0 )
-	{
-		return;
-	}
-	i = 0;
-	while ( i < 256 )
-	{
-		NECount += MapCounter(MapList1[i]);
-		NECount += MapCounter(MapList2[i]);
-		NECount += MapCounter(MapList3[i]);
-		NECount += MapCounter(MapList4[i]);
-		NECount += MapCounter(MapList5[i]);
-		NECount += MapCounter(MapList6[i]);
-		NECount += MapCounter(MapList7[i]);
-		NECount += MapCounter(MapList8[i]);
-		NECount += MapCounter(MapList9[i]);
-		NECount += MapCounter(MapList10[i]);
-		NECount += MapCounter(MapList11[i]);
-		NECount += MapCounter(MapList12[i]);
-		NECount += MapCounter(MapList13[i]);
-		NECount += MapCounter(MapList14[i]);
-		NECount += MapCounter(MapList15[i]);
-		NECount += MapCounter(MapList16[i]);
-		i++;
-	}
-	i = 0;
-
-	while ( i < ArrayCount(RuleList) )
-	{
-		if ( RuleList[i] != "" )
-		{
-			RLCount++;
-		}
-		if ( (GameModeName[i] != "") && (RuleName[i] != "") && (VotePriority[i] > 0) )
-		{
-			RCount++;
-		}
-		i++;
-	}
-
-	LoadMapCount = NECount;
-	LoadRuleCount = RCount;
-	LoadPercentage = (NECount + RLCount + RCount) * 100 / (MapCount + RuleListCount + RuleCount);
-
-	if ((RLCount == RuleListCount) && (RCount == RuleCount))
-	{
-		bRulesAreLoaded = true;
-	}
-
-	if ( (NECount == MapCount) && (RLCount == RuleListCount) && (RCount == RuleCount) )
-	{
-		bClientLoadEnd = True;
-		if ( bNeedServerMapList )
-		{
-			SaveToMapVoteCache();
-		}
-		bNeedServerMapList = False;
-		FinishServerMapList();
-	}
-}
-
-final simulated function int MapCounter (string S)
-{
-	if (InStr(S,";") == -1){
-		return 0;
-	}
-	return 1;
-}
-
-final simulated function float GetVotePriority( int Idx)
-{
-	return VotePriority[Idx];
-}
-
-final simulated function SetVotePriority( int Idx, float Value)
-{
-	VotePriority[Idx] = Value;
+	return True;
 }
 
 defaultproperties

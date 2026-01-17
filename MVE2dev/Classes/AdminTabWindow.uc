@@ -1,6 +1,4 @@
-//================================================================================
-// AdminTabWindow.
-//================================================================================
+// AdminTabWindow wraps AdminWindow inside a tab
 class AdminTabWindow extends UWindowScrollingDialogClient;
 
 function Created ()
@@ -8,8 +6,4 @@ function Created ()
 	ClientClass = Class'AdminWindow';
 	FixedAreaClass = None;
 	Super.Created();
-}
-
-defaultproperties
-{
 }

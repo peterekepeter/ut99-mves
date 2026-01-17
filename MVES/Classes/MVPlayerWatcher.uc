@@ -49,7 +49,7 @@ state Initializing
 			GotoState('Inactive');
 		bOverflow = False;
 	}
-	Begin:
+Begin:
 	if ( Mutator.PlayerIDType == PID_Default ) //15 ticks to retrieve ip
 	{
 		while( TicksLeft -- > 0 )
@@ -99,7 +99,7 @@ state Initializing
 		Watched.Destroy();
 		Stop;
 	}
-	PostID:
+PostID:
 	PlayerIP = class'MV_MainExtension'.static.ByDelimiter( Watched.GetPlayerNetworkAddress(), ":"); //Remove port
 	bInitialized = True;
 	if ( Mutator.bWelcomeWindow )
@@ -109,56 +109,10 @@ state Initializing
 	PlayerID = class'MV_MainExtension'.static.NumberToByte( Watched.PlayerReplicationInfo.PlayerID);
 	PlayerID = class'MV_MainExtension'.static.PreFill( PlayerID, "0", 3);
 	Mutator.Extension.AddPlayerToWindows( Self);
-	GetCache:
+GetCache:
 	Sleep( 1.0 + FRand() * 1.0 );
 	if ( !GetCacheActor() )
 		Stop;
-	TicksLeft = 15;
-	if ( ViewPort(Watched.Player) != None ) //Local player, proceed to hack the MLC
-	{
-		// MapListCacheActor.SetPropertyText("bNeedServerMapList","1");
-		MapListCacheActor.SetPropertyText("bClientLoadEnd","1");
-		// MapListCacheActor.SetPropertyText("HTTPMapListLocation","None");
-		MapListCacheActor.SetPropertyText("bChaceCheck","1");
-		MapListCacheActor.SetPropertyText("LoadMapCount", string(Mutator.MapList.iMapList) );
-		MapListCacheActor.SetPropertyText("LoadRuleCount", string(Mutator.MapList.GameCount) );
-		MapListCacheActor.SetPropertyText("LoadPercentage", "100" );
-	}
-	while ( TicksLeft -- > 0 )
-	{
-		if ( NeedsFullCache() )
-		{
-			FullCache:
-			// MapListCacheActor.SetPropertyText("bNeedServerMapList","1");
-			// MapListCacheActor.SetPropertyText("HTTPMapListLocation","None");
-			// MapListCacheActor.SetPropertyText("ClientScreenshotPackage", Mutator.ClientScreenshotPackage );
-			// MapListCacheActor.SetPropertyText("ClientLogoTexture", Mutator.ClientLogoTexture );
-			// MapListCacheActor.SetPropertyText("ServerInfoURL", Mutator.ServerInfoURL );
-			// MapListCacheActor.SetPropertyText("bFixNetNews", string(Mutator.bFixNetNewsForPlayers) );
-			// MapListCacheActor.SetPropertyText("MapInfoURL", Mutator.MapInfoURL );
-			// Mutator.Extension.MLC_Rules( MapListCacheActor); 	Sleep(0.5);
-			// Mutator.Extension.MLC_MapList_1( MapListCacheActor); 	Sleep(0.5);
-			// Mutator.Extension.MLC_MapList_2( MapListCacheActor);	Sleep(0.5);
-			// Mutator.Extension.MLC_MapList_3( MapListCacheActor);	Sleep(0.5);
-			// Mutator.Extension.MLC_MapList_4( MapListCacheActor);	Sleep(0.5);
-			// Mutator.Extension.MLC_MapList_5( MapListCacheActor);	Sleep(0.5);
-			// Mutator.Extension.MLC_MapList_6( MapListCacheActor);	Sleep(0.5);
-			// Mutator.Extension.MLC_MapList_7( MapListCacheActor);	Sleep(0.5);
-			// Mutator.Extension.MLC_MapList_8( MapListCacheActor);	Sleep(0.5);
-			// Mutator.Extension.MLC_MapList_9( MapListCacheActor);	Sleep(0.5);
-			// Mutator.Extension.MLC_MapList_10( MapListCacheActor);	Sleep(0.5);
-			// Mutator.Extension.MLC_MapList_11( MapListCacheActor);	Sleep(0.5);
-			// Mutator.Extension.MLC_MapList_12( MapListCacheActor);	Sleep(0.5);
-			// Mutator.Extension.MLC_MapList_13( MapListCacheActor);	Sleep(0.5);
-			// Mutator.Extension.MLC_MapList_14( MapListCacheActor);	Sleep(0.5);
-			// Mutator.Extension.MLC_MapList_15( MapListCacheActor);	Sleep(0.5);
-			// Mutator.Extension.MLC_MapList_16( MapListCacheActor);
-			Stop;
-		}
-		Sleep(0.5); // Total: 8-10 seconds
-	}
-	if ( bHTTPLoading ) // Started but not ended
-		goto('FullCache');
 }
 
 state Inactive
@@ -262,17 +216,6 @@ function bool GetCacheActor()
 	return True;
 }
 
-function bool NeedsFullCache()
-{
-	local string test;
-	if ( MapListCacheActor == None )
-		return False;
-	test = GetPropertyText("bInitialized"); //Always true here
-	return (MapListCacheActor.GetPropertyText("HTTPMapListLocation") == "None" 
-		&& MapListCacheActor.GetPropertyText("bNeedServerMapList") == test );
-}
-
-
 function RequestFullCache()
 {
 	MapListCacheActor.SetPropertyText("ClientScreenshotPackage", Mutator.ClientScreenshotPackage );
@@ -297,11 +240,6 @@ function RequestFullCache()
 	Mutator.Extension.MLC_MapList_14( MapListCacheActor);	
 	Mutator.Extension.MLC_MapList_15( MapListCacheActor);	
 	Mutator.Extension.MLC_MapList_16( MapListCacheActor);
-}
-
-function FullCacheLoaded()
-{
-	// finished loading full cache
 }
 
 function bool IsModerator()

@@ -4,8 +4,3 @@ function RequestFullCache()
 {
 
 }
-
-function FullCacheLoaded()
-{
-
-}

@@ -1,6 +1,4 @@
-//================================================================================
-// MapVoteCache.
-//================================================================================
+// responsible for storing a per server cache on each client
 class MapVoteCache extends Object
 	config(MVE_ClientCache) perobjectconfig;
 
@@ -54,47 +52,40 @@ static function MapVoteCache GetNamedInstance(name ServerCode)
 
 simulated function CacheClear ()
 {
-  local int i;
+	local int i;
 
-  i = 0;
-  JL0007:
-  if ( i < ArrayCount(RuleList) )
-  {
-    RuleList[i] = "";
-    GameModeName[i] = "";
-    RuleName[i] = "";
-    VotePriority[i] = 0.0;
-    i++;
-    goto JL0007;
-  }
-  RuleListCount = 0;
-  RuleCount = 0;
-  i = 0;
-  JL006D:
-  if ( i < 256 )
-  {
-    MapList1[i] = "";
-    MapList2[i] = "";
-    MapList3[i] = "";
-    MapList4[i] = "";
-    MapList5[i] = "";
-    MapList6[i] = "";
-    MapList7[i] = "";
-    MapList8[i] = "";
-    MapList9[i] = "";
-    MapList10[i] = "";
-    MapList11[i] = "";
-    MapList12[i] = "";
-    MapList13[i] = "";
-    MapList14[i] = "";
-    MapList15[i] = "";
-    MapList16[i] = "";
-    i++;
-    goto JL006D;
-  }
-  MapCount = 0;
-  for (i = 0; i < ArrayCount(iNewMaps); i++)
-	iNewMaps[i] = 0;
+	for ( i = 0; i < ArrayCount(RuleList) ; i+=1 )
+	{
+		RuleList[i] = "";
+		GameModeName[i] = "";
+		RuleName[i] = "";
+		VotePriority[i] = 0.0;
+	}
+	RuleListCount = 0;
+	RuleCount = 0;
+
+	for ( i = 0; i < 256; i+=1 )
+	{
+		MapList1[i] = "";
+		MapList2[i] = "";
+		MapList3[i] = "";
+		MapList4[i] = "";
+		MapList5[i] = "";
+		MapList6[i] = "";
+		MapList7[i] = "";
+		MapList8[i] = "";
+		MapList9[i] = "";
+		MapList10[i] = "";
+		MapList11[i] = "";
+		MapList12[i] = "";
+		MapList13[i] = "";
+		MapList14[i] = "";
+		MapList15[i] = "";
+		MapList16[i] = "";
+	}
+	MapCount = 0;
+	for ( i = 0; i < ArrayCount(iNewMaps); i++ )
+		iNewMaps[i] = 0;
 }
 
 final simulated function float GetVotePriority( int Idx)
