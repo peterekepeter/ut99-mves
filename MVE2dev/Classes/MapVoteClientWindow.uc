@@ -1048,7 +1048,7 @@ function Paint (Canvas C, float MouseX, float MouseY)
 		C.DrawColor.R = 255;
 		C.DrawColor.G = 255;
 		C.DrawColor.B = 255;
-		W = PlayerListwidth;
+		W = size;
 
 		// aspect ratio
 		R = Screenshot.VSize;
