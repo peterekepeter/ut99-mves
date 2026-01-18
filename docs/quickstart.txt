@@ -31,6 +31,32 @@ against filters
 After these steps are done, in game you should be able to make the vote window
 show up by either typing `!v` in chat or `mutate bdbmapvote votemenu` in console.
 
+Alternatively you can also just start a server from the multiplayer menu, or a
+run a pracitce session in which case using the mutator menu add mapvote as a 
+utator. This requires correct installation of the `.int` file without which 
+the mutator will not show up in the mutator menu. 
+
+
+Updating
+========
+
+When updating make a backup so that you can roll back if something breaks.
+You should at least back up MVE_Config.ini and UnrealTournament.ini
+
+1. Copy necessary files
+
+    - copy the `.u` files into to the `System/` folder
+
+2. Add the client package to ServerPackages inside UnrealTournament.ini:
+
+    ServerPackages=MVE2dev
+
+The new version will pick up the existing MVE_Config configuration but it may 
+also add new options to the configuration. These would show up at the end of 
+each ini section and you may want to re-arrange to keep the config nice and clean.
+
+Please refer to the provided changelog to see what changed.
+
 
 Troubleshooting
 ===============
@@ -70,10 +96,22 @@ Troubleshooting
     MVE will print out configuration problems found during map list reload.
 
 
+3. When joining the game players have wrong skin/texture:
+
+    A. Is `bOverrideServerPackages` inside `MVE_Config.ini` set to `True`?
+    This changes how ServerPackages are managed, only enable it if you 
+    understand what it does, for troubleshooting purposes disable it first
+    by setting it to `bOverrideServerPackages=False`
+
+    B. In `UnrealTournament.ini` verify that your `ServerPackages` are correcly
+    set up. If they are not players will not be able to use even the stok skins.
+    Restore this configuration from a stock install of UT99 if needed to.
+
+
 Support
 =======
 
-If the above did not work ytou can reach out to the communityt. 
+If the above did not work you can reach out to the community. 
 You can report bugs or ask for help in the thread:
 
 https://ut99.org/viewtopic.php?t=15657
@@ -91,6 +129,9 @@ You will need to learn how to use the config file.
 This can only be done through experiment and practice.
 Always make small changes and test it.
 Once you got a good config, make a backup of it.
+
+Please refer to the provided manual for more configration options it goes more
+in depth into some subjects and contains configuration snippets and examples.
 
 
 Adding More Maps
@@ -110,6 +151,9 @@ Alternatively a reload can be triggered from the config file MVE_Config.ini
 This is useful so that you can reload the map list without entering the game.
 
     bReloadOnNextRun=True
+
+It can also be done from the admin tab when logged in as admin inside the 
+mapvote window.
 
 
 Adding Custom Gametypes
@@ -151,23 +195,21 @@ You can ofcourse choose different keys to bind to.
 Note: if you logged in as admin, you can force a map swicth!
 
 
-Advanced Installation
+Advanced Tip & Tricks
 =====================
 
 - If bOverrideServerPackages=True then MapVote will manage ServerPackages for
 you and will automatically add the user interface package MVE2dev to ServerPackages
-By default bOverrideServerPackages=True but if you have set 
-bOverrideServerPackages=False you will need to manually add the client package 
-yourself to ServerPackages:
-
-[Engine.GameEngine] 
-ServerPackages=MVE2dev
+By default bOverrideServerPackages=False because this is more work to set up 
+corectly. It will also allow you to configure ServerPackages separately for 
+every custom gametype you set up. This is a good optimization if to only make
+client download the packages needed for the currently playing gametype.
 
 
-- MapVote can be installed both in mutator or server actor mode. This will 
-affect the initialization order a bit. This will influence initialization of 
-other mutators. Ultimately this is a choice for you to use whichever mode is
-more comfortable working with. Here are some ways you can run MapVote:
+- MapVote can be installed both in mutator or server actor mode. When run as a
+server actor mapvote will run in special "background" mode until the first map 
+is voted. This is a choice for you to use whichever mode is more comfortable 
+working with. Here are some ways you can run MapVote:
 
     1) as server actor, edit UnrealTournament.ini add the following:
 

@@ -11,132 +11,83 @@
 
 **For more information also check the changelog, it may be liste there**
 
-## Random Gametype/Rule aka Random Random
-
-To enable this configure GameName or RuleName property to "Random" and 
-recommended to also have bHasRandom=True this will make it possible for 
-players to select a random game with random rule with random map. 
-
-```ini
-CustomGame[48]=(bEnabled=True,GameName="Random",RuleName="Random",GameClass="Botpack.DeathMatchPlus",FilterCode="xrandom",bHasRandom=True,VotePriority=1.000000,MutatorList="",Settings="",Packages="",TickRate=100,ServerActors="",Extends="",UrlParameters="",ExcludeMutators="",ExcludeActors="")
-```
-
-After this
-option gets voted mapvote will first randomly pick a random game then inside 
-the game a random rule is selected then a random map is selected.
+Installation/troubleshooting is covered in the separate "Quickstart" file.
 
 
-## Configuration reuse via aliases
+## Configuration
 
-When configuring a lot of gametypes you'll notice that you're repeating the 
-same configuration over and over again. You can reduce the repetition by 
-reusing parts of configuration. This can be done using aliases.
+Your configuration only file is `MVE_Config.ini`. You will need to familiarize
+yourself with `MVE_Config.ini` as it's the only way to configure MapVote. 
+You'll need to learn and undestand how it's structured.
 
-Aliases are basically shorthands that get replaced with a longer definition.
-You can reference an alias from the MutatorList.
+Use your favorite text editor and possible one that has syntax highlighting
+for `ini` files. For example VsCode(ium) works out of the box. If you're using
+notepad++ you may use the custom syntax provided with this MapVote which 
+enhances ini highlighting for UT99. This can help avoid mistakes and typos
+which are unfortunately silent errors when running UT99.
 
-When the configuration is loaded, the alias will be substituted based on the 
-alias definition. Please note that this is basic text substitution and you 
-will have to ensure that the commas are in the right place after substitution.
+It's good pracitce to make backups of this file once you have a working 
+configuration make a copy of it and give it a name.
 
-```ini
-CustomGame[7]=(GameName="CTF",MutatorList="<lgsniper>",...)
-CustomGame[8]=(GameName="DM",MutatorList="<lgsniper>",...)
-Aliases[0]=<lgsniper>=Botpack.LowGrav,BotPack.SniperArena
-```
+A good workflow is:
 
-The configuration above is same as manually typing out all the mutators as 
-seen in the configuration below:
+1. Close server
+2. Edit MVE_Config.ini
+3. Restart server
+4. Test the changes
+
+It's recommended to make small changes and to test them often. Once you start
+gain a bit of understanding, you'll be able to make larger changes with 
+confidence, but until then make the smallest changes and see what it does. 
+
+
+## Map Lists (aka FilterCode)
+
+Every gametype you configure requires a list of maps. The list of maps to be 
+used for a gametype is specified via the `FilterCode` property. 
 
 ```ini
-CustomGame[7]=(GameName="CTF",MutatorList="Botpack.LowGrav,BotPack.SniperArena",...)
-CustomGame[8]=(GameName="DM",MutatorList="Botpack.LowGrav,BotPack.SniperArena",...)
+CustomGame[19]=(GameName="DeathMatch",FilterCode="DMlist", ... )
+CustomGame[20]=(GameName="Assault",FilterCode="ASlist", ... )
 ```
 
-Note: not all properties support aliases, but mutators do.
-
-## Premade lists
-
-For coop campagins or for any other gametype where the order of maps needs
-to be manually set up, premade lists can be used. When you make a premade
-the number and order of the maps will be exactly as you set them up in the
-configuration file. 
-
-You will first need a gametype, let's call it Coop, but it can be anything else
-and create a new FilterCode. The filter code can be customized but it must
-start with `premade`, so for example `premadeRTNP` or `premadeDK` are fine,
-in this example we'll go with `premadeA`.
+If you want two gametypes with the same list of maps, use the same FilterCode.
 
 ```ini
-CustomGame[33]=(GameName="Coop",FilterCode="premadeA",bHasRandom=False,...)
+CustomGame[19]=(RuleName="Low Grav",FilterCode="DMlist", ... )
+CustomGame[20]=(RuleName="InstaGib",FilterCode="DMlist", ... )
 ```
 
-Next, in the map filters, you will need to list the maps you want in the premade
-list.
+There are multiple types of filters which can be combined together.
+MapVote supports having multiple include and exclude filters on the same
+FilterCode and filters can be a simple wildcard file match or a combination 
+of tags. There is also a special mode when you want very specific manual 
+control over the order of the maps.
+
+
+## Map Wildcard Filter
+
+The simple-est way to use MapVote is with wildcard file prefix filters. 
+You can just set up which maps to grab based on how the filename starts.
+Since UT99 maps are prefixed with the gametype this is super simple to set 
+up multiple gametypes.
+
 
 ```ini
-MapFilters[20]=
-MapFilters[21]=premadeA DM-Malevolence
-MapFilters[22]=premadeA DM-Liandri
-MapFilters[23]=premadeA DM-StalwartXL
-MapFilters[24]=
-MapFilters[25]=
+MapFilters[0]=DMlist DM-*
+MapFilters[1]=ASlist AS-*
+MapFilters[2]=DOMlist DOM-*
+MapFilters[3]=CTFlist CTF-*
 ```
 
-As long as the convention above is respected, they will be picked up by the 
-special premade filter in the order given in the config file, and will not
-be sorted alphabetically.
+Using this workflow, whenever you need to add new maps to the server, you need
+to install the new files and run the map reload command and they will be 
+instantly picked up.
 
 
-## Green background for players that voted
+## Map Tag Filters
 
-Players that vote recieve a green background. This was a broken feature. 
-Players did receive the green background but only when mapvote window 
-opens. Now with the fixes applied the player background shouls switch to
-green as soon as they vote.
-
-
-## Logo Texture 
-
-Since mapvote automatically selects a map this feature is not that important
-anymore as in a properly configured mapvote the logo would rarely be 
-displayed.
-
-A logo texture can now be configured and shown. The mapvote will instruct
-all windows to show this texture initially before players select a map.
-
-Example:
-
-```ini
-[MVES.MapVote]
-ClientLogoTexture=Botpack.ASMDAlt_a00
-```
-
-
-## Populate ServerPackages for Known Properties
-
-When `bOverrideServerPackages` is enabled then mapvote will automatically 
-detect and populate packages from the following properties:
-
- - ClientLogoTexture
- - ClientScreenshotPackage
- - ClientPackage
-
-This means you dont have to manually set these server packages. But currently
-the changes to take place need a new map to be voted through mapvote.
-
-
-<!-- ## Screenshot Bundle [EXPERIMENTAL]
-
-In order to have screenshot and level summary for every level in the map,
-there is an experimental feature in place that allows players to load 
-screenshots from a dedicated package which contains all screenshots for 
-the levels. -->
-
-
-## Map Tags Feature
-
-In order to add more flexibility to the way map lists are built, it's now
+In order to add more flexibility to the way map lists are built, it's also
 possible to tag specific maps. You can assign multiple tags per map.
 
 For example `DM-CliffyB4:RA` could mean that the map DM-CliffyB4 is suitable
@@ -183,18 +134,44 @@ MapTags[5]=DM-Crane:DM:LARGE
 MapTags[6]=DM-Morpheus:DM:MEDIUM:LG
 ```
 
+The downsides of this is that if you use this was to configure map lists,
+every time you want to add a map to the list you need to add an entry to 
+`MVE_Config.ini` to that the map. Map lists built with tags require more
+maintenance.
 
-<!-- ## Extended Gametype Configuration
 
-- Added option Tickrate for each GameConfig. Also added DefaultTickRate globally. 
-But not sure if change on fly tickrate applied on map change. Anyway be request of it.
+## Premade Map Lists
 
-- Added option ServerActors for each GameConfig, which allow spawn some actors,
-without try add it to Mutator list, as do option Mutators.
+For coop campagins or for any other gametype where the order of maps needs
+to be manually set up, premade lists can be used. When you make a premade
+the number and order of the maps will be exactly as you set them up in the
+configuration file. 
 
-- Added option bAvoidRandom for each GameConfig. Done in really dumb way. Random 
-still same, but if pick game mode which forbidden random restart. Up to 1024 times.
- -->
+You will first need a gametype, let's call it Coop, but it can be anything else
+and create a new FilterCode. The filter code can be customized but it must
+start with `premade`, so for example `premadeRTNP` or `premadeDK` are fine,
+in this example we'll go with `premadeA`.
+
+```ini
+CustomGame[33]=(GameName="Coop",FilterCode="premadeA",bHasRandom=False,...)
+```
+
+Next, in the map filters, you will need to list the maps you want in the premade
+list.
+
+```ini
+MapFilters[20]=
+MapFilters[21]=premadeA DM-Malevolence
+MapFilters[22]=premadeA DM-Liandri
+MapFilters[23]=premadeA DM-StalwartXL
+MapFilters[24]=
+MapFilters[25]=
+```
+
+As long as the convention above is respected, they will be picked up by the 
+special premade filter in the order given in the config file, and will not
+be sorted alphabetically.
+
 
 ## MapOverrides
 
@@ -231,6 +208,138 @@ MapOverrides[0]=DM-Deck16][?Song=Organic.Organic?MutatorList=Botpack.LowGrav
 MapOverrides[1]=DM-Gothic?Song=Mannodermaus-20200222.20200222
 MapOverrides[2]=Song==Phantom.Phantom?Song=X-void_b.X-void_b
 ```
+
+## Random Gametype/Rule aka Random Random
+
+To enable this configure GameName or RuleName property to "Random" and 
+recommended to also have bHasRandom=True this will make it possible for 
+players to select a random game with random rule with random map. 
+
+```ini
+CustomGame[48]=(bEnabled=True,GameName="Random",RuleName="Random",GameClass="Botpack.DeathMatchPlus",FilterCode="xrandom",bHasRandom=True,VotePriority=1.000000,MutatorList="",Settings="",Packages="",TickRate=100,ServerActors="",Extends="",UrlParameters="",ExcludeMutators="",ExcludeActors="")
+```
+
+After this
+option gets voted mapvote will first randomly pick a random game then inside 
+the game a random rule is selected then a random map is selected.
+
+
+## Configuration reuse via aliases
+
+When configuring a lot of gametypes you'll notice that you're repeating the 
+same configuration over and over again. You can reduce the repetition by 
+reusing parts of configuration. This can be done using aliases.
+
+Aliases are basically shorthands that get replaced with a longer definition.
+You can reference an alias from the MutatorList.
+
+When the configuration is loaded, the alias will be substituted based on the 
+alias definition. Please note that this is basic text substitution and you 
+will have to ensure that the commas are in the right place after substitution.
+
+```ini
+CustomGame[7]=(GameName="CTF",MutatorList="<lgsniper>",...)
+CustomGame[8]=(GameName="DM",MutatorList="<lgsniper>",...)
+Aliases[0]=<lgsniper>=Botpack.LowGrav,BotPack.SniperArena
+```
+
+The configuration above is same as manually typing out all the mutators as 
+seen in the configuration below:
+
+```ini
+CustomGame[7]=(GameName="CTF",MutatorList="Botpack.LowGrav,BotPack.SniperArena",...)
+CustomGame[8]=(GameName="DM",MutatorList="Botpack.LowGrav,BotPack.SniperArena",...)
+```
+
+Note: not all properties support aliases, but mutators do.
+
+
+## Logo Texture 
+
+Since mapvote automatically selects a map this feature is not that important
+anymore as in a properly configured mapvote the logo would rarely be 
+displayed.
+
+A logo texture can now be configured and shown. The mapvote will instruct
+all windows to show this texture initially before players select a map.
+
+Example:
+
+```ini
+[MVES.MapVote]
+ClientLogoTexture=Botpack.ASMDAlt_a00
+```
+
+## Configuring ServerPackages per Gametype
+
+MapVote can take control over managing ServerPackages for you this allows
+you to optimize you packages configuration to only make the clients download
+what is needed only for the current gametype instead of requiring clients to
+preload everything for the whole server. This feature is emabled via the 
+`bOverrideServerPackages` flag.
+
+- bOverrideServerPackages=False
+  -> You edit ServerPackages inside UnrealTournament.ini
+
+- bOverrideServerPackages=True 
+  -> You edit ServerPackages inside MVE_Config.ini
+
+If your MainServerPackages is empty then MapVote will extract the
+packages for you from UnrealTournament.ini and populate the list. Otherwise 
+you need to make sure the server packages are correcly set up. Here is an
+example for a correct value.
+
+```ini
+MainServerPackages=("SoldierSkins","CommandoSkins","FCommandoSkins","SGirlSkins","BossSkins","Botpack")
+```
+
+Then in each CustomGame you can add additional packages on top which will 
+then only be applied when that particular custom game is being played. And then
+players would only need to download the additional packages when playing that 
+gametype.
+
+```ini
+CustomGame[4]=(RuleName="Classic",Packages="", ...)
+CustomGame[5]=(RuleName="Relics",Packages="Relics", ... )
+```
+
+### Populate ServerPackages for Known Properties
+
+When `bOverrideServerPackages` is enabled then mapvote will automatically 
+detect and populate packages from the following properties:
+
+ - ClientLogoTexture
+ - ClientScreenshotPackage
+ - ClientPackage
+ - Package of the GameClass
+ - Package of the Song when using MapOverrides
+
+This means you dont have to manually set these server packages. Note that
+package changes are applied when a new map is voted through MapVote.
+
+Package changes are logged to server log and you can also check in 
+UnrealTournament.ini that they were correctly applied.
+
+
+<!-- ## Screenshot Bundle [EXPERIMENTAL]
+
+In order to have screenshot and level summary for every level in the map,
+there is an experimental feature in place that allows players to load 
+screenshots from a dedicated package which contains all screenshots for 
+the levels. -->
+
+
+<!-- ## Extended Gametype Configuration
+
+- Added option Tickrate for each GameConfig. Also added DefaultTickRate globally. 
+But not sure if change on fly tickrate applied on map change. Anyway be request of it.
+
+- Added option ServerActors for each GameConfig, which allow spawn some actors,
+without try add it to Mutator list, as do option Mutators.
+
+- Added option bAvoidRandom for each GameConfig. Done in really dumb way. Random 
+still same, but if pick game mode which forbidden random restart. Up to 1024 times.
+ -->
 
 ## Configurable Shutdown on travel
 
