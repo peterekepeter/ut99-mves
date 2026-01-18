@@ -6,6 +6,7 @@ class MapVoteWRI extends WRI;
 
 var string ServerInfoURL;
 var bool bFixNetNews;
+var bool bAdmin;
 var string MapInfoURL;
 var string MapList[4096];
 var string RuleList[100];
@@ -87,7 +88,7 @@ replication
 	reliable if ( Role == ROLE_Authority )
 		SendBTRecord,SendReportText,UpdateKickVoteResults,UpdateMapVoteResults,UpdatePlayerVoted,RemovePlayerName,AddNewPlayer,
 		PlayerName,bKickVote,MapVoteResults,KickVoteResults,GameTypes,OtherClass,VoteTimeLimit,KickPercent,bAutoOpen,
-		ScoreBoardDelay,bCheckOtherGameTie,ServerInfoURL,bFixNetNews,MapInfoURL,Mode,RepeatLimit,MapVoteHistoryType,MidGameVotePercent,
+		ScoreBoardDelay,bCheckOtherGameTie,ServerInfoURL,bFixNetNews,bAdmin,MapInfoURL,Mode,RepeatLimit,MapVoteHistoryType,MidGameVotePercent,
 		MinMapCount,MapPreFixOverRide,PreFixSwap,OtherPreFix,HasStartWindow,bEntryWindows,bDebugMode,bRemoveCrashedMaps,
 		ActGameClass,ActGamePrefix,MapVoteTitle,CustomGames,CustomGamesState,PrefixDictionary,LogoTexture;
 	reliable if ( Role < ROLE_Authority )
@@ -226,6 +227,7 @@ simulated function bool SetupWindow()
 	{
 		SetTimer(Level.TimeDilation,False);
 		CWindow = MapVoteTabWindow(MapVoteFramedWindow(TheWindow).ClientArea);
+		UpdateIsAdmin(bAdmin);
 	} else {
 		Log("Super.SetupWindow() = false");
 	}
@@ -654,6 +656,14 @@ simulated function RemovePlayerName (string OldPlayerName)
 		{
 			CWindow.RemovePlayerName(OldPlayerName);
 		}
+	}
+}
+
+simulated function UpdateIsAdmin(bool bAdmin)
+{
+	if ( TheWindow != None )
+	{
+		CWindow.UpdateIsAdmin(bAdmin);
 	}
 }
 

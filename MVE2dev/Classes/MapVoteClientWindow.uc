@@ -247,17 +247,6 @@ function Created ()
 	KickVoteButton = UWindowSmallButton(CreateControl(Class'UWindowSmallButton',30.0 + 2 * MapListwidth,ListHeight + 46,PlayerListwidth,18.0));
 	KickVoteButton.DownSound = Sound'Click';
 	
-	if ( bKickVote || GetPlayerOwner().PlayerReplicationInfo.bAdmin )
-	{
-		KickVoteButton.Text = "Kick";
-		KickVoteButton.bDisabled = True;
-	} 
-	else 
-	{
-		KickVoteButton.Text = "";
-		KickVoteButton.bDisabled = False;
-	}
-	
 	lblKickVote1 = UMenuLabelControl(CreateControl(Class'UMenuLabelControl',10.0,217.0,60,60.0));
 	lblKickVote1.SetText("Player Name");
 	lblKickVote1.SetFont(0);
@@ -367,6 +356,29 @@ function Created ()
 	SendButton.DownSound = Sound'Click';
 	SendButton.Text = "Send";
 	SendButton.bDisabled = False;
+}
+
+function UpdateIsAdmin(bool bAdmin)
+{
+	if ( bAdmin )
+	{
+		VoteButton.Text = "Force Switch";
+	}
+	else 
+	{
+		VoteButton.Text = "Vote";
+	}
+	
+	if ( bKickVote || bAdmin )
+	{
+		KickVoteButton.Text = "Kick";
+		KickVoteButton.bDisabled = True;
+	} 
+	else 
+	{
+		KickVoteButton.Text = "";
+		KickVoteButton.bDisabled = False;
+	}
 }
 
 function RestoreSelection()

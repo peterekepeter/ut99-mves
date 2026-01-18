@@ -27,12 +27,6 @@ function Created ()
 	ConfigWindow = ConfigWindow(PageControl.Page);
 	PageControl = Pages.AddPage("Info",Class'ServerInfoWindow');
 	InfoWindow = ServerInfoWindow(PageControl.Page);
-
-	if ( GetPlayerOwner().PlayerReplicationInfo.bAdmin )
-	{
-		PageControl = Pages.AddPage("Admin",Class'AdminTabWindow');
-		AdminWindow = AdminTabWindow(PageControl.Page);
-	}
 }
 
 function AddMapName (int listNum, string MapName)
@@ -102,6 +96,19 @@ function AddPlayerName (string PlayerName, bool bHasVoted)
 function ClearPlayerList ()
 {
 	MapWindow.PlayerListBox.Items.Clear();
+}
+
+function UpdateIsAdmin(bool bAdmin)
+{	
+	local UWindowPageControlPage PageControl;
+
+	if ( bAdmin && AdminWindow == None )
+	{
+		PageControl = Pages.AddPage("Admin",Class'AdminTabWindow');
+		AdminWindow = AdminTabWindow(PageControl.Page);
+	}
+
+	MapWindow.UpdateIsAdmin(bAdmin);
 }
 
 function RemovePlayerName (string PlayerID)
