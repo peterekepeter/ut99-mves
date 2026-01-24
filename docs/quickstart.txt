@@ -1,13 +1,11 @@
-Quickstart
+I. Quickstart
 ==========
 
 1. Copy necessary files
 
     - copy the `.u` files into to the `System/` folder
 
-    - copy the `.int` file:
-        - on 436 into the `System/`
-        - on 469 into the `SystemLocalized/int/`
+    - copy the `.int` file also into the `System/` folder
 
     - copy the configuration `.ini` file:
         - on Windows this is the `System/` folder
@@ -17,37 +15,53 @@ Quickstart
 
     ServerPackages=MVE2dev
 
-3. Start your server with mapvote enabled:
+3. Start your server with the mapvote mutator from a command line:
 
     ucc server DM-Deck16][?Mutator=MVES.MapVote
 
-4. Whenever you want the map list to be updated you need to run the reload 
-command the reload command will re-scan paths for maps and will match them 
-against filters
+OR install as a server actor:
+
+    ServerActors=MVES.MapVote
+
+OR add it to LocalMap:
+
+    LocalMap=DM-Fractal?Mutator=MVES.MapVote
+
+OR add as mutator from the GUI:
+    - from Practice Session 
+    - from Start New Multiplayer Game
+
+4. Join the server with a client. Whenever you want the map list to be 
+updated you need to run the reload command the reload command will re-scan 
+paths for maps and will match them against filters:
 
     adminlogin yoursecretpassword
     mutate bdbmapvote reload
 
-After these steps are done, in game you should be able to make the vote window
-show up by either typing `!v` in chat or `mutate bdbmapvote votemenu` in console.
+5. Now you should be able to bring up the mapvote vote window either by 
+typing `!v` in chat or `mutate bdbmapvote votemenu` in console. If everything 
+went well you'll have a default starter setup with some gametypes and maps.
 
-Alternatively you can also just start a server from the multiplayer menu, or a
-run a pracitce session in which case using the mutator menu add mapvote as a 
-utator. This requires correct installation of the `.int` file without which 
-the mutator will not show up in the mutator menu. 
+If things did not go well and mapvote window is not showing up or the map
+lists are empty then skip down below to troubleshooting.
+
+Mapvote can take control over settings like FragLimit and TickRate. You will 
+need to configure the settings that you want for your server. To get started 
+with configuration skip down below to the configuration section.
 
 
-Updating
-========
+II. Updating
+============
 
-When updating make a backup so that you can roll back if something breaks.
-You should at least back up MVE_Config.ini and UnrealTournament.ini
+When updating from older version mapvote to a newer one, start by making a 
+backup so that you can roll back if something goes wrong. You should at least 
+back up MVE_Config.ini and UnrealTournament.ini
 
 1. Copy necessary files
 
     - copy the `.u` files into to the `System/` folder
 
-2. Add the client package to ServerPackages inside UnrealTournament.ini:
+2. Update the client package to ServerPackages inside UnrealTournament.ini:
 
     ServerPackages=MVE2dev
 
@@ -58,8 +72,8 @@ each ini section and you may want to re-arrange to keep the config nice and clea
 Please refer to the provided changelog to see what changed.
 
 
-Troubleshooting
-===============
+III. Troubleshooting
+====================
 
 
 1. Map vote window does not show up:
@@ -108,8 +122,8 @@ Troubleshooting
     Restore this configuration from a stock install of UT99 if needed to.
 
 
-Support
-=======
+IV. Additional Support
+======================
 
 If the above did not work you can reach out to the community. 
 You can report bugs or ask for help in the thread:
@@ -121,21 +135,27 @@ Or ask in the ut99.org discord inside the #ut-server-help channel
 https://discord.com/invite/6CP2UjZ
 
 
-Configuration
-=============
+V. Configuration
+================
 
-To make good use of this mapvote you need to edit `MVE_Config.ini`
-You will need to learn how to use the config file.
-This can only be done through experiment and practice.
+To make good use of this mapvote you need to edit `MVE_Config.ini` You will 
+need to learn how to use the config file. This can only be done through 
+experiment and practice. 
+
+Mapvote set FragLimit, TickRate and just about any other setting a gametype
+has. It can also load extra mutators and extra server actors. You will also 
+need to manage map lists so that your mapvote is populated with maps.
+
 Always make small changes and test it.
-Once you got a good config, make a backup of it.
+
+Make a backup copy once you have good stable settings.
 
 Please refer to the provided manual for more configration options it goes more
 in depth into some subjects and contains configuration snippets and examples.
 
 
-Adding More Maps
-================
+1. Adding More Maps
+
 
 New maps you add to the game are not automatically detected. 
 
@@ -156,8 +176,8 @@ It can also be done from the admin tab when logged in as admin inside the
 mapvote window.
 
 
-Adding Custom Gametypes
-=======================
+2. Adding Custom Gametypes
+
 
 New game types are not automatically detected.
 You need to edit MVE_Config and define the new gametypes. 
@@ -174,8 +194,8 @@ If you make a change then again you need to reload the map list.
 If you do not reload then the same old games list is sent to players.
 
 
-Useful Keybinds
-===============
+3. Useful Keybinds
+
 
 I recommend setting up 3 keybinds. These are optional you can do everything
 without them, but it speeds things up a bit.
@@ -195,8 +215,8 @@ You can ofcourse choose different keys to bind to.
 Note: if you logged in as admin, you can force a map swicth!
 
 
-Advanced Tip & Tricks
-=====================
+4. Advanced Tip & Tricks
+
 
 - If bOverrideServerPackages=True then MapVote will manage ServerPackages for
 you and will automatically add the user interface package MVE2dev to ServerPackages
