@@ -32,7 +32,6 @@ var int MapCount;
 var int iNewMaps[32];
 var bool bInitialized;
 var bool bClientLoadEnd;
-var bool bRulesAreLoaded;
 var bool bChaceCheck;
 var bool bNeedServerMapList;
 var int LoadMapCount;
@@ -215,19 +214,14 @@ final simulated function MapListCheck ()
 	LoadRuleCount = RCount;
 	LoadPercentage = (NECount + RLCount + RCount) * 100 / (MapCount + RuleListCount + RuleCount);
 
-	if ( (RLCount == RuleListCount) && (RCount == RuleCount) )
-	{
-		bRulesAreLoaded = True;
-	}
-
 	if ( (NECount == MapCount) && (RLCount == RuleListCount) && (RCount == RuleCount) )
 	{
-		bClientLoadEnd = True;
 		if ( bNeedServerMapList )
 		{
 			SaveToMapVoteCache();
 		}
 		bNeedServerMapList = False;
+		bClientLoadEnd = True;
 	}
 }
 
@@ -340,8 +334,11 @@ final simulated function ChaceCheck()
 		}
 		return;
 	}
+	else 
+	{
+		LoadFromCache(MVC);
+	}
 
-	LoadFromCache(MVC);
 }
 
 final simulated function LoadFromCache(MapVoteCache MVC)
