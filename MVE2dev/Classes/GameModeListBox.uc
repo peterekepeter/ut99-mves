@@ -34,46 +34,25 @@ function Created()
 
 function DrawItem (Canvas C, UWindowList Item, float X, float Y, float W, float H)
 {
-	local string MapName;
-	local string CapMapName;
-	local bool bSelected;
-
 	if ( UMenuGameModeVoteList(Item).bSelected )
 	{
-		C.DrawColor.R=0;
-		C.DrawColor.G=0;
-		C.DrawColor.B=255;
+		C.DrawColor.R = 0;
+		C.DrawColor.G = 0;
+		C.DrawColor.B = 255;
 		DrawStretchedTexture(C,X,Y,W,H - 1,Texture'ListsBoxBackground');
-		bSelected=True;
-	} else {
+		C.DrawColor.R = 255;
+		C.DrawColor.G = 255;
+		C.DrawColor.B = 255;
+	} 
+	else 
+	{
 		C.DrawColor = BXC;
 		DrawStretchedTexture(C,X,Y,W,H - 1,Texture'ListsBoxBackground');
-		bSelected=False;
+		C.DrawColor = BXTC;
 	}
-	C.Font=Root.Fonts[0];
-	MapName = UMenuGameModeVoteList(Item).MapName;
-	if ( Left(MapName,3) == "[X]" )
-	{
-		C.DrawColor.R=255;
-		C.DrawColor.G=0;
-		C.DrawColor.B=0;
-		ClipText(C,X + 2,Y,Mid(MapName,3));
-	}
-	else
-	{
-		if ( bSelected )
-		{
-			C.DrawColor.R=255;
-			C.DrawColor.G=255;
-			C.DrawColor.B=255;
-		}
-		else
-		{
-			C.DrawColor = BXTC;
-		}
+	C.Font = Root.Fonts[0];
 
-		ClipText(C,X + 2,Y,MapName);
-	}
+	ClipText(C,X + 2,Y, UMenuGameModeVoteList(Item).GameModeName);
 }
 
 function KeyDown (int Key, float X, float Y)
@@ -139,31 +118,19 @@ function KeyDown (int Key, float X, float Y)
 	ParentWindow.KeyDown(Key,X,Y);
 }
 
-function SelectMap(string MapName)
-{
-    local UMenuGameModeVoteList MapItem;
-
-	for ( MapItem = UMenuGameModeVoteList(Items); MapItem != none; MapItem = UMenuGameModeVoteList(MapItem.Next) )
-	{
-        if(MapName ~= MapItem.MapName)
-        {
-            SetSelectedItem(MapItem);
-            MakeSelectedVisible();
-            break;
-        }
-    }
-}
-
-function bool isMapInList (string MapName)
+function SelectMap(string GameModeName)
 {
 	local UMenuGameModeVoteList MapItem;
 
 	for ( MapItem = UMenuGameModeVoteList(Items); MapItem != None; MapItem = UMenuGameModeVoteList(MapItem.Next) )
 	{
-		if ( MapName ~= MapItem.MapName )
-			return True;
+		if( GameModeName ~= MapItem.GameModeName )
+		{
+			SetSelectedItem(MapItem);
+			MakeSelectedVisible();
+			break;
+		}
 	}
-	return False;
 }
 
 function DoubleClickItem (UWindowListBoxItem i)
@@ -173,15 +140,13 @@ function DoubleClickItem (UWindowListBoxItem i)
 
 function Find (string SearchText)
 {
-	local int i;
-	local UWindowListBoxItem ItemPointer;
-	local UMenuGameModeVoteList MapItem;
+	local UMenuGameModeVoteList Item;
 
-	for ( MapItem = UMenuGameModeVoteList(Items); MapItem != None; MapItem = UMenuGameModeVoteList(MapItem.Next) )
+	for ( Item = UMenuGameModeVoteList(Items); Item != None; Item = UMenuGameModeVoteList(Item.Next) )
 	{
-		if ( Caps(SearchText) <= Caps(Left(MapItem.MapName,Len(SearchText))) )
+		if ( Caps(SearchText) <= Caps(Left(Item.GameModeName,Len(SearchText))) )
 		{
-			SetSelectedItem(MapItem);
+			SetSelectedItem(Item);
 			MakeSelectedVisible();
 			break;
 		}
@@ -194,7 +159,7 @@ function EditCopy()
 
 	P = GetPlayerOwner();
 
-	P.CopyToClipboard(UMenuGameModeVoteList(SelectedItem).MapName);
+	P.CopyToClipboard(UMenuGameModeVoteList(SelectedItem).GameModeName);
 }
 
 defaultproperties

@@ -35,46 +35,39 @@ function AddMapName (int listNum, string MapName)
 	local MapVoteListBox L;
 
 	L = MapWindow.GetMapVoteList(listNum);
-	L.Count ++ ;
+	L.Count++;
 	i = UMenuMapVoteList(L.Items.Append(Class'UMenuMapVoteList'));
 	i.MapName = MapName;
 	if ( listNum < 0 )
 		i.CGNum = -listNum;
 }
 
-function AddGameMode (int listNum, string MapName)
+function AddGameMode (int listNum, string ModeName)
 {
-	local UMenuGameModeVoteList i;
-	local GameModeListBox L;
+	local UMenuGameModeVoteList item;
+	local GameModeListBox list;
 
-	L = MapWindow.GMListBox;
-	i = UMenuGameModeVoteList(L.Items.Append(Class'UMenuGameModeVoteList'));
-	i.MapName = MapName;
-	i.listNum = listNum;
+
+	list = MapWindow.GMListBox;
+	item = UMenuGameModeVoteList(list.Items.Append(Class'UMenuGameModeVoteList'));
+	item.GameModeName = ModeName;
+	item.listNum = listNum;
 }
 
-function AddGameRule (int listNum, string MapName, int RuleNum)
+function AddGameRule (int listNum, string ruleName, int ruleNum)
 {
 	local UMenuRuleVoteList i;
 	local RuleListBox L;
 
 	L = MapWindow.GetRListBox(listNum);
 	i = UMenuRuleVoteList(L.Items.Append(Class'UMenuRuleVoteList'));
-	i.MapName = MapName;
-	i.listNum = RuleNum;
+	i.RuleName = ruleName;
+	i.listNum = ruleNum;
 }
 
 function FinishSetRuleListAndVoteList()
 {
 	MapWindow.RestoreSelection();
-}
-
-function ClearList (int listNum)
-{
-	local MapVoteListBox L;
-
-	L = MapWindow.GetMapVoteList(listNum);
-	L.Items.Clear();
 }
 
 function AddPlayerName (string PlayerName, bool bHasVoted)

@@ -35,46 +35,25 @@ function Created()
 
 function DrawItem (Canvas C, UWindowList Item, float X, float Y, float W, float H)
 {
-	local string MapName;
-	local string CapMapName;
-	local bool bSelected;
-
 	if ( UMenuRuleVoteList(Item).bSelected )
 	{
-		C.DrawColor.R=0;
-		C.DrawColor.G=0;
-		C.DrawColor.B=255;
+		C.DrawColor.R = 0;
+		C.DrawColor.G = 0;
+		C.DrawColor.B = 255;
 		DrawStretchedTexture(C,X,Y,W,H - 1,Texture'ListsBoxBackground');
-		bSelected=True;
-	} else {
+		C.DrawColor.R = 255;
+		C.DrawColor.G = 255;
+		C.DrawColor.B = 255;
+	} 
+	else 
+	{
 		C.DrawColor = BXC;
 		DrawStretchedTexture(C,X,Y,W,H - 1,Texture'ListsBoxBackground');
-		bSelected=False;
+		C.DrawColor = BXTC;
 	}
-	C.Font=Root.Fonts[0];
-	MapName = UMenuRuleVoteList(Item).MapName;
-	if ( Left(MapName,3) == "[X]" )
-	{
-		C.DrawColor.R=255;
-		C.DrawColor.G=0;
-		C.DrawColor.B=0;
-		ClipText(C,X + 2,Y,Mid(MapName,3));
-	}
-	else
-	{
-		if ( bSelected )
-		{
-			C.DrawColor.R=255;
-			C.DrawColor.G=255;
-			C.DrawColor.B=255;
-		}
-		else
-		{
-			C.DrawColor = BXTC;
-		}
 
-		ClipText(C,X + 2,Y,MapName);
-	}
+	C.Font = Root.Fonts[0];
+	ClipText(C,X + 2,Y,UMenuRuleVoteList(Item).RuleName);
 }
 
 function KeyDown (int Key, float X, float Y)
@@ -151,67 +130,39 @@ JL01D2:
 	ParentWindow.KeyDown(Key,X,Y);
 }
 
-function SelectMap(string MapName)
+function SelectMap(string ToSelect)
 {
-    local UMenuRuleVoteList MapItem;
+	local UMenuRuleVoteList Item;
 
-    MapItem = UMenuRuleVoteList(Items);
-J0x10:
-    if(MapItem != none)
-    {
-        if(MapName ~= MapItem.MapName)
-        {
-            SetSelectedItem(MapItem);
-            MakeSelectedVisible();
-        } else {
-			MapItem = UMenuRuleVoteList(MapItem.Next);
-			goto J0x10;
+	for ( Item = UMenuRuleVoteList(Items); Item != None; Item = UMenuRuleVoteList(Item.Next) )
+	{
+		if( ToSelect ~= Item.RuleName )
+		{
+			SetSelectedItem(Item);
+			MakeSelectedVisible();
+		} 
+		else 
+		{
+			break;
 		}
-    }
+	}
 }
 
-function bool isMapInList(string MapName)
+function bool isMapInList(string ToFind)
 {
-    local UMenuRuleVoteList MapItem;
+	local UMenuRuleVoteList Item;
 
-    MapItem = UMenuRuleVoteList(Items);
-J0x10:
-    if(MapItem != none)
-    {
-        if(MapName ~= MapItem.MapName)
-        {
-            return True;
-        }
-        MapItem = UMenuRuleVoteList(MapItem.Next);
-        goto J0x10;
-    }
-    return False;
+	for ( Item = UMenuRuleVoteList(Items); Item != None; Item = UMenuRuleVoteList(Item.Next) )
+	{
+		if( ToFind ~= Item.RuleName )
+			return True;
+	}
+	return False;
 }
 
 function DoubleClickItem(UWindowListBoxItem i)
 {
     UWindowDialogClientWindow(ParentWindow).Notify(self, 11);
-}
-
-function Find(string SearchText)
-{
-    local int i;
-    local UWindowListBoxItem ItemPointer;
-    local UMenuRuleVoteList MapItem;
-
-    MapItem = UMenuRuleVoteList(Items);
-J0x10:
-    if(MapItem != none)
-    {
-        if(Caps(SearchText) <= Caps(Left(MapItem.MapName, Len(SearchText))))
-        {
-            SetSelectedItem(MapItem);
-            MakeSelectedVisible();
-        } else {
-			MapItem = UMenuRuleVoteList(MapItem.Next);
-			goto J0x10;
-		}
-    }
 }
 
 function EditCopy()
@@ -220,7 +171,7 @@ function EditCopy()
 
 	P = GetPlayerOwner();
 
-	P.CopyToClipboard(UMenuRuleVoteList(SelectedItem).MapName);
+	P.CopyToClipboard(UMenuRuleVoteList(SelectedItem).RuleName);
 }
 
 defaultproperties

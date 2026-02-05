@@ -401,13 +401,13 @@ function ApplySelectionArgs(string selectedGame, string selectedGameRule, string
 RETRY_GAME:
 
 	if ( selectedGame == "" && GMListBox.Items != None && GMListBox.Items.Next != None )
-		selectedGame = UMenuGameModeVoteList(GMListBox.Items.Next).MapName;
+		selectedGame = UMenuGameModeVoteList(GMListBox.Items.Next).GameModeName;
 
 	if ( selectedGame == "" ) return;
 
 	for ( item = GMListBox.Items; item != None; item = item.Next )
 	{
-		if ( UMenuGameModeVoteList(item).MapName != selectedGame ) 
+		if ( UMenuGameModeVoteList(item).GameModeName != selectedGame ) 
 			continue;
 
 		SelectListItemWithoutNotify(GMListBox, UWindowListBoxItem(item));
@@ -426,13 +426,13 @@ RETRY_GAME:
 RETRY_RULE:
 
 	if ( selectedGameRule == "" && ruleList != -1 && RListBox[ruleList].Items != None && RListBox[ruleList].Items.Next != None )
-		selectedGameRule = UMenuRuleVoteList(RListBox[ruleList].Items.Next).MapName;
+		selectedGameRule = UMenuRuleVoteList(RListBox[ruleList].Items.Next).RuleName;
 
 	if ( ruleList < 0 || selectedGameRule == "" ) return;
 
 	for ( item = RListBox[ruleList].Items; item != None; item = item.Next )
 	{
-		if ( UMenuRuleVoteList(item).MapName != selectedGameRule )
+		if ( UMenuRuleVoteList(item).RuleName != selectedGameRule )
 			continue;
 
 		SelectListItemWithoutNotify(RListBox[ruleList], UWindowListBoxItem(item));
@@ -741,9 +741,9 @@ function SelectGameRuleListItem(UWindowDialogControl C, bool bSaveSelection)
 	}
 	lblTitle3.SetText(s);
 
-	if ( bSaveSelection && UMenuRuleVoteList(RuleListBox(C).SelectedItem).MapName != ClientConf.SelectedGameRule )
+	if ( bSaveSelection && UMenuRuleVoteList(RuleListBox(C).SelectedItem).RuleName != ClientConf.SelectedGameRule )
 	{
-		ClientConf.SetSelectedGameRule(UMenuRuleVoteList(RuleListBox(C).SelectedItem).MapName);
+		ClientConf.SetSelectedGameRule(UMenuRuleVoteList(RuleListBox(C).SelectedItem).RuleName);
 		RestoreSelection();
 		SaveClientConfigWithDebounce();
 	}
@@ -788,9 +788,9 @@ function SelectGameModeListItem(bool bSaveSelection)
 	RListBox[listNum].WinHeight = ListHeight / 2;
 	RListBox[listNum].Resized();
 
-	if ( bSaveSelection && UMenuGameModeVoteList(GMListBox.SelectedItem).MapName != ClientConf.SelectedGameMode )
+	if ( bSaveSelection && UMenuGameModeVoteList(GMListBox.SelectedItem).GameModeName != ClientConf.SelectedGameMode )
 	{
-		ClientConf.SetSelectedGameMode(UMenuGameModeVoteList(GMListBox.SelectedItem).MapName);
+		ClientConf.SetSelectedGameMode(UMenuGameModeVoteList(GMListBox.SelectedItem).GameModeName);
 		RestoreSelection();
 		SaveClientConfigWithDebounce();
 	}
@@ -1199,38 +1199,6 @@ final simulated function RuleListBox GetRListBox( int Idx)
 final simulated function MapVoteListBox GetMapListBox( int Idx)
 {
 	return MapListBox[Idx];
-}
- 
-simulated function string GetPrefix(int CGNum) 
-{
-	local string ret;
-	local int i, rule;
-	local UMenuRuleVoteList MenuRule;
-	local UMenuGameModeVoteList MenuGame;
-	
-	for ( i = 0; i < ArrayCount(RListBox); i++ ) 
-	{
-		for ( MenuRule = UMenuRuleVoteList(RListBox[i].Items.Next); MenuRule != None; MenuRule = UMenuRuleVoteList(MenuRule.Next) ) 
-		{
-			if ( MenuRule.listNum == CGNum ) 
-			{
-				rule = i;
-				ret = MenuRule.MapName;
-				break;
-			}
-		}
-	}
-	
-	for ( MenuGame = UMenuGameModeVoteList(GMListBox.Items.Next); MenuGame != None; MenuGame = UMenuGameModeVoteList(MenuGame.Next) ) 
-	{
-		if ( MenuGame.listNum == rule ) 
-		{
-			ret = MenuGame.MapName@"-"@ret;
-			break;
-		}
-	}
-		
-	return "["$ret$"] ";
 }
 
 defaultproperties

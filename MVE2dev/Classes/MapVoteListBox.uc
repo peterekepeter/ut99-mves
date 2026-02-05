@@ -7,7 +7,6 @@ var int Count;
 var float VotePriority;
 var Color BXTC;
 var Color BXC;
-var MapVoteClientWindow CW;
 var bool bRequestingSearch;
 
 function Paint (Canvas C, float MouseX, float MouseY)
@@ -39,47 +38,25 @@ function Created()
 
 function DrawItem (Canvas C, UWindowList Item, float X, float Y, float W, float H)
 {
-	local string MapName, CapMapName, Prefix;
-	local bool bSelected;
-
 	if ( UMenuMapVoteList(Item).bSelected )
 	{
-		C.DrawColor.R=0;
-		C.DrawColor.G=0;
-		C.DrawColor.B=255;
+		C.DrawColor.R = 0;
+		C.DrawColor.G = 0;
+		C.DrawColor.B = 255;
 		DrawStretchedTexture(C,X,Y,W,H - 1,Texture'ListsBoxBackground');
-		bSelected=True;
-	} else {
+		C.DrawColor.R = 255;
+		C.DrawColor.G = 255;
+		C.DrawColor.B = 255;
+	} 
+	else 
+	{
 		C.DrawColor = BXC;
 		DrawStretchedTexture(C,X,Y,W,H - 1,Texture'ListsBoxBackground');
-		bSelected=False;
+		C.DrawColor = BXTC;
 	}
-	C.Font=Root.Fonts[0];
-	MapName = UMenuMapVoteList(Item).MapName;
-	if (CW != None)
-		Prefix = CW.GetPrefix(UMenuMapVoteList(Item).CGNum);
-	if ( Left(MapName,3) == "[X]" )
-	{
-		C.DrawColor.R=255;
-		C.DrawColor.G=0;
-		C.DrawColor.B=0;
-		ClipText(C,X + 2,Y,Prefix $ Mid(MapName,3));
-	}
-	else
-	{
-		if ( bSelected )
-		{
-			C.DrawColor.R=255;
-			C.DrawColor.G=255;
-			C.DrawColor.B=255;
-		}
-		else
-		{
-			C.DrawColor = BXTC;
-		}
 
-		ClipText(C,X + 2,Y,Prefix $ MapName);
-	}
+	C.Font = Root.Fonts[0];
+	ClipText(C,X + 2,Y,UMenuMapVoteList(Item).MapName);
 }
 
 function KeyDown (int Key, float X, float Y)
@@ -199,28 +176,6 @@ function DoubleClickItem (UWindowListBoxItem i)
   UWindowDialogClientWindow(ParentWindow).Notify(self,11);
 }
 
-function Find(string SearchText)
-{
-    local int i;
-    local UWindowListBoxItem ItemPointer;
-    local UMenuMapVoteList MapItem;
-
-    MapItem = UMenuMapVoteList(Items);
-    J0x10:
-    if(MapItem != none)
-    {
-        if(Caps(SearchText) <= Caps(Left(MapItem.MapName, Len(SearchText))))
-        {
-            SetSelectedItem(MapItem);
-            MakeSelectedVisible();
-            goto J0x70;
-        }
-        MapItem = UMenuMapVoteList(MapItem.Next);
-        J0x70:
-        goto J0x10;
-    }
-}
-
 function KeyType(int Key, float X, float Y)
 {
 	Super.KeyType(Key, X, Y);
@@ -246,10 +201,7 @@ function EditCopy()
 
 defaultproperties
 {
-      Count=0
-      VotePriority=0.000000
-      BXTC=(R=0,G=0,B=0,A=0)
-      CW=None
-      ItemHeight=12.000000
-      ListClass=Class'UMenuMapVoteList'
+	BXTC=(R=0,G=0,B=0,A=0)
+	ItemHeight=12.000000
+	ListClass=Class'UMenuMapVoteList'
 }
