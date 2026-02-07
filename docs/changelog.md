@@ -1,3 +1,204 @@
+# `MVE2i` **TODO** February 2026
+
+- All mapvote releases are now bundled with changelog, feature documentation 
+  and updated quickstarter information which contains clear and information
+  and troubleshooting steps in case things don't work.
+
+- The mapvote window is now customized for server admins who are logged in the
+  'Vote' button is now replaced with a 'Force Switch' button to reflect the 
+  dangerous action that is about to happen when pressed. I expect this to help
+  avoid admins acidentally switching maps when they didn't mean to.
+
+- Increased screenshot size by a few pixels so that its 128px. If you're 
+  the dobule GUI scale this will perfectly line up with mip 0 of the texture
+  improving screenshot clarity. On default scaling you'll get mip 1 without 
+  burring too.
+
+- Fixed an issue which prevented the map list from loading when the game is
+  started in the "Start New Multiplayer Game" in game. With these fixes now
+  mapvote can be used in every mode you can run UT99 in, dedicated or not, 
+  multiplayer or pratice session.
+
+- If you are typing a chat message into mapvote then when if the window closes
+  the chat is moved to the regular chat and can be continued instead of losing
+  the partially typed message.
+
+- Map names, player names, mode/rule names can be now copied from the list 
+  box using the keyboard shortcut Ctrl+C. I found this to be super useful 
+  when I want to note down a particular map or a player name. These values 
+  can now be copied from the window.
+
+- There is a new feature which allows having random gametype and random rule
+  selection. If the game mode or rule is named "Random" then mapvote will 
+  choose one of the other avaiable options randomly. **TODO** document and example
+
+- In the mapvote window the first or previous option of each list box is now 
+  automatically selected to reduce the number of clicks needed to vote a map.
+  If you only have a single gametype and single rule for example it will be 
+  automatically selected and players are presented immediately with the list
+  of maps.
+
+- The welcome window can now have a configurable checkbox that players need
+  to check. This is part of the welcome screen feature which is enabled with 
+  bWelcomeWindow=True and the checkbox can be enabled with 
+  bServerInfoRequiresAccept=True and customized with a custom label by setting
+  ServerInfoAcceptLabel to a short message. Players will keep getting the 
+  welcome window shown until the checkbox is checked. If the player changes
+  their name then the checkbox signature will not match and will be re-shown.
+  The checkbox can be forced again by server admins by chaning the 
+  ServerInfoVersion value to invalidate all signatures. **TODO** document
+
+- Improved the keybinder popup to not be shown again once it was shown once.
+  This is part of the welcome screen which is enabled with bWelcomeWindow=True
+  So that players who don't want to set a keybind will be left alone.
+
+- Improved the way in which mapvote detects level changes initiated outside 
+  of mapvote. When this happens the level change is allowed to happen and then
+  when the next map loads mapvote will re-apply the mutators and settings of 
+  the preivous map. This improves compatibility assault and coop gametypes.
+
+- Added a feature to fix missing song playback for levels that have no song 
+  specified the client will no longer play the default menu music regarless
+  if they have an older version of the game or a patched client. These maps
+  will have a dummy silent song to prevent the menu music from starting. 
+  This feature is enabled by default but can be disabled with by having
+  bFixMissingSongPlayback=False
+
+- There is a new experimental feature that allows limiting how often a rule
+  can be repeatedly voted. By settings RuleCostMaxAllow=0 and by having 
+  MapCostPerLoad=3 players need to vote 3 separate rules before they can vote
+  the first one again. If the voting player is an admin they will by pass this
+  limitation and the map switch is forced as usual.
+
+- The welcome screen is now configured to only show the first time when a 
+  client joins and the if the welcome screen was shown is not stored in the 
+  user config instead of just in process memory so that if the game crashes
+  and the player rejoins the server, they are not shown the welcome screen
+  again. This can be invalidated server side by updating the ServerInfoVersion
+  to a different value to force showing updates or news that we made to the 
+  server in the information screen.
+
+- Starting with MVE2i mapvote can cache the map list for each server 
+  separately. For caching the ServerCodeName is used. So if you're running 
+  multiple servers and they have different lists, make sure there is a unique
+  value for each server. But if all your servers have the same identical map 
+  lists, if you use the same ServerCodeName then the client will share the 
+  cache between these servers. This value is empty by default and a random
+  key is generated on the first time mapvote is launched.
+  **TODO** document and make the default empty
+
+- Added keyboard navigation between the list game/rule/map list boxes. By
+  pressint he left and right arrows you can focus on the next/previous panel.
+
+- Added a map search feature for the map list. This can be invoked by just 
+  starting when a map is seleted in the map list or by pressing Ctrl+F then
+  after typing by pressing Enter anc Shift+Enter it's possible to navigate
+  between next and previous match.
+
+- The mapvote GUI will save the last selected mode and map when closed and
+  will try to restore the selection when reopening. This feature can be used 
+  to re-vote the previously selected map if it did not win or to continue
+  browsing the map list where left off.
+
+- Added a fix to detect when server admins change the order of gametypes in 
+  the config file, and then restart the server, MVE will still correctly load
+  the correct gametype by matching it by name instead of by position.
+
+- Mapvote will auto generate a working default configuration when the config
+  file MVE_Config.ini is missing. This is so that mapvote still wakes up in a 
+  functional state when not all files were installed. This code should only 
+  trigger if all gametypes are emtpy.
+
+- Added FixNetNews feature which fixes the master server list for older
+  version of UT99 clients that still contain the now discontinued epicgames
+  master server in their master server list. This feature is enabled by 
+  default but can be disabled by settings bFixNetNewsForPlayers=False
+  **TODO** confirm test and document
+
+- Map overrides can now add mutators for specific maps. For example you can
+  run the NoRedeemer on one specific map but have redeemer on all other maps.
+
+- Improved performance of the map overrides feature
+
+- Fixed mapvote initialization in server actor mode. Now mapvote in server
+  actor mode is compatible with all mutators and server actors and mapvote
+  can be safely used both as server actor or mutator. You can just ad mapvote
+  as a server actor and vote from any gametype. If you needed this feature 
+  before, please update to MVE2i as it will be much more stable, fix mutator initialization and report any initialization error in the server log file.
+
+- Added MainMutatorList and MainServerActors to MVE_Config.ini, here it's now
+  possible to add mutators and server actors which would be initialized to 
+  every gametype. This way commonly used actors and mutators can be grouped
+  together and do not need to be copy pasted to every gametype separately
+  eliminating configuration duplication. **TODO** document and example 
+
+- Added an ExcludeMutators and ExcludeActors option to each gametype. This way
+  it's now possible for specific gametypes to ignore specific actors or 
+  mutators which are defined in the main list. **TODO** document and example.
+
+- Changed `bOverrideServerPackages` to be disable by default. This is a great
+  feature but unfortunately it interferes of the expectations of server admins
+  when they first set up mapvote. Server admins are know how to set up server
+  packages trough UnrealTournament.ini and it's a disruptive change if mapvote
+  now suddenly controls them. For simple server setups with not a lot of 
+  packages it's also simpler that way to skip this feature.
+
+- UrlParameters are now supported by mapvote. These can be for every gametype.
+  This string will be attached to the travel string level URL as is. Certain
+  mutators and server actors can read this and act upon it for example to load
+  specific settings or enable specific options for the gametype.. **TODO** add supporting material, docs/ example
+
+- Configuration can now be reloaded when maplist is reloaded. This feature
+  needs patched 469d server version to work as it's a new engine feature. This
+  allows making changed so MVE_Config.ini using a text editor then reloading 
+  the map list would apply it to the live server without needing to restart 
+  the server. This feature is enabled by default but can be disabled using by
+  setting bReloadConfigDuringReload=False **TODO** feature doc
+
+- Fix setting tick rate for gametype. There was an issue with the tick rate
+  not being set correctly in previous versions of mapvote. You can now set a 
+  DefaultTickRate which applies to all gametypes by default. Log changes made
+  to tick rate as it's an important engine setting and server admins should be
+  aware if mapvote is changing it. **TODO** feature doc
+
+- Skip loading empty aliases, if aliases feature is not used there should be
+  no extra load generated by it.
+
+- Fix package name casing in the example MVE_Config.ini which is provided in 
+  release packages to make it compatible with linux. **TODO** test a linux srv
+
+- If multiple versions of MVE2i are  running they will detect each other and 
+  only one will activate. This fixes initialization if when mapvote is loaded
+  both as a server actor and a mutator.
+
+- Moved some of the mapvote features to initialized with a delay to improve s
+  server load during match startup.
+
+- When `bOverrideServerPackages` is enabled MVE2i specific packages will be
+  downloaded before others. This is because these need to be downloaded 
+  any regardless of which map/mode is played so it's not a wasted downlaod
+  if the map switches while the player is connecting.
+
+- Fixed the Assault gametype reset so that the red team always attack first
+  instead of depending on the previous Assault match. 
+
+- The release package now contains a language definition for Notepad++ which 
+  adds enhanced highlighting to *.ini files. In our experience this helps 
+  avoiding and spotting mistakes sooner, especialyl since a lot of 
+  misconfiguration errors in UT99 are silent erros.
+
+- Improved response messages to user commands. For example if someones who is
+  not logged in as admin if they try to relaod the map list they now get a 
+  message that tells them they need to log in first.
+
+- There is a new reworked aliases engine inside mapvote which can now 
+  recursively resolve aliases. So if you like aliases you can now put an alias
+  inside an alias. **TODO** document and example
+
+- Aliases are now resolved for settings, so you can now define an alias and
+  use them in settings. **TODO** add example to MVE_Config
+
+
 # `MVE2h` 23 September 2023
 
 - Map list transfer control has been optimized so that clients no longer need 
