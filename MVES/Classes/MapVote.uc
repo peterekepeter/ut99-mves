@@ -4,13 +4,13 @@
 class MapVote expands Mutator config(MVE_Config);
 
 const MaxGametypes = 100;
-const ClientPackageDeprecatedValue = "automatic (will be removed)";
 const ClientPackageInternal = "MVE2dev";
 
 var() config string ClientPackage;		// Load this package
 
 var() config string ClientScreenshotPackage; // Load this package
 var() config string ClientLogoTexture; // Clients will load and display this texture
+var() config bool bWelcomeWindow;
 var() config string ServerInfoURL;
 var() config string ServerInfoVersion;
 var() config bool bServerInfoRequiresAccept;
@@ -41,7 +41,6 @@ var() config EIDType PlayerIDType;
 var() config bool bReloadConfigDuringReload;
 var() config bool bSaveConfigOnNextRun, bReloadOnNextRun, bReloadOnEveryRun, bFullscanOnNextRun;
 var() config bool bShutdownServerOnTravel;
-var() config bool bWelcomeWindow;
 var() config bool bSpecsAllowed;
 var() config bool bAutoOpen;
 var() config int ScoreBoardDelay;
@@ -1116,9 +1115,9 @@ function CleanRules()
 	local int i, j;
 	local bool bSave;
 
-	if ( ClientPackage != ClientPackageDeprecatedValue )
+	if ( ClientPackage != ClientPackageInternal )
 	{
-		ClientPackage = ClientPackageDeprecatedValue;
+		ClientPackage = ClientPackageInternal;
 		bSave = True;
 	}
 	
@@ -2149,7 +2148,7 @@ defaultproperties
 	DefaultMap="DM-Deck16]["
 	bSwitchToRandomMapOnIdle=True
 	ServerIdleAfterMinutes=60
-	ServerCodeName="MyUt99Server"
+	ServerCodeName=
 	MidGameVotePercent=51
 	KickPercent=51
 	PlayerIDType=PID_Default
