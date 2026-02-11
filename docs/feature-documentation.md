@@ -219,9 +219,9 @@ players to select a random game with random rule with random map.
 CustomGame[48]=(bEnabled=True,GameName="Random",RuleName="Random",GameClass="Botpack.DeathMatchPlus",FilterCode="xrandom",bHasRandom=True,VotePriority=1.000000,MutatorList="",Settings="",Packages="",TickRate=100,ServerActors="",Extends="",UrlParameters="",ExcludeMutators="",ExcludeActors="")
 ```
 
-After this
-option gets voted mapvote will first randomly pick a random game then inside 
-the game a random rule is selected then a random map is selected.
+After this option gets voted mapvote will first randomly pick a random 
+gametype. GameClass does not matter. FilterCode is best to have a filter
+with 0 maps. bHasRandom=True should be set so that a random map is chosen.
 
 
 ## Configuration reuse via aliases

@@ -10,8 +10,8 @@
 ## New Features 
 
 - There is a new feature which allows having random gametype and random rule
-  selection. If the game mode or rule is named "Random" then mapvote will 
-  choose one of the other avaiable options randomly. **TODO** document and example
+  selection. If the game mode and rule are named "Random" then mapvote will 
+  choose one of the other avaiable options randomly.
 
 - Map overrides can now add mutators for specific maps. For example you can
   run the NoRedeemer on one specific map but have redeemer on all other maps.
