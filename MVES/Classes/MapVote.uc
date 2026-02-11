@@ -7,28 +7,36 @@ const MaxGametypes = 100;
 const ClientPackageInternal = "MVE2dev";
 
 var() config string ClientPackage;		// Load this package
-
-var() config string ClientScreenshotPackage; // Load this package
 var() config string ClientLogoTexture; // Clients will load and display this texture
+var() config string ClientScreenshotPackage; // Load this package
+
+var() config name ServerCodeName; //Necessary for our ServerCode
+
 var() config bool bWelcomeWindow;
 var() config string ServerInfoURL;
 var() config string ServerInfoVersion;
 var() config bool bServerInfoRequiresAccept;
 var() config string ServerInfoAcceptLabel;
 var() config string MapInfoURL;
-var() config string HTTPMapListLocation; //HTTPMapListPort is needs to be attached here as well
 
 var() config int VoteTimeLimit;
-var() config int HTTPMapListPort;
-var() config bool bSwitchToRandomMapOnIdle;
-var() config bool bSwitchToDefaultMapOnIdle;
-var() config int ServerIdleAfterMinutes;
-var() config string DefaultMap;
-var() config int DefaultGameTypeIdx; //For crashes
-var() config name ServerCodeName; //Necessary for our ServerCode
+var() config int ScoreBoardDelay;
 
+var() config bool bSpecsAllowed;
+var() config bool bAutoOpen;
+var() config bool bKickVote;
 var() config int MidGameVotePercent, KickPercent;
 var() config int MapCostAddPerLoad, MapCostMaxAllow, RuleCostMaxAllow;
+
+var() config int ServerIdleAfterMinutes;
+var() config bool bSwitchToRandomMapOnIdle;
+var() config bool bSwitchToDefaultMapOnIdle;
+var() config string DefaultMap;
+var() config int DefaultGameTypeIdx; //For crashes
+
+var() config bool bEnableHTTPMapList;
+var() config string HTTPMapListLocation; //HTTPMapListPort is needs to be attached here as well
+var() config int HTTPMapListPort;
 
 enum EIDType
 {
@@ -38,15 +46,8 @@ enum EIDType
 
 var() config EIDType PlayerIDType;
 
-var() config bool bReloadConfigDuringReload;
-var() config bool bSaveConfigOnNextRun, bReloadOnNextRun, bReloadOnEveryRun, bFullscanOnNextRun;
 var() config bool bShutdownServerOnTravel;
-var() config bool bSpecsAllowed;
-var() config bool bAutoOpen;
-var() config int ScoreBoardDelay;
-var() config bool bKickVote;
 var() config bool bSortAndDeduplicateMaps;
-var() config bool bEnableHTTPMapList;
 var() config bool bEnableMapOverrides;
 var() config bool bEnableMapTags;
 var() config bool bAutoSetGameName;
@@ -54,26 +55,20 @@ var() config bool bFixMutatorsQueryLagSpikes;
 var() config bool bFixNetNewsForPlayers;
 var() config bool bFixMissingSongPlayback;
 
+var() config bool bReloadConfigDuringReload;
+var() config bool bReloadOnEveryRun, bFullscanOnNextRun, bSaveConfigOnNextRun, bReloadOnNextRun;
+
 var() config bool bOverrideServerPackages;
 var() config bool bResetServerPackages;
+
 var() config string MainServerPackages;
 var() config string MainMutatorList;
 var() config string MainServerActors;
 
+var() config string DefaultSettings;
+var() config int DefaultTickRate;
+var() config string DefaultUrlParameters;
 
-var int ScoreBoardTime;
-var float EndGameTime;
-
-var string CurrentMode; //Clear on restart, if "", take gametype's default game mode
-
-var bool bRunning;
-var bool bLevelSwitchPending;
-var bool bVotingStage;
-var int VotingStagePreBeginWait;
-var bool bMapChangeIssued;
-var bool bMapChangeByMVE;
-var bool bXCGE_DynLoader;
-var bool bMissingClientPackage;
 
 struct GameType
 {
@@ -95,29 +90,38 @@ struct GameType
 	var() config string ExcludeActors;
 };
 
-var() config string DefaultSettings;
-var() config int DefaultTickRate;
-var() config string DefaultUrlParameters;
-var int pos;
 var() config GameType CustomGame[100];
+var() config string Aliases[32];
+var() config string MapFilters[1024], ExcludeFilters[32];
+
+var int ScoreBoardTime;
+var float EndGameTime;
+
+var string CurrentMode; //Clear on restart, if "", take gametype's default game mode
+
+var bool bRunning;
+var bool bLevelSwitchPending;
+var bool bVotingStage;
+var int VotingStagePreBeginWait;
+var bool bMapChangeIssued;
+var bool bMapChangeByMVE;
+var bool bXCGE_DynLoader;
+var bool bMissingClientPackage;
+
+var int pos;
 var GameType EmptyGame;
 var GameType CurrentGame;
 var int CurrentGameIdx;
 var int iGames;
 
-
-var() config string Aliases[32];
 var MV_Aliases AliasesLogic;
-var() config string MapFilters[1024], ExcludeFilters[32];
 var int iFilter, iExclF;
-
 
 var MVPlayerWatcher WatcherList, InactiveList;
 
 var MV_MapList MapList;
 var MV_MainExtension Extension;
 var string ExtensionClass;
-
 
 var string LastMsg;
 
