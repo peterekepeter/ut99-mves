@@ -24,17 +24,17 @@
 - UrlParameters are now supported by mapvote. These can be for every gametype.
   This string will be attached to the travel string level URL as is. Certain
   mutators and server actors can read this and act upon it for example to load
-  specific settings or enable specific options for the gametype.. **TODO** add supporting material, docs/ example
+  specific settings or enable specific options for the gametype.
 
 - Added MainMutatorList and MainServerActors to MVE_Config.ini, here it's now
   possible to add mutators and server actors which would be initialized to 
   every gametype. This way commonly used actors and mutators can be grouped
   together and do not need to be copy pasted to every gametype separately
-  eliminating configuration duplication. **TODO** document and example 
+  eliminating configuration duplication.
 
 - Added an ExcludeMutators and ExcludeActors option to each gametype. This way
   it's now possible for specific gametypes to ignore specific actors or 
-  mutators which are defined in the main list. **TODO** document and example.
+  mutators which are defined in the main list.
 
 - There is a new experimental feature that allows limiting how often a rule
   can be repeatedly voted. By settings RuleCostMaxAllow=0 and by having 
@@ -50,7 +50,7 @@
   welcome window shown until the checkbox is checked. If the player changes
   their name then the checkbox signature will not match and will be re-shown.
   The checkbox can be forced again by server admins by chaning the 
-  ServerInfoVersion value to invalidate all signatures. **TODO** document
+  ServerInfoVersion value to invalidate all signatures.
 
 - The release package now contains a language definition for Notepad++ which 
   adds enhanced highlighting to *.ini files. In our experience this helps 
@@ -62,7 +62,7 @@
   allows making changed so MVE_Config.ini using a text editor then reloading 
   the map list would apply it to the live server without needing to restart 
   the server. This feature is enabled by default but can be disabled using by
-  setting bReloadConfigDuringReload=False **TODO** feature doc
+  setting bReloadConfigDuringReload=False 
 
 ## Improvements
 
@@ -110,7 +110,6 @@
   lists, if you use the same ServerCodeName then the client will share the 
   cache between these servers. This value is empty by default and a random
   key is generated on the first time mapvote is launched.
-  **TODO** document and make the default empty
 
 - Added keyboard navigation between the list game/rule/map list boxes. By
   pressint he left and right arrows you can focus on the next/previous panel.
@@ -194,7 +193,7 @@
   not being set correctly in previous versions of mapvote. You can now set a 
   DefaultTickRate which applies to all gametypes by default. Log changes made
   to tick rate as it's an important engine setting and server admins should be
-  aware if mapvote is changing it. **TODO** feature doc
+  aware if mapvote is changing it.
 
 - Fix package name casing in the example MVE_Config.ini which is provided in 
   release packages to make it compatible with linux. **TODO** test a linux srv

@@ -216,7 +216,7 @@ recommended to also have bHasRandom=True this will make it possible for
 players to select a random game with random rule with random map. 
 
 ```ini
-CustomGame[48]=(bEnabled=True,GameName="Random",RuleName="Random",GameClass="Botpack.DeathMatchPlus",FilterCode="xrandom",bHasRandom=True,VotePriority=1.000000,MutatorList="",Settings="",Packages="",TickRate=100,ServerActors="",Extends="",UrlParameters="",ExcludeMutators="",ExcludeActors="")
+CustomGame[48]=(bEnabled=True,GameName="Random",RuleName="Random",GameClass="Botpack.DeathMatchPlus",FilterCode="xrandom",bHasRandom=True, ...)
 ```
 
 After this option gets voted mapvote will first randomly pick a random 
@@ -254,22 +254,6 @@ CustomGame[8]=(GameName="DM",MutatorList="Botpack.LowGrav,BotPack.SniperArena",.
 Note: not all properties support aliases, but mutators do.
 
 
-## Logo Texture 
-
-Since mapvote automatically selects a map this feature is not that important
-anymore as in a properly configured mapvote the logo would rarely be 
-displayed.
-
-A logo texture can now be configured and shown. The mapvote will instruct
-all windows to show this texture initially before players select a map.
-
-Example:
-
-```ini
-[MVES.MapVote]
-ClientLogoTexture=Botpack.ASMDAlt_a00
-```
-
 ## Configuring ServerPackages per Gametype
 
 MapVote can take control over managing ServerPackages for you this allows
@@ -303,6 +287,19 @@ CustomGame[4]=(RuleName="Classic",Packages="", ...)
 CustomGame[5]=(RuleName="Relics",Packages="Relics", ... )
 ```
 
+### UrlParameters
+
+Additional URL parameters can be added added to the travel string separately
+for every game type. Some mutators can be configured via URL parameters.
+For mutator developers this is useful because the travel string can be read
+during initialization to load up a configuration.
+
+```ini
+DefaultUrlParameters=Key1=ValueDefault1?Key2=ValueDefault2
+CustomGame[6]=(UrlParameters="Key1=Value1a?Key2=Value2a", ... )
+CustomGame[7]=(UrlParameters="Key1=Valie1b", ... )
+```
+
 ### Populate ServerPackages for Known Properties
 
 When `bOverrideServerPackages` is enabled then mapvote will automatically 
@@ -329,17 +326,132 @@ screenshots from a dedicated package which contains all screenshots for
 the levels. -->
 
 
-<!-- ## Extended Gametype Configuration
+## Configurable TickRate per gametype
 
-- Added option Tickrate for each GameConfig. Also added DefaultTickRate globally. 
-But not sure if change on fly tickrate applied on map change. Anyway be request of it.
+There is an option `TickRate` for each GameConfig. There is an option to set
+a `DefaultTickRate` globally for all gametypes.
 
-- Added option ServerActors for each GameConfig, which allow spawn some actors,
-without try add it to Mutator list, as do option Mutators.
+There a special default value `0` which is treated as tickrat enot set. If 
+you don't want mapvote to modify the tickrate then use this `0` default value
+everywhere.
 
-- Added option bAvoidRandom for each GameConfig. Done in really dumb way. Random 
-still same, but if pick game mode which forbidden random restart. Up to 1024 times.
- -->
+If `TickRate` is has value 0 on a gametype then `DefaultTickRate` is used and
+if that is also value 0 then mapvote will not set any tick rate.
+
+Since this setting affects the whole server, whenever mapvote changes the tick
+rate it will log this event into the server log. If you're not sure why your
+tickrate is a specific value, check the server log to see if mapvote is the 
+one changing it to something else.
+
+
+## Mutators and ServerActors configuration
+
+Mapvote can spawn server actors and mutators. It's recommended to set up all
+your server actors and mutators through mapvote. The advantage is that they
+can be configured individually per gametype so then depending on which 
+gametype is voted the correct set of mutators/actors can be spawned.
+
+There is also global list of mutators/actors that mapvote can spawn these are
+configured as a comman separated list in `MainMutatorList` and for server 
+actors in the `MainServerActors` property.
+
+On each gametype you have it's own separate list of mutators and server actors
+by adding them as a comma separated list inside the `MutatorList` and the
+`ServerActors` properties of each gametype.
+
+In case there is a gametype where you do not wish to spawn a mutator or an 
+actor then those can be excluded by setting them as a comma separated list
+inside the `ExcludeMutators` and the `ExcludeActors` properties. 
+
+Using this you can set up for example mutators that would be spawned every
+where except a few gametypes. For example to remove redeemer in general you
+can have have the a mutator which removes globally but if you have a gametype
+where you need the redeemer then you can add it to the sclude proeprty of a 
+particular gametype.
+
+```ini
+MainMutatorList=Botpack.NoRedeemer
+CustomGame[7]=(MutatorList="SLV203.StrangeMutator",ExcludeMutators="Botpack.NoRedeemer")
+```
+
+## Logo Texture 
+
+Since mapvote automatically selects a map this feature is not that important
+anymore as in a properly configured mapvote the logo would rarely be 
+displayed.
+
+A logo texture can now be configured and shown. The mapvote will instruct
+all windows to show this texture initially before players select a map.
+
+Example:
+
+```ini
+[MVES.MapVote]
+ClientLogoTexture=Botpack.ASMDAlt_a00
+```
+
+## Welcome Window
+
+Mapvote has a feature for welcoming new players to the server. This feature
+is option and can be enabled by settings `bWelcomeWindow=True` This will make
+a window pop up for new players on the server which will show the server info 
+page.
+
+The contents of the server info page is loaded from a HTTP server. If you have
+a redirect running (which you should) then you can put a basic static HTML
+page inside your redirect. And example page is provided, check the 
+`server-info.html` file.
+
+For the client to load the content you need to configure the `ServerInfoURL`
+property with the URL of the page. Note that the URL should be using the 
+HTTP protocol, not HTTPS. HTTPS is not supported. Also not that only very
+basic formatting can be used.
+
+The `ServerInfoVersion` is used by the clients to remember if the content was
+shown or not. This value can be changed by server admins to force display the
+welcome info page for all the players for example to publish changes or 
+notifications.
+
+When `bServerInfoRequiresAccept` is enabled a checkbox will be shown to 
+players and it will be required for players to check the checkbox. Players 
+will keep getting the information window until it is checked. 
+
+Using `ServerInfoAcceptLabel` the text label can be customized. Note that when
+left empty a fallback value is used if the checkbox feature is enabled.
+
+Here is an example screenshot of how this looks in practice:
+
+  ![Screeshot of ServerInfo](./server-info-screen.png)
+
+The above is done using this configuration. 
+
+```ini
+bWelcomeWindow=True
+ServerInfoURL=http://127.0.0.1:8080/server-info.html
+ServerInfoVersion=1
+bServerInfoRequiresAccept=True
+ServerInfoAcceptLabel=I accept the rules
+```
+
+You will ofcourse need to host your own rules file and put the URL there which
+can be accessed from over the internet. In the example above I use localhost
+which would only ever work on the local machine.
+
+
+# Configuration reload during map list reload
+
+By setting `bReloadConfigDuringReload=True` mapvote will first reload the 
+config then reload the map list. 
+
+This is a 469 feature that would need a 469d or newer server. But it can be a
+convenient feature for server admins to reduce the number of server reloades 
+needed to be done. 
+
+This feature enables a workflow where server admins can edit `MVE_Config.ini` 
+with notepad then alt tab to the game and hit the reload hotkey to apply the 
+changes to the server without needing to shut down and restart the server 
+between each edit.
+
 
 ## Configurable Shutdown on travel
 
@@ -347,6 +459,30 @@ When the match ends and the next match is being set up by MapVote, there is now
 an option for MapVote to exit the server process. This can be used for more
 advanced server control script to essentially have 1 process per match and
 allows logs to be separated by match.
+
+
+## Client side caching
+
+This mapvote uses client side caching for map lists. This feature makes 
+mapvote feel really fast as in general case it will only need to load a local
+stash of map lists.
+
+For caching the `ServerCodeName` is used as a cache key.
+  
+If you're running multiple servers and they have different lists, make sure 
+there is a unique `ServerCodeName` value for each server. Otherwise server-A 
+will overwrite the cached data for server-B.
+
+But if all your servers have the same identical map then it's beneficial to
+use the same `ServerCodeName` for all servers this will make the players 
+only need to download the map list on the first server and players switching
+between servers will instantly have the map list ready and loaded.
+
+The defautl value for `ServerCodeName` is empty and in the example confiv an
+empty value is provided as well, this is because when mapvote first loads it 
+will auto generate a unique key so that server admins who don't read this
+readme will have good defaults, as, in having a unique key that does not 
+collide with other servers.
 
 
 ## Notes on Compatiblity
