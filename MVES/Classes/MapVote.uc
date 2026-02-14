@@ -266,6 +266,14 @@ event PostBeginPlay()
 		bSaveConfigOnNextRun = True;
 	}
 
+	if ( bOverrideServerPackages && (bResetServerPackages || MainServerPackages == "") )
+	{
+		MainServerPackages = GetEngineIniServerPackages();
+		bResetServerPackages = False;
+		Log("[MVE] Resetting MainServerPackages="$MainServerPackages);
+		bSaveConfigOnNextRun = True;
+	}
+
 	LoadAliases();
 	MapList = new class'MV_MapList';
 	MapList.Mutator = Self;
@@ -511,13 +519,6 @@ event PostBeginPlay()
       
 	if ( MapList.MapListString == "" && MapList.iMapList > 0 )
 		MapList.GenerateString();
-	if ( bResetServerPackages && bOverrideServerPackages )
-	{
-		MainServerPackages = GetEngineIniServerPackages();
-		bResetServerPackages = False;
-		Log("SAVE CONFIG! 503 pgb");
-		SaveConfig(); // initially populates updates MVE_Config with MainServerPackages
-	}
 
 	// finally done!
 	Log("[MVE] Finished loading map: `"$TravelMap$"` idx: "$TravelIdx$" mode: "$CurrentMode);
