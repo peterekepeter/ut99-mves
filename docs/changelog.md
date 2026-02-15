@@ -187,7 +187,6 @@
   version of UT99 clients that still contain the now discontinued epicgames
   master server in their master server list. This feature is enabled by 
   default but can be disabled by settings bFixNetNewsForPlayers=False
-  **TODO** confirm test and document
 
 - Fix setting tick rate for gametype. There was an issue with the tick rate
   not being set correctly in previous versions of mapvote. You can now set a 
@@ -195,8 +194,12 @@
   to tick rate as it's an important engine setting and server admins should be
   aware if mapvote is changing it.
 
+- Fix a bug which would cause mapvote to wipe clean the ServerPackages leaving
+  the server in a broken state when first enabling `bOverrideServerPackages`
+  if `MainServerPackages` is empty.
+
 - Fix package name casing in the example MVE_Config.ini which is provided in 
-  release packages to make it compatible with linux. **TODO** test a linux srv
+  release packages to make it compatible with linux.
 
 - If multiple versions of MVE2i are running they will detect each other and 
   only one will activate. This fixes initialization if when mapvote is loaded

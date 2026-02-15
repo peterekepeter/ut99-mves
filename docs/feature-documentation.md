@@ -485,6 +485,15 @@ readme will have good defaults, as, in having a unique key that does not
 collide with other servers.
 
 
+## Fix net news and master server for clients
+
+When `bFixNetNewsForPlayers=True` the client side mapvote will apply a patch
+to players if they still have the discontinued epic games masterserver 
+configured. This means that for joining players with an old clientwill auto
+matically get their settings patched to allow them to use the server browser.
+This feature is enabled by default but can be disabled.
+
+
 ## Notes on Compatiblity
 
 There was extensive work on compatibility so that MapVote could basically load
