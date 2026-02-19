@@ -125,6 +125,11 @@ function string Resolve(string input)
 	local int i, at, depth;
 	local bool done;
 
+	if ( AliasCount == 0 ) 
+	{
+		return input;
+	}
+
 	if ( bNeedsPrefixDetection ) 
 	{
 		DetectPrefix();

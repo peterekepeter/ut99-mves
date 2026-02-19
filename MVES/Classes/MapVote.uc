@@ -331,14 +331,6 @@ event PostBeginPlay()
 		CheckClientPackageInstalled();
 	}
 
-	if ( DefaultSettings != "" )
-	{
-		Cmd = DefaultSettings;
-		if ( InStr( Cmd, "<") >= 0 )
-			Cmd = ParseAliases( Cmd);
-		ExecuteSettings(Cmd);
-	}
-
 	bNeedToRestorePackages = False;
 	if ( bOverrideServerPackages && !bXCGE_DynLoader )
 	{
@@ -370,7 +362,7 @@ event PostBeginPlay()
 		Cmd = CurrentGame.Packages;
 		if ( InStr( Cmd, "<") >= 0 )
 		{
-			Cmd = ParseAliases( Cmd);
+			Cmd = AliasesLogic.Resolve( Cmd);
 		}
 		while ( Cmd != "" )
 		{
@@ -447,16 +439,13 @@ event PostBeginPlay()
 			Level.Game.GameName = CurrentGame.RuleName@CurrentGame.GameName;
 		}
 	DEFAULT_MODE:
-		Cmd = CurrentGame.Settings;
-		if ( InStr( Cmd, "<") >= 0 )
-			Cmd = ParseAliases( Cmd);
-		ExecuteSettings(Cmd);
+		ExecuteMvSettings(CurrentMap);
 		
 		if ( 0 < CurrentMap.ActorCount )
 			Log("[MVE] Spawning ServerActors",'MapVote');
 		for ( i = 0; i < CurrentMap.ActorCount; i+=1 )
 		{
-			NextParm = ParseAliases(CurrentMap.Actors[i]);
+			NextParm = CurrentMap.Actors[i];
 			if ( InStr(NextParm,".") < 0 )
 				NextParm = "Botpack."$NextParm;
 			ActorClass = class<Actor>(DynamicLoadObject(NextParm, class'Class'));	
@@ -468,7 +457,7 @@ event PostBeginPlay()
 			Log("[MVE] Spawning Mutators",'MapVote');
 		for( i = 0; i < CurrentMap.MutatorCount; i+=1 )
 		{
-			NextParm = ParseAliases(CurrentMap.Mutators[i]);
+			NextParm = CurrentMap.Mutators[i];
 			if ( InStr(NextParm,".") < 0 )
 				NextParm = "Botpack."$NextParm;
 			ActorClass = class<Actor>(DynamicLoadObject(NextParm, class'Class'));	
@@ -481,7 +470,7 @@ event PostBeginPlay()
 		{
 			Cmd = CurrentGame.Packages;
 			if ( InStr( Cmd, "<") >= 0 )
-				Cmd = ParseAliases( Cmd);
+				Cmd = AliasesLogic.Resolve( Cmd);
 			while ( Cmd != "" )
 			{
 				NextParm = Extension.NextParameter( Cmd, ",");
@@ -552,38 +541,21 @@ function bool IsBackgroundMode()
 	return True;
 }
 
-function ExecuteSettings(string Settings) 
+function ExecuteMvSettings(MV_Result res)
 {
+	local int i;
 
-	while ( Len(Settings) > 0 )
+	for ( i = 0; i < res.SettingsCount; i+=1 )
 	{
-		pos = InStr(Settings,";");
-		if ( pos < 0 )
-		{
-			pos = InStr(Settings,",");
-		}
-		if ( pos < 0 )
-		{
-			ExecuteSetting(Settings);
-			Settings = "";
-		} 
-		else 
-		{
-			ExecuteSetting(Left(Settings,pos));
-			Settings = Mid(Settings,pos + 1);
-		}
+		ExecuteSettingKV(res.SettingsKey[i], res.SettingsValue[i]);
 	}
 }
 
-function ExecuteSetting (string Setting)
+function ExecuteSettingKV(string Property, string Value)
 {
-	local string Property, Value;
 	local int pos;
+	Log("[MVE] Set "$Property$"="$Value);
 
-	Log("[MVE] Set "$Setting);
-
-	Property = Left(Setting,InStr(Setting,"="));
-	Value = Mid(Setting,InStr(Setting,"=") + 1);
 	pos = InStr(Property, ".");
 	if ( pos != -1 ) 
 	{
@@ -1710,9 +1682,7 @@ final function bool CanVote(PlayerPawn Sender)
 final function MV_Result GenerateMapResult(string map, int idx)
 {
 	local MV_Result r;
-	r = class'MV_Result'.Static.Create();
-	r.Map = map;
-	r.GameIndex = idx;
+	r = class'MV_Result'.Static.Create(map, idx, AliasesLogic);
 	PopulateResultWithDefaults(r);
 	PopulateResultWithRule(r, idx);
 
@@ -1722,6 +1692,7 @@ final function MV_Result GenerateMapResult(string map, int idx)
 function PopulateResultWithDefaults(MV_Result r) 
 {
 	r.SetTickRate(DefaultTickRate);
+	r.AddGameSettings(DefaultSettings);
 	r.AddUrlParameters(DefaultUrlParameters);
 	r.AddMutators(MainMutatorList);
 	r.AddActors(MainServerActors);
@@ -1813,7 +1784,7 @@ final function bool SetupTravelString( string mapStringWithIdx )
 
 	GameClassName = Result.GameClass;
 
-	if ( DynamicLoadObject(ParseAliases(GameClassName),class'Class') == None )
+	if ( DynamicLoadObject(GameClassName,class'Class') == None )
 	{
 		Err("Game class cannot be loaded: `"$GameClassName$"`" );
 		return False;
@@ -1821,7 +1792,7 @@ final function bool SetupTravelString( string mapStringWithIdx )
 
 	TravelInfo.TravelString = (
 		Result.Map
-		$"?Game="$ParseAliases(GameClassName)
+		$"?Game="$GameClassName
 		$"?Mutator="$Self.Class
 		$Result.GetUrlParametersString()
 	);
@@ -1861,10 +1832,6 @@ final function bool SetupTravelString( string mapStringWithIdx )
 		// concats main packages
 		Result.AddPackages(MainServerPackages);
 		spk = Result.GetWrappedPackages();
-		if ( InStr( spk, "<") >= 0 )
-		{
-			spk = ParseAliases( spk);
-		}
 		ConsoleCommand("set ini:Engine.Engine.GameEngine ServerPackages "$spk);
 		Nfo("-> ServerPackages: `"$GetEngineIniServerPackages()$"`");
 	}
@@ -1934,7 +1901,13 @@ function string GetEngineIniServerPackages()
 
 function string ParseAliases(string input) 
 {
-	return AliasesLogic.Resolve(input);
+	local string output;
+	output = AliasesLogic.Resolve(input);
+	if ( input != output )
+	{
+		Log("ParseAliases: "$input$" --> "$output);
+	}
+	return output;
 }
 
 function ProcessMapOverrides(MV_Result map)

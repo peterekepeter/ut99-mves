@@ -1,15 +1,13 @@
 
-# Map Vote Extended Manual
+# Map Vote Extended
 
-
-## Known Limitations
-
+ - Required UT99 version: 436 or newer
  - **MAX** maps: 4096
  - **MAX** gametypes: 100
 
 **This document is incomplete, but it does document some of the features!**
 
-**For more information also check the changelog, it may be liste there**
+**For more information also check the changelog, it may be listed there**
 
 Installation/troubleshooting is covered in the separate "Quickstart" file.
 
@@ -240,7 +238,7 @@ will have to ensure that the commas are in the right place after substitution.
 ```ini
 CustomGame[7]=(GameName="CTF",MutatorList="<lgsniper>",...)
 CustomGame[8]=(GameName="DM",MutatorList="<lgsniper>",...)
-Aliases[0]=<lgsniper>=Botpack.LowGrav,BotPack.SniperArena
+Aliases[0]=<lgsniper> Botpack.LowGrav,BotPack.SniperArena
 ```
 
 The configuration above is same as manually typing out all the mutators as 
@@ -251,7 +249,40 @@ CustomGame[7]=(GameName="CTF",MutatorList="Botpack.LowGrav,BotPack.SniperArena",
 CustomGame[8]=(GameName="DM",MutatorList="Botpack.LowGrav,BotPack.SniperArena",...)
 ```
 
-Note: not all properties support aliases, but mutators do.
+The following configuration properties support aliases:
+
+- MainServerActors
+- CustomGame[n].ServerActors
+- CustomGame[n].ExcludeActors
+- MainMutatorList
+- CustomGame[n].MutatorList
+- CustomGame[n].ExcludeMutators
+- MainServerPackages
+- CustomGame[n].ExcludeMutators
+- DefaultSettings
+- CustomGame[i].Settings
+- DefaultUrlParameters
+- CustomGame[i].UrlParameters
+- CustomGame[i].GameClass
+- Aliases[i]
+
+The aliases are recursively resolved. This is a fancy way of saying that an 
+alias can be used inside another alias. In practice what this means is that 
+you can have shared configuration reuse within the aliases themselves.
+
+```ini
+Aliases[0]=<lgsniper> BotPack.SniperArena,<lg>
+Aliases[1]=<lgrocket> BotPack.RocketArena,<lg>
+Aliases[2]=<lg> Botpack.LowGrav
+```
+
+The syntax for defining an alias is either `<key>=value` or `<key> value`.
+The first one is the way aliases were used in previous versions of mapvote so
+we'll keep it for backwards compatibility.
+
+It's possible to use aliases without the `<>` characters but this is not 
+recommended. Having this naming convention enables optimizations and it also 
+makes the configuration more readable.
 
 
 ## Configuring ServerPackages per Gametype

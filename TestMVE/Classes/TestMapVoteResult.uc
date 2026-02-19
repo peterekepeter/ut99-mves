@@ -1,6 +1,7 @@
 class TestMapVoteResult extends TestClass;
 
 var MV_Result s;
+var MV_Aliases a;
 
 function TestMain()
 {
@@ -14,6 +15,7 @@ function TestMain()
 	TestWrappedPackages();
 	TestUrlParameters();
 	TestRemove();
+	TestAliases();
 }
 
 function TestPackages()
@@ -169,9 +171,51 @@ function TestRemove()
 	AssertEquals(s.ActorCount, 0, "has 0 actors");
 }
 
+
+function TestAliases()
+{
+	Describe("map result will expand aliases");
+	Alias("<X>=B,<Y>");
+	Alias("<Y>=C,D");
+
+	s.AddActors("A,<X>,E");
+	AssertEquals(s.ActorCount, 5, "add aliased actors");
+
+	s.RemoveActors("A,<X>,E");
+	AssertEquals(s.ActorCount, 0, "remov aliased actors");
+
+	s.AddMutators("A,<X>,E");
+	AssertEquals(s.MutatorCount, 5, "add aliased mutators");
+
+	s.RemoveMutators("A,<X>,E");
+	AssertEquals(s.MutatorCount, 0, "remove aliased mutators");
+
+	s.AddPackages("A,<X>,E");
+	AssertEquals(s.ServerPackageCount, 5, "add aliased packages");
+
+	Alias("<DMSET>=FragLimit=30,TimeLimit=0");
+	s.AddGameSettings("MinPlayers=2,<DMSET>");
+	AssertEquals(s.SettingsCount, 3, "add aliased settings");
+	AssertEquals(s.GetGameSettingByKey("FragLimit"), "30", "aliased FragLimit is 30");
+
+	Alias("<URLP>=?ProfileX=1?ProfileY=2?ProfileZ=3");
+	s.AddUrlParameters("<URLP>");
+	AssertEquals(s.UrlParametersCount, 3, "add aliased url paramater");
+
+	Alias("<DMP> Botpack.DeathMatchPlus");
+	s.SetGameClass("<DMP>");
+	AssertEquals(s.GameClass, "Botpack.DeathMatchPlus", "set aliased game class"); 
+}
+
+function Alias(string input) 
+{ 
+	a.AddAliasLine(input);
+}
+
 function Describe(string subject)
 {
 	Super.Describe(subject);
-	s = new class'MV_Result';
+	a = new class'MV_Aliases';
+	s = class'MV_Result'.Static.Create("DM-Fractal", 0, a);
 	s.bQuiet = True;
 }

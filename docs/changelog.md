@@ -1,17 +1,26 @@
 # `MVE2i` **TODO** February 2026
 
-- Updated quickstart.txt information for admins. This file contains relevant 
-  information for installing/updating MVE2i as well as troubleshooting steps.
+This release contains 2 years of upgrades and improvements. The main focus has
+been improving compatibility, fixing bugs and some new features for admins and
+players as well. MVE2i is now compatible with practice-session, start new 
+multiplayer game, and ofcourse dedicated servers and is compatible across all 
+436/469 versions of clients and servers.
 
-- New mapvote releases are now bundled with a full changelog in HTML format.
-  and a feature documentation also in HTML format. Unfortunately the feature 
-  documentation is not complete yet but it does go in depth into some info.
+The release package now contains updated documentation:
+
+- Quickstart.txt - installation/upgrade/troubleshooting -> basic setup
+- Manual.html - in depth explanation of various features -> advanced users
+- Changelog.html - explains the changes made in each version 
+
+Since there is a lot here I have groupped the features, improvements and
+bugfixes into their own section.
+
 
 ## New Features 
 
 - There is a new feature which allows having random gametype and random rule
-  selection. If the game mode and rule are named "Random" then mapvote will 
-  choose one of the other avaiable options randomly.
+  selection. If the game mode and rule are both named "Random" then mapvote 
+  will choose one of the other avaiable options randomly.
 
 - Map overrides can now add mutators for specific maps. For example you can
   run the NoRedeemer on one specific map but have redeemer on all other maps.
@@ -21,10 +30,10 @@
   after typing by pressing Enter anc Shift+Enter it's possible to navigate
   between next and previous match.
 
-- UrlParameters are now supported by mapvote. These can be for every gametype.
-  This string will be attached to the travel string level URL as is. Certain
-  mutators and server actors can read this and act upon it for example to load
-  specific settings or enable specific options for the gametype.
+- UrlParameters are now supported by mapvote. This string will be attached to 
+  the travel string level URL as is. Certain mutators and server actors can 
+  read this and act upon it for example to load specific settings or enable 
+  specific options for the gametype.
 
 - Added MainMutatorList and MainServerActors to MVE_Config.ini, here it's now
   possible to add mutators and server actors which would be initialized to 
@@ -36,12 +45,6 @@
   it's now possible for specific gametypes to ignore specific actors or 
   mutators which are defined in the main list.
 
-- There is a new experimental feature that allows limiting how often a rule
-  can be repeatedly voted. By settings RuleCostMaxAllow=0 and by having 
-  MapCostPerLoad=3 players need to vote 3 separate rules before they can vote
-  the first one again. If the voting player is an admin they will by pass this
-  limitation and the map switch is forced as usual.
-
 - The welcome window can now have a configurable checkbox that players need
   to check. This is part of the welcome screen feature which is enabled with 
   bWelcomeWindow=True and the checkbox can be enabled with 
@@ -51,6 +54,12 @@
   their name then the checkbox signature will not match and will be re-shown.
   The checkbox can be forced again by server admins by chaning the 
   ServerInfoVersion value to invalidate all signatures.
+
+- There is a new experimental feature that allows limiting how often a rule
+  can be repeatedly voted. By settings RuleCostMaxAllow=0 and by having 
+  MapCostPerLoad=3 players need to vote 3 separate rules before they can vote
+  the first one again. If the voting player is an admin they will by pass this
+  limitation and the map switch is forced as usual.
 
 - The release package now contains a language definition for Notepad++ which 
   adds enhanced highlighting to *.ini files. In our experience this helps 
@@ -62,21 +71,21 @@
   allows making changed so MVE_Config.ini using a text editor then reloading 
   the map list would apply it to the live server without needing to restart 
   the server. This feature is enabled by default but can be disabled using by
-  setting bReloadConfigDuringReload=False 
+  setting bReloadConfigDuringReload=False
+
 
 ## Improvements
 
 - There is a new reworked aliases engine inside mapvote which can now 
   recursively resolve aliases. So if you like aliases you can now put an alias
-  inside an alias. **TODO** document and example
+  inside an alias.
 
 - Aliases are now resolved for settings, so you can now define an alias and
-  use them in settings. **TODO** add example to MVE_Config
+  use them in settings.
 
 - Map names, player names, mode/rule names can be now copied from the list 
   box using the keyboard shortcut Ctrl+C. I found this to be super useful 
-  when I want to note down a particular map or a player name. These values 
-  can now be copied from the window.
+  when I want to note down a particular map or a player name.
 
 - In the mapvote window the first or previous option of each list box is now 
   automatically selected to reduce the number of clicks needed to vote a map.
@@ -86,13 +95,12 @@
 
 - The mapvote window is now customized for server admins who are logged in the
   'Vote' button is now replaced with a 'Force Switch' button to reflect the 
-  dangerous action that is about to happen when pressed. I expect this to help
-  avoid admins acidentally switching maps when they didn't mean to.
+  dangerous action that is about to happen when pressed.
 
 - Increased screenshot size by a few pixels so that its 128px. If you're 
   the dobule GUI scale this will perfectly line up with mip 0 of the texture
   improving screenshot clarity. On default scaling you'll get mip 1 without 
-  burring too.
+  the blurring from texture interpolation.
 
 - Improved the keybinder popup to not be shown again once it was shown once.
   This is part of the welcome screen which is enabled with bWelcomeWindow=True
@@ -107,12 +115,12 @@
   separately. For caching the ServerCodeName is used. So if you're running 
   multiple servers and they have different lists, make sure there is a unique
   value for each server. But if all your servers have the same identical map 
-  lists, if you use the same ServerCodeName then the client will share the 
+  lists then use the same ServerCodeName so that the client will share the 
   cache between these servers. This value is empty by default and a random
   key is generated on the first time mapvote is launched.
 
 - Added keyboard navigation between the list game/rule/map list boxes. By
-  pressint he left and right arrows you can focus on the next/previous panel.
+  pressing the left and right arrows you can focus on the next/previous panel.
 
 - The mapvote GUI will save the last selected mode and map when closed and
   will try to restore the selection when reopening. This feature can be used 
@@ -121,8 +129,8 @@
 
 - Mapvote will auto generate a working default configuration when the config
   file MVE_Config.ini is missing. This is so that mapvote still wakes up in a 
-  functional state when not all files were installed. This code should only 
-  trigger if all gametypes are emtpy.
+  functional state when MVE_Config.ini is lost. This code should only trigger 
+  if all gametypes are emtpy.
 
 - Improved performance of the map overrides feature
 
@@ -130,23 +138,24 @@
   no extra load generated by it.
 
 - Changed `bOverrideServerPackages` to be disable by default. This is a great
-  feature but unfortunately it interferes of the expectations of server admins
-  when they first set up mapvote. Server admins are know how to set up server
-  packages trough UnrealTournament.ini and it's a disruptive change if mapvote
-  now suddenly controls them. For simple server setups with not a lot of 
-  packages it's also simpler that way to skip this feature.
+  feature but unfortunately it interferes with the expectations of server 
+  admins when they first set up mapvote. Server admins are know how to set up 
+  server packages trough UnrealTournament.ini and it's a disruptive change if 
+  mapvote now suddenly controls them. For simple server setups with not a lot 
+  of packages it's also simpler that way to skip this feature.
 
-- Improved response messages to user commands. For example if someones who is
+- Improved feedback messages to user commands. For example if someones who is
   not logged in as admin if they try to reload the map list they now get a 
   message that tells them they need to log in first.
 
 - When `bOverrideServerPackages` is enabled MVE2i specific packages will be
-  downloaded before others. This is because these need to be downloaded 
-  any regardless of which map/mode is played so it's not a wasted downlaod
-  if the map switches while the player is connecting.
+  downloaded before others. This better because these need to be downloaded
+  regardless of which map/mode is played so it's not a wasted download if the 
+  map switches while the player is connecting.
 
-- Moved some of the mapvote features to initialized with a delay to improve
+- Moved some of the mapvote features to be initialized with a delay to improve
   server load during match startup.
+
 
 ## Bugfixes
 
@@ -157,7 +166,7 @@
 
 - Fixed mapvote initialization in server actor mode. Now mapvote in server
   actor mode is compatible with all mutators and server actors and mapvote
-  can be safely used both as server actor or mutator. You can just ad mapvote
+  can be safely used both as server actor or mutator. You can just add mapvote
   as a server actor and vote from any gametype. If you needed this feature 
   before, please update to MVE2i as it will be much more stable, fix mutator 
   initialization and report any initialization error in the server log file.

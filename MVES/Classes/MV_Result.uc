@@ -1,5 +1,7 @@
 class MV_Result expands MV_Util;
 
+var MV_Aliases Aliases;
+
 var string OriginalSong;
 var string Map;
 var string Song;
@@ -43,19 +45,22 @@ var bool LevelSummaryCached;
 
 var bool bQuiet;
 
-static function MV_Result Create(optional string map, optional int gameIdx)
+static function MV_Result Create(optional string map, optional int gameIdx, optional MV_Aliases aliases)
 {
 	local MV_Result object;
 	object = new class'MV_Result';
 	object.Map = map;
 	object.GameIndex = gameIdx;
 	object.bQuiet = False;
+	object.Aliases = aliases;
 	return object;
 }
 
 function AddPackages(string packageNameList)
 {
 	local string packageName;
+
+	packageNameList = Aliases.Resolve(packageNameList);
 
 	// unwrap decorations
 	if ( InStr(packageNameList, "(") == 0 ) 
@@ -128,6 +133,7 @@ function bool AddMutators(string list)
 	local string mutator;
 	local bool success;
 	success = True;
+	list = Aliases.Resolve(list);
 	
 	while ( class'MV_Parser'.static.TrySplit(list, ",", mutator, list) )
 		if ( !AddMutator(mutator) ) 
@@ -161,6 +167,7 @@ function bool RemoveMutators(string list)
 	local string mutator;
 	local bool success;
 	success = True;
+	list = Aliases.Resolve(list);
 	
 	while ( class'MV_Parser'.static.TrySplit(list, ",", mutator, list) )
 		if ( !RemoveMutator(mutator) ) 
@@ -197,6 +204,7 @@ function bool AddActors(string list)
 	local string actor;
 	local bool success;
 	success = True;
+	list = Aliases.Resolve(list);
 	
 	while ( class'MV_Parser'.static.TrySplit(list, ",", actor, list) )
 		if ( !AddActor(actor) ) 
@@ -230,6 +238,7 @@ function bool RemoveActors(string list)
 	local string actorstr;
 	local bool success;
 	success = True;
+	list = Aliases.Resolve(list);
 	
 	while ( class'MV_Parser'.static.TrySplit(list, ",", actorstr, list) )
 		if ( !RemoveActor(actorstr) ) 
@@ -268,6 +277,7 @@ function bool AddGameSettings(string settingsList)
 	local string value;
 	local bool success;
 	success = True;
+	settingsList = Aliases.Resolve(settingsList);
 	
 	while ( class'MV_Parser'.static.TrySplit(settingsList, ",", keyvalue, settingsList) )
 	{
@@ -294,6 +304,7 @@ function bool AddUrlParameters(string params)
 	local int i;
 	local bool success;
 	success = False;
+	params = Aliases.Resolve(params);
 
 	while ( class'MV_Parser'.static.TrySplit(params, "?", param, params) )
 	{
@@ -386,7 +397,7 @@ function SetRuleName(string s)
 function SetGameClass(string s)
 {
 	if ( s == "" ) return;
-	GameClass = s;
+	GameClass = Aliases.Resolve(s);
 }
 
 function SetFilterCode(string s)
