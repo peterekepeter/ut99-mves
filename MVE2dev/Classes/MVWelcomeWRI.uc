@@ -45,17 +45,13 @@ simulated function Timer ()
 	local string RequiredAcceptSignature;
 	local bool bRequireAccept;
 
-	Log("Welcome WRI timer!");
-
 	if ( ServerCode == "" ) 
 	{
-		Log("Server code empty, awaiting replication...");
 		return;
 	}
 
 	if ( RequireAccept == "" )
 	{
-		Log("RequireAccept empty, awaiting replication...");
 		return;
 	}
 
@@ -91,8 +87,6 @@ simulated function Timer ()
 		class'MapVoteNavBar'.Default.bWelcomeKeybinderCheck = True;
 	}
 
-	Log("seen "$MVC.InfoSeenSignature == RequiredInfoSignature$" accepted "$MVC.InfoAcceptSignature == RequiredAcceptSignature$" need accept "$bRequireAccept);
-	
 	if ( MVC.InfoSeenSignature != RequiredInfoSignature 
 		|| bRequireAccept && MVC.InfoAcceptSignature != RequiredAcceptSignature )
 	{

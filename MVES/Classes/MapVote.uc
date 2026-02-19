@@ -1901,13 +1901,7 @@ function string GetEngineIniServerPackages()
 
 function string ParseAliases(string input) 
 {
-	local string output;
-	output = AliasesLogic.Resolve(input);
-	if ( input != output )
-	{
-		Log("ParseAliases: "$input$" --> "$output);
-	}
-	return output;
+	return AliasesLogic.Resolve(input);
 }
 
 function ProcessMapOverrides(MV_Result map)

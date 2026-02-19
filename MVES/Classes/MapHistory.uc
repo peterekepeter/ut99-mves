@@ -102,7 +102,6 @@ function bool IsExcluded( string map, int MapCostMaxAllow )
 			cost += Elements[i].Acc;
 		}
 	}
-	Log("Sum is "$cost);
 	return cost > MapCostMaxAllow; // not found
 }
 
