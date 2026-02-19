@@ -51,6 +51,10 @@ function TestMain()
 	Alias("<b> <c>");
 	Alias("<c> <a>");
 	AssertConfigError("Circular alias chain '<a>' -> '<b>' -> '<c>' not allowed...", "error as expected");
+
+	Describe("Without equals for game settings");
+	Alias("<lgsniperset> TimeLimit=11");
+	AssertResolves("<lgsniperset>", "TimeLimit=11", "correctly parsed game settings");
 }
 
 function Alias(string input) 

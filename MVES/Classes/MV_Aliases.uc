@@ -18,15 +18,16 @@ function AddAliasLine(string configLine)
 	local int pos;
 	local string key, value;
 
-	pos = InStr(configLine, "=");
+	pos = InStr(configLine, " ");
 	if ( pos == -1 ) 
 	{
-		pos = InStr(configLine, " ");
+		pos = InStr(configLine, "=");
 	}
+	value = Mid(configLine, pos + 1);
 
 	key = Left(configLine, pos);
 	AliasKey[AliasCount] = key;
-	AliasValue[AliasCount] = Mid(configLine, pos + 1);
+	AliasValue[AliasCount] = value;
 	AliasKeyLen[AliasCount] = Len(key);
 	bNeedsPrefixDetection = True;
 	
