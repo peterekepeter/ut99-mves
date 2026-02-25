@@ -122,6 +122,13 @@ III. Troubleshooting
     Restore this configuration from a stock install of UT99 if needed to.
 
 
+4. Map vote is crash looping trying to switch to map
+
+    A. The most likely cause that triggers this is a missing map or missing 
+    packages. Please investigate the server log for problems. Delete the 
+    `MVE_Travel.ini` to reset mapvote's state.
+
+
 IV. Additional Support
 ======================
 

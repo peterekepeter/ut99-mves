@@ -1,4 +1,4 @@
-# `MVE2i` **TODO** February 2026
+# `MVE2i` 25 February 2026
 
 This release contains 2 years of upgrades and improvements. The main focus has
 been improving compatibility, fixing bugs and some new features for admins and

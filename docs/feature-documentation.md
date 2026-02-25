@@ -39,6 +39,19 @@ gain a bit of understanding, you'll be able to make larger changes with
 confidence, but until then make the smallest changes and see what it does. 
 
 
+## Travel State
+
+MapVote holds between map switches in a special file called `MVE_Travel.ini`
+If mapvote crashes or if the current map is deleted it's possible for this 
+file to contain instructions to switch to a map or load a gametype for which
+the packages no longer exist. This can cause a crashloop where mapvote will 
+keep trying to switch to the map that does not exist.
+
+To reset the travel state simply vote for a mode and map and which works. If 
+it's not possible to bring up mapvote anymore then an admin needs to delete 
+the `MVE_Travel.ini` file and restart the server to start from a clean state.
+
+
 ## Map Lists (aka FilterCode)
 
 Every gametype you configure requires a list of maps. The list of maps to be 
@@ -260,11 +273,11 @@ The following configuration properties support aliases:
 - MainServerPackages
 - CustomGame[n].ExcludeMutators
 - DefaultSettings
-- CustomGame[i].Settings
+- CustomGame[n].Settings
 - DefaultUrlParameters
-- CustomGame[i].UrlParameters
-- CustomGame[i].GameClass
-- Aliases[i]
+- CustomGame[n].UrlParameters
+- CustomGame[n].GameClass
+- Aliases[n]
 
 The aliases are recursively resolved. This is a fancy way of saying that an 
 alias can be used inside another alias. In practice what this means is that 
